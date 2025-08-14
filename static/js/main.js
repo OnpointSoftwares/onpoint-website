@@ -1,189 +1,11 @@
 // Chat Widget with Bootstrap Modal
-const chatWidget = {
-  init() {
-    this.elements = {
-      chatModal: new bootstrap.Modal(document.getElementById('chatModal')),
-      chatToggle: document.getElementById('chatToggle'),
-      chatMessages: document.getElementById('chatMessages'),
-      userInput: document.getElementById('userInput'),
-      sendButton: document.getElementById('sendButton'),
-      typingIndicator: document.getElementById('typingIndicator')
-    };
-    
-    // Initialize modal events
-    this.initModalEvents();
-    
-    // Initialize chat toggle button
-    if (this.elements.chatToggle) {
-      this.elements.chatToggle.addEventListener('click', () => {
-        this.elements.chatModal.show();
-        // Focus input after modal is shown
-        setTimeout(() => this.elements.userInput?.focus(), 500);
-      });
-    }
-    
-    // Send message on button click or Enter key
-    if (this.elements.sendButton) {
-      this.elements.sendButton.addEventListener('click', () => this.handleSendMessage());
-    }
-    
-    if (this.elements.userInput) {
-      this.elements.userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.handleSendMessage();
-      });
-      
-      // Auto-resize textarea
-      this.elements.userInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-      });
-    }
-  },
+const chatWidget = (function() {
+  // Private variables
+  let isInitialized = false;
+  let elements = {};
   
-  initModalEvents() {
-    // Focus input when modal is shown
-    const modal = document.getElementById('chatModal');
-    if (modal) {
-      modal.addEventListener('shown.bs.modal', () => {
-        this.elements.userInput?.focus();
-      });
-    }
-  },
-  
-  async handleSendMessage() {
-    if (!this.elements.userInput) return;
-    
-    const userMessage = this.elements.userInput.value.trim();
-    if (!userMessage) return;
-    
-    // Add user message to chat
-    this.addUserMessage(userMessage);
-    this.elements.userInput.value = '';
-    this.elements.userInput.style.height = 'auto'; // Reset textarea height
-    
-    // Show typing indicator
-    this.showTypingIndicator();
-    
-    try {
-      // Get CSRF token from cookie
-      const csrftoken = this.getCookie('csrftoken');
-      
-      // Send message to server as JSON
-      const response = await fetch('/chat/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify({ message: userMessage }),
-        credentials: 'same-origin' // Include cookies in the request
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.response) {
-        // Simulate typing delay
-        setTimeout(() => {
-          this.hideTypingIndicator();
-          this.addBotMessage(data.response);
-        }, 800);
-      } else {
-        throw new Error('No response from server');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      this.hideTypingIndicator();
-      this.addBotMessage("I'm sorry, I'm having trouble connecting to the server. Please try again later or contact us directly at onpointinfo635@gmail.com");
-    }
-  },
-  
-  addUserMessage(message) {
-    if (!this.elements.chatMessages) return;
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message user-message mb-3';
-    
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    messageDiv.innerHTML = `
-      <div class="message-avatar">
-        <i class="bi bi-person"></i>
-      </div>
-      <div class="message-content">
-        <p class="mb-1">${this.escapeHtml(message)}</p>
-        <small class="message-time text-muted">${time}</small>
-      </div>
-    `;
-    
-    this.elements.chatMessages.appendChild(messageDiv);
-    this.scrollToBottom();
-  },
-  
-  addBotMessage(message) {
-    if (!this.elements.chatMessages) return;
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message bot-message mb-3';
-    
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    messageDiv.innerHTML = `
-      <div class="message-avatar">
-        <i class="bi bi-robot"></i>
-      </div>
-      <div class="message-content">
-        <p class="mb-1">${this.formatMessage(message)}</p>
-        <small class="message-time text-muted">${time}</small>
-      </div>
-    `;
-    
-    this.elements.chatMessages.appendChild(messageDiv);
-    this.scrollToBottom();
-  },
-  
-  formatMessage(message) {
-    // Convert markdown to HTML
-    return this.escapeHtml(message)
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\n/g, '<br>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-primary">$1</a>');
-  },
-  
-  escapeHtml(unsafe) {
-    return unsafe
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  },
-  
-  showTypingIndicator() {
-    if (this.elements.typingIndicator) {
-      this.elements.typingIndicator.style.display = 'block';
-      this.scrollToBottom();
-    }
-  },
-  
-  hideTypingIndicator() {
-    if (this.elements.typingIndicator) {
-      this.elements.typingIndicator.style.display = 'none';
-    }
-  },
-  
-  scrollToBottom() {
-    if (this.elements.chatMessages) {
-      this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
-    }
-  },
-  
-  getCookie(name) {
+  // Private methods
+  function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
       const cookies = document.cookie.split(';');
@@ -197,50 +19,309 @@ const chatWidget = {
     }
     return cookieValue;
   }
-};
-
-// Wait for everything to be fully loaded
-window.addEventListener('load', function() {
-  console.log('Window fully loaded');
   
-  // Initialize chat widget with retry logic
-  function initChatWidget(retryCount = 0) {
-    const maxRetries = 3;
+  function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+  
+  function formatMessage(message) {
+    // Simple URL to link conversion
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return escapeHtml(message)
+      .replace(urlRegex, url => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+      })
+      .replace(/\n/g, '<br>');
+  }
+  
+  function scrollToBottom() {
+    if (elements.chatMessages) {
+      elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+    }
+  }
+  
+  function showTypingIndicator() {
+    if (elements.typingIndicator) {
+      elements.typingIndicator.style.display = 'block';
+      scrollToBottom();
+    }
+  }
+  
+  function hideTypingIndicator() {
+    if (elements.typingIndicator) {
+      elements.typingIndicator.style.display = 'none';
+    }
+  }
+  
+  function addUserMessage(message) {
+    if (!elements.chatMessages) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message user-message mb-3';
+    messageDiv.innerHTML = `
+      <div class="message-content">
+        <p>${escapeHtml(message)}</p>
+        <small class="message-time">Just now</small>
+      </div>
+      <div class="message-avatar">
+        <i class="bi bi-person"></i>
+      </div>
+    `;
+    
+    elements.chatMessages.appendChild(messageDiv);
+    scrollToBottom();
+  }
+  
+  function addBotMessage(message) {
+    if (!elements.chatMessages) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message bot-message mb-3';
+    messageDiv.innerHTML = `
+      <div class="message-avatar">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="message-content">
+        <p>${formatMessage(message)}</p>
+        <small class="message-time">Just now</small>
+      </div>
+    `;
+    
+    elements.chatMessages.appendChild(messageDiv);
+    scrollToBottom();
+  }
+  
+  async function handleSendMessage() {
+    if (!elements.userInput) {
+      console.error('User input element not found');
+      return;
+    }
+    
+    const userMessage = elements.userInput.value.trim();
+    if (!userMessage) return;
     
     try {
-      console.log('Initializing chat widget, attempt', retryCount + 1);
+      // Add user message to chat
+      addUserMessage(userMessage);
+      elements.userInput.value = '';
+      elements.userInput.style.height = 'auto'; // Reset textarea height
       
-      // Check if all required elements exist
-      const requiredElements = [
-        'chatModal', 'chatToggle', 'chatMessages', 
-        'userInput', 'sendButton', 'typingIndicator'
-      ];
+      // Show typing indicator
+      showTypingIndicator();
       
-      const missingElements = requiredElements.filter(id => !document.getElementById(id));
-      
-      if (missingElements.length > 0) {
-        console.warn('Missing required elements:', missingElements);
-        if (retryCount < maxRetries) {
-          console.log(`Retrying in 500ms... (${retryCount + 1}/${maxRetries})`);
-          setTimeout(() => initChatWidget(retryCount + 1), 500);
-        } else {
-          console.error('Max retries reached. Chat widget initialization failed.');
+          // Get CSRF token from cookie or meta tag
+      function getCSRFToken() {
+        // First try to get from meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+          return metaTag.getAttribute('content');
         }
+        
+        // Then try to get from cookie
+        const cookieMatch = document.cookie.match(/csrftoken=([^;]+)/);
+        if (cookieMatch) {
+          return cookieMatch[1];
+        }
+        
+        return null;
+      }
+      
+      const csrftoken = getCSRFToken();
+      
+      if (!csrftoken) {
+        console.error('CSRF token not found');
+        hideTypingIndicator();
+        addBotMessage("We're having trouble connecting to the server. Please refresh the page and try again.");
         return;
       }
       
-      // Initialize if chatWidget is defined
+      console.log('Sending message to server...');
+      
+      try {
+        // Send message to server as JSON
+        const response = await fetch('/chat/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ message: userMessage }),
+          credentials: 'same-origin' // Include cookies in the request
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Server error:', errorText);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.response) {
+          // Simulate typing delay
+          setTimeout(() => {
+            hideTypingIndicator();
+            addBotMessage(data.response);
+          }, 800);
+        } else {
+          throw new Error('No response from server');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        hideTypingIndicator();
+        addBotMessage("Sorry, I'm having trouble connecting to the chat service. Please try again later or contact us directly at onpointinfo635@gmail.com");
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      hideTypingIndicator();
+      addBotMessage("I'm having trouble connecting to the server. Please try again later or contact us at onpointinfo635@gmail.com");
+    }
+  }
+  
+  // Public API
+  return {
+    init: function() {
+      if (isInitialized) return;
+      
+      console.log('Initializing chat widget...');
+      
+      try {
+        // Initialize elements
+        elements = {
+          chatModal: new bootstrap.Modal(document.getElementById('chatModal')),
+          chatToggle: document.getElementById('chatToggle'),
+          chatMessages: document.getElementById('chatMessages'),
+          userInput: document.getElementById('userInput'),
+          sendButton: document.getElementById('sendButton'),
+          typingIndicator: document.getElementById('typingIndicator')
+        };
+        
+        // Verify all required elements exist
+        if (!elements.chatModal || !elements.chatToggle || !elements.chatMessages || 
+            !elements.userInput || !elements.sendButton || !elements.typingIndicator) {
+          console.error('Missing required chat widget elements');
+          return;
+        }
+        
+        // Initialize modal events
+        elements.chatToggle.addEventListener('click', () => {
+          elements.chatModal.show();
+          // Focus input after modal is shown
+          setTimeout(() => elements.userInput?.focus(), 500);
+        });
+        
+        // Send message on button click or Enter key
+        elements.sendButton.addEventListener('click', handleSendMessage);
+        
+        elements.userInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') handleSendMessage();
+        });
+        
+        // Auto-resize textarea
+        elements.userInput.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        // Focus input when modal is shown
+        const modal = document.getElementById('chatModal');
+        if (modal) {
+          modal.addEventListener('shown.bs.modal', () => {
+            elements.userInput?.focus();
+          });
+        }
+        
+        isInitialized = true;
+        console.log('Chat widget initialized successfully');
+      } catch (error) {
+        console.error('Error initializing chat widget:', error);
+      }
+    },
+    
+    // Public method to manually send a message (useful for testing)
+    sendMessage: function(message) {
+      if (elements.userInput) {
+        elements.userInput.value = message;
+        handleSendMessage();
+      }
+    }
+  };
+})();
+
+// Initialize when window loads
+window.addEventListener('load', function() {
+  console.log('Window fully loaded - initializing chat widget');
+  
+  // Check for required elements
+  function checkElements() {
+    const requiredElements = [
+      'chatModal', 'chatToggle', 'chatMessages', 
+      'userInput', 'sendButton', 'typingIndicator'
+    ];
+    
+    const elements = {};
+    const missing = [];
+    
+    requiredElements.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        elements[id] = el;
+      } else {
+        missing.push(id);
+      }
+    });
+    
+    return { elements, missing };
+  }
+  
+  // Initialize chat widget with retry logic
+  function initChatWidget(retryCount = 0) {
+    const maxRetries = 5;
+    const retryDelay = 300; // ms
+    
+    try {
+      console.log(`Initializing chat widget, attempt ${retryCount + 1}...`);
+      
+      // Check for required elements
+      const { elements, missing } = checkElements();
+      
+      if (missing.length > 0) {
+        console.warn('Missing required elements:', missing);
+        if (retryCount < maxRetries) {
+          console.log(`Retrying in ${retryDelay}ms... (${retryCount + 1}/${maxRetries})`);
+          return setTimeout(() => initChatWidget(retryCount + 1), retryDelay);
+        }
+        console.error('Max retries reached. Chat widget initialization failed.');
+        return;
+      }
+      
+      // Initialize chat widget if available
       if (typeof chatWidget !== 'undefined') {
+        console.log('All elements found, initializing chat widget...');
         chatWidget.init();
         console.log('Chat widget initialized successfully');
       } else {
         console.error('chatWidget is not defined');
+        if (retryCount < maxRetries) {
+          console.log(`Retrying in ${retryDelay}ms... (${retryCount + 1}/${maxRetries})`);
+          setTimeout(() => initChatWidget(retryCount + 1), retryDelay);
+        }
       }
     } catch (error) {
       console.error('Error initializing chat widget:', error);
       if (retryCount < maxRetries) {
-        console.log(`Retrying after error in 500ms... (${retryCount + 1}/${maxRetries})`);
-        setTimeout(() => initChatWidget(retryCount + 1), 500);
+        console.log(`Retrying after error in ${retryDelay}ms... (${retryCount + 1}/${maxRetries})`);
+        setTimeout(() => initChatWidget(retryCount + 1), retryDelay);
       }
     }
   }
@@ -249,10 +330,16 @@ window.addEventListener('load', function() {
   initChatWidget();
   
   // Also try to initialize when DOM is fully loaded
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded');
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded - initializing chat widget');
+      initChatWidget();
+    });
+  } else {
+    // DOMContentLoaded has already fired
+    console.log('DOM already loaded - initializing chat widget');
     initChatWidget();
-  });
+  }
   
   // Header sticky effect
   const header = document.getElementById('siteHeader');

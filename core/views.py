@@ -88,7 +88,10 @@ def home(request):
     projects = Project.objects.all()
     return render(request, 'core/home.html', {'projects': projects})
 
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 @require_http_methods(["POST"])
+@ensure_csrf_cookie
 def chat_api(request):
     if not request.body:
         return JsonResponse({'error': 'No data provided'}, status=400)
@@ -109,7 +112,8 @@ def chat_api(request):
         if not chat:
             return JsonResponse({
                 'response': 'Chat service is currently unavailable. Please contact us directly at onpointinfo635@gmail.com',
-                'error': 'Gemini not initialized'
+                'error': 'Gemini not initialized',
+                'status': 'error'
             }, status=503)
         
         # Get response from Gemini
@@ -117,7 +121,8 @@ def chat_api(request):
         
         return JsonResponse({
             'response': response.text,
-            'status': 'success'
+            'status': 'success',
+            'csrf_token': request.META.get('CSRF_COOKIE', '')
         })
         
     except json.JSONDecodeError:
