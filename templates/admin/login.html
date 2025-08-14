@@ -1,0 +1,88 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Login - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0 mt-5">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="h4 mb-3">Admin Login</h2>
+                        <p class="text-muted">Sign in to access the admin dashboard</p>
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Please enter a correct username and password. Note that both fields may be case-sensitive.
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'admin_login' %}" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <input type="hidden" name="next" value="{{ next }}">
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                <input type="text" name="username" id="id_username" 
+                                       class="form-control form-control-lg" 
+                                       placeholder="Enter your username" 
+                                       required 
+                                       autofocus>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="id_password" class="form-label">Password</label>
+                                <a href="#" class="small text-decoration-none">Forgot password?</a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+                                <input type="password" name="password" id="id_password" 
+                                       class="form-control form-control-lg" 
+                                       placeholder="Enter your password" 
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="small text-muted mb-0">
+                            &copy; {% now "Y" %} OnPoint Software Solutions. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+body {
+    background-color: #f8f9fa;
+}
+.card {
+    border-radius: 1rem;
+    border: none;
+}
+.input-group-text {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

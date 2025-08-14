@@ -4,16 +4,22 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import login, authenticate
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
+from django.db.models import Q, Count, Case, When, Value, IntegerField
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView, View, TemplateView
+)
+from django.urls import reverse_lazy
 import google.generativeai as genai
 import os
 import json
+from datetime import timedelta
 from .models import Contact, Project
 from .forms import ProjectForm, ProjectFilterForm
 
@@ -24,7 +30,7 @@ def get_gemini_chat():
             return None
             
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         chat = model.start_chat(history=[])
         
         CHAT_INSTRUCTIONS = """
@@ -172,3 +178,230 @@ def home(request):
         'team_members': 12,
     }
     return render(request, 'core/home.html', {'stats': stats})
+
+
+# Admin Views
+class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Mixin to ensure user is staff member"""
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def handle_no_permission(self):
+        if not self.request.user.is_authenticated:
+            return super().handle_no_permission()
+        return HttpResponseForbidden("You don't have permission to access this page.")
+
+
+class AdminDashboardView(StaffRequiredMixin, TemplateView):
+    """Admin dashboard view showing project statistics and recent activities"""
+    template_name = 'admin/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Project statistics
+        projects = Project.objects.all()
+        total_projects = projects.count()
+        active_projects = projects.filter(status__in=['in_progress', 'on_hold']).count()
+        completed_projects = projects.filter(status='completed').count()
+        
+        # Project status distribution
+        status_distribution = projects.values('status').annotate(
+            count=Count('id'),
+            percentage=Count('id') * 100 / total_projects if total_projects > 0 else 0
+        )
+        
+        # Recent projects
+        recent_projects = projects.order_by('-created_at')[:5]
+        
+        context.update({
+            'total_projects': total_projects,
+            'active_projects': active_projects,
+            'completed_projects': completed_projects,
+            'status_distribution': status_distribution,
+            'recent_projects': recent_projects,
+            'title': 'Dashboard',
+        })
+        
+        return context
+
+
+class ProjectListView(StaffRequiredMixin, ListView):
+    """List all projects with filtering and pagination"""
+    model = Project
+    template_name = 'admin/project_list.html'
+    context_object_name = 'projects'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        queryset = Project.objects.all().order_by('-created_at')
+        
+        # Apply filters
+        status = self.request.GET.get('status')
+        category = self.request.GET.get('category')
+        featured = self.request.GET.get('featured')
+        search = self.request.GET.get('search')
+        
+        if status:
+            queryset = queryset.filter(status=status)
+        if category:
+            queryset = queryset.filter(category=category)
+        if featured == 'on':
+            queryset = queryset.filter(featured=True)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) |
+                Q(description__icontains=search) |
+                Q(client__icontains=search) |
+                Q(technologies__icontains=search)
+            )
+            
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter_form'] = ProjectFilterForm(self.request.GET or None)
+        context['title'] = 'Projects'
+        return context
+
+
+class ProjectCreateView(StaffRequiredMixin, CreateView):
+    """Create a new project"""
+    model = Project
+    form_class = ProjectForm
+    template_name = 'admin/project_form.html'
+    success_url = reverse_lazy('project_list')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Add New Project'
+        return context
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        messages.success(self.request, 'Project created successfully!')
+        return super().form_valid(form)
+
+
+class ProjectDetailView(StaffRequiredMixin, DetailView):
+    """View project details"""
+    model = Project
+    template_name = 'admin/project_detail.html'
+    context_object_name = 'project'
+    slug_field = 'pk'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.object.title
+        return context
+
+
+class ProjectUpdateView(StaffRequiredMixin, UpdateView):
+    """Update an existing project"""
+    model = Project
+    form_class = ProjectForm
+    template_name = 'admin/project_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Edit {self.object.title}'
+        context['project'] = self.object
+        return context
+    
+    def get_success_url(self):
+        messages.success(self.request, 'Project updated successfully!')
+        return reverse_lazy('project_detail', kwargs={'pk': self.object.pk})
+    
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class ProjectDeleteView(StaffRequiredMixin, DeleteView):
+    """Delete a project"""
+    model = Project
+    template_name = 'admin/project_confirm_delete.html'
+    success_url = reverse_lazy('project_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Project deleted successfully!')
+        return super().delete(request, *args, **kwargs)
+
+
+class ProjectStatusUpdateView(StaffRequiredMixin, View):
+    """Update project status via AJAX"""
+    def post(self, request, *args, **kwargs):
+        if not request.is_ajax():
+            return JsonResponse({'error': 'Invalid request'}, status=400)
+            
+        project = get_object_or_404(Project, pk=kwargs['pk'])
+        new_status = request.POST.get('status')
+        
+        if new_status in dict(Project.STATUS_CHOICES).keys():
+            project.status = new_status
+            project.save()
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Status updated to {project.get_status_display()}',
+                'status_display': project.get_status_display(),
+                'status_class': project.status
+            })
+        
+        return JsonResponse({'error': 'Invalid status'}, status=400)
+
+
+# API Views
+class ProjectStatsAPIView(StaffRequiredMixin, View):
+    """API endpoint for project statistics"""
+    def get(self, request, *args, **kwargs):
+        # Get counts for different statuses
+        status_counts = Project.objects.aggregate(
+            total=Count('id'),
+            completed=Count(Case(When(status='completed', then=1), output_field=IntegerField())),
+            in_progress=Count(Case(When(status='in_progress', then=1), output_field=IntegerField())),
+            on_hold=Count(Case(When(status='on_hold', then=1), output_field=IntegerField())),
+            cancelled=Count(Case(When(status='cancelled', then=1), output_field=IntegerField())),
+        )
+        
+        # Get monthly project counts for the last 6 months
+        six_months_ago = timezone.now() - timedelta(days=180)
+        monthly_counts = Project.objects.filter(
+            created_at__gte=six_months_ago
+        ).extra({
+            'month': "date_trunc('month', created_at)"
+        }).values('month').annotate(count=Count('id')).order_by('month')
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'status_counts': status_counts,
+                'monthly_counts': list(monthly_counts)
+            }
+        })
+
+
+class RecentProjectsAPIView(StaffRequiredMixin, ListView):
+    """API endpoint for recent projects"""
+    model = Project
+    context_object_name = 'projects'
+    template_name = 'admin/includes/recent_projects.html'
+    
+    def get_queryset(self):
+        return Project.objects.order_by('-created_at')[:5]
+    
+    def render_to_response(self, context, **response_kwargs):
+        projects = []
+        for project in context['projects']:
+            projects.append({
+                'id': project.id,
+                'title': project.title,
+                'status': project.status,
+                'status_display': project.get_status_display(),
+                'created_at': project.created_at.strftime('%b %d, %Y'),
+                'url': reverse_lazy('project_detail', kwargs={'pk': project.pk})
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': projects
+        })

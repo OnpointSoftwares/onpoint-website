@@ -265,19 +265,21 @@
   <div class="container">
     <h2 class="section-title" data-aos="fade-up">Portfolio</h2>
     <div class="row g-4 mt-1">
-      {% for i in "123456" %}
+
       <div class="col-6 col-md-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}0">
         <div class="portfolio-card">
-          <div class="thumb"></div>
+          <div class="thumb">
+            <img src="{% static 'images/church/church_project_image1.png' %}" alt="Church Management System" class="img-fluid">
+          </div>
           <div class="overlay">
             <div>
-              <h6>Project {{ forloop.counter }}</h6>
-              <p class="small text-secondary mb-0">Brief description of a successful project.</p>
+              <h6>Church Management System</h6>
+              <p class="small text-secondary mb-0">Church Management System</p>
             </div>
           </div>
+          <a href="https://www.christekklesians.org" target="_blank" class="btn btn-gradient">View Project</a>
         </div>
       </div>
-      {% endfor %}
     </div>
   </div>
 </section>
@@ -294,7 +296,7 @@
             <div class="d-flex align-items-center gap-2">
               <div class="avatar"></div>
               <div>
-                <div class="fw-semibold">Jane Doe</div>
+                <div class="fw-semibold">Jane Kimani</div>
                 <div class="small text-secondary">Product Manager, FinTech Co.</div>
               </div>
             </div>
@@ -306,7 +308,7 @@
             <div class="d-flex align-items-center gap-2">
               <div class="avatar"></div>
               <div>
-                <div class="fw-semibold">John Smith</div>
+                <div class="fw-semibold">Jakes Kipkemoi</div>
                 <div class="small text-secondary">CTO, HealthTech</div>
               </div>
             </div>
@@ -318,7 +320,7 @@
             <div class="d-flex align-items-center gap-2">
               <div class="avatar"></div>
               <div>
-                <div class="fw-semibold">Mary Lee</div>
+                <div class="fw-semibold">Mary Kamau</div>
                 <div class="small text-secondary">Founder, EduStart</div>
               </div>
             </div>

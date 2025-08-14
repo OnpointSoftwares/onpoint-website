@@ -1,0 +1,75 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Delete Project - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="avatar-lg mx-auto mb-3">
+                        <div class="avatar-title bg-light text-danger rounded-circle" style="width: 80px; height: 80px; font-size: 2.5rem; line-height: 80px;">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <h4>Are you sure?</h4>
+                    <p class="text-muted mb-0">You are about to delete the project <strong>"{{ object.title }}"</strong>. This action cannot be undone.</p>
+                </div>
+                
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="mb-2">Project Details</h6>
+                        <div class="d-flex mb-2">
+                            <div class="flex-grow-1 text-muted">Client:</div>
+                            <div class="fw-medium">{{ object.client|default:"N/A" }}</div>
+                        </div>
+                        <div class="d-flex mb-2">
+                            <div class="flex-grow-1 text-muted">Status:</div>
+                            <div>
+                                <span class="badge bg-{{ object.status }}">
+                                    {{ object.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="flex-grow-1 text-muted">Created:</div>
+                            <div>{{ object.created_at|date:"M d, Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Yes, delete this project
+                        </button>
+                        <a href="{% url 'project_detail' object.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-1"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <a href="{% url 'project_list' %}" class="text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Projects
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-lg {
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

@@ -25,13 +25,13 @@
             </div>
 
             <ul class="list-unstyled components">
-                <li class="{% if 'dashboard' in request.path %}active{% endif %}">
-                    <a href="{% url 'admin:dashboard' %}" class="nav-link">
+                <li class="{% if 'admin/' == request.path or 'admin/dashboard' in request.path %}active{% endif %}">
+                    <a href="{% url 'admin_dashboard' %}" class="nav-link">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
-                <li class="{% if 'projects' in request.path %}active{% endif %}">
-                    <a href="{% url 'admin:project_list' %}" class="nav-link">
+                <li class="{% if 'admin/projects' in request.path %}active{% endif %}">
+                    <a href="{% url 'project_list' %}" class="nav-link">
                         <i class="bi bi-journal-text me-2"></i> Projects
                     </a>
                 </li>

@@ -223,9 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const priceCalculator = {
     basePrices: {
       website: 15000,     // KES - Basic website for startups
-      webapp: 75000,      // KES - Web application for startups
+      webapp: 40000,      // KES - Web application for startups
       mobile: 20000,     // KES - Mobile app development
-      ecommerce: 60000,  // KES - Basic e-commerce site
+      ecommerce: 50000,  // KES - Basic e-commerce site
       custom: 50000      // KES - Custom software solutions
     },
     
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pagePrice: 2000,   // KES per page after first 3 pages (startup friendly)
     
     featurePrices: {
-      seo: 15000,      // KES - Basic SEO package
+      seo: 5000,      // KES - Basic SEO package
       responsive: 5000, // KES - Included in most packages
       cms: 25000,      // KES - Content Management System
       ecommerce: 50000 // KES - E-commerce functionality
