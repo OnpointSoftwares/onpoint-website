@@ -1,0 +1,417 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ title }} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'admin:project_list' %}">Projects</a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {% if project %}{{ project.title }}{% else %}New Project{% endif %}
+                </li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">{{ title }}</h1>
+            {% if project %}
+            <a href="{% url 'admin:project_detail' project.slug %}" class="btn btn-outline-secondary">
+                <i class="bi bi-eye me-1"></i> View Project
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Basic Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_title" class="form-label">Project Title *</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.title.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_category" class="form-label">Category *</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.category.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_short_description" class="form-label">Short Description *</label>
+                                    {{ form.short_description }}
+                                    <small class="form-text text-muted">A brief description that appears in project listings (max 200 characters).</small>
+                                    {% if form.short_description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.short_description.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_description" class="form-label">Full Description *</label>
+                                    {{ form.description }}
+                                    <small class="form-text text-muted">Detailed description of the project.</small>
+                                    {% if form.description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.description.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_technologies" class="form-label">Technologies Used *</label>
+                                    {{ form.technologies }}
+                                    <small class="form-text text-muted">Comma-separated list of technologies (e.g., Django, React, PostgreSQL)</small>
+                                    {% if form.technologies.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.technologies.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Client Information -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Client Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_client" class="form-label">Client Name</label>
+                                    {{ form.client }}
+                                    {% if form.client.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.client.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_website" class="form-label">Client Website</label>
+                                    {{ form.website }}
+                                    {% if form.website.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.website.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Timeline -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Project Timeline</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_start_date" class="form-label">Start Date</label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.start_date.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_end_date" class="form-label">End Date</label>
+                                    {{ form.end_date }}
+                                    {% if form.end_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.end_date.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_status" class="form-label">Status *</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Media & Links -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Media & Links</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_image" class="form-label">Featured Image *</label>
+                                    {% if project and project.image %}
+                                        <div class="mb-2">
+                                            <img src="{{ project.image.url }}" alt="{{ project.title }}" 
+                                                 class="img-thumbnail" style="max-height: 150px;">
+                                        </div>
+                                    {% endif %}
+                                    {{ form.image }}
+                                    <small class="form-text text-muted">Recommended size: 1200x800px</small>
+                                    {% if form.image.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.image.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_github_url" class="form-label">GitHub Repository</label>
+                                    {{ form.github_url }}
+                                    {% if form.github_url.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.github_url.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_live_url" class="form-label">Live Demo URL</label>
+                                    {{ form.live_url }}
+                                    {% if form.live_url.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.live_url.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'admin:project_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Cancel
+                        </a>
+                        <div>
+                            <button type="submit" name="save_and_continue" class="btn btn-outline-primary me-2">
+                                <i class="bi bi-save me-1"></i> Save & Continue Editing
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i> Save Project
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Project Status</h6>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                    {{ form.featured }}
+                    <label class="form-check-label" for="id_featured">
+                        <strong>Featured Project</strong>
+                    </label>
+                    <div class="form-text">
+                        Featured projects are displayed prominently on the portfolio page.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Created</label>
+                    <div class="form-control-plaintext">
+                        {% if project %}
+                            {{ project.created_at|date:"M d, Y" }}
+                        {% else %}
+                            <em>New project</em>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-0">
+                    <label class="form-label">Last Updated</label>
+                    <div class="form-control-plaintext">
+                        {% if project %}
+                            {{ project.updated_at|timesince }} ago
+                        {% else %}
+                            <em>Not saved yet</em>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Card -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">Preview</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div id="imagePreview" class="bg-light p-3 mb-2" 
+                         style="height: 150px; display: flex; align-items: center; justify-content: center;">
+                        {% if project and project.thumbnail %}
+                            <img src="{{ project.thumbnail.url }}" alt="Preview" 
+                                 class="img-fluid" style="max-height: 140px;">
+                        {% else %}
+                            <div class="text-muted">No image selected</div>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">Thumbnail Preview</small>
+                </div>
+                
+                <h5 id="previewTitle" class="mb-1">
+                    {{ project.title|default:"Project Title" }}
+                </h5>
+                <p id="previewCategory" class="text-muted small mb-2">
+                    {{ project.get_category_display|default:"Category" }}
+                </p>
+                <p id="previewDescription" class="small">
+                    {{ project.short_description|default:"Short description will appear here..."|truncatechars:100 }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="previewDate" class="badge bg-light text-dark">
+                        {% if project %}
+                            {{ project.start_date|date:"M Y"|default:"Date" }}
+                        {% else %}
+                            {{ "now"|date:"M Y" }}
+                        {% endif %}
+                    </span>
+                    <span id="previewStatus" class="badge bg-{{ project.status|default:'primary' }}">
+                        {{ project.get_status_display|default:"Status" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update preview when fields change
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview
+    const imageInput = document.getElementById('id_image');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid" style="max-height: 140px;">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Title preview
+    const titleInput = document.getElementById('id_title');
+    const previewTitle = document.getElementById('previewTitle');
+    
+    if (titleInput && previewTitle) {
+        titleInput.addEventListener('input', function() {
+            previewTitle.textContent = this.value || 'Project Title';
+        });
+    }
+    
+    // Category preview
+    const categorySelect = document.getElementById('id_category');
+    const previewCategory = document.getElementById('previewCategory');
+    
+    if (categorySelect && previewCategory) {
+        categorySelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            previewCategory.textContent = selectedOption.text;
+        });
+    }
+    
+    // Description preview
+    const descriptionInput = document.getElementById('id_short_description');
+    const previewDescription = document.getElementById('previewDescription');
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || 'Short description will appear here...';
+        });
+    }
+    
+    // Status preview
+    const statusSelect = document.getElementById('id_status');
+    const previewStatus = document.getElementById('previewStatus');
+    
+    if (statusSelect && previewStatus) {
+        statusSelect.addEventListener('change', function() {
+            const status = this.value;
+            const statusText = this.options[this.selectedIndex].text;
+            
+            // Remove all status classes
+            previewStatus.className = 'badge';
+            
+            // Add appropriate class based on status
+            if (status === 'completed' || status === 'launched') {
+                previewStatus.classList.add('bg-success');
+            } else if (status === 'in_progress') {
+                previewStatus.classList.add('bg-primary');
+            } else if (status === 'on_hold') {
+                previewStatus.classList.add('bg-warning', 'text-dark');
+            } else {
+                previewStatus.classList.add('bg-secondary');
+            }
+            
+            previewStatus.textContent = statusText;
+        });
+    }
+    
+    // Date preview
+    const startDateInput = document.getElementById('id_start_date');
+    const previewDate = document.getElementById('previewDate');
+    
+    if (startDateInput && previewDate) {
+        startDateInput.addEventListener('change', function() {
+            if (this.value) {
+                const date = new Date(this.value);
+                const options = { year: 'numeric', month: 'short' };
+                previewDate.textContent = date.toLocaleDateString('en-US', options);
+            } else {
+                previewDate.textContent = '{{ "now"|date:"M Y" }}';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

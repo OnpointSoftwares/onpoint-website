@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ project.title }} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'admin:project_list' %}">Projects</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ project.title|truncatechars:30 }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Project Details</h1>
+            <div>
+                <a href="{% url 'admin:project_update' project.pk %}" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                </a>
+                <a href="{% url 'admin:project_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

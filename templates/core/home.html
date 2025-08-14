@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- Hero -->
+<section class="hero-section position-relative overflow-hidden" id="hero">
+  <div class="container py-5">
+    <div class="row align-items-center py-5">
+      <div class="col-lg-6" data-aos="fade-up">
+        <h1 class="display-4 fw-extrabold mb-3">Design. Build. Ship.</h1>
+        <p class="lead text-secondary mb-4">Innovating Your Digital Future — Custom Software, Websites, Mobile Apps, and Expert GitHub README craft.</p>
+        <div class="d-flex gap-3">
+          <a href="#contact" class="btn btn-gradient btn-lg">Get Started</a>
+          <a href="#services" class="btn btn-outline-light btn-lg">Our Services</a>
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left">
+        <div class="hero-graphic rounded-4">
+            <img src="{% static 'images/hero-image.jpg' %}" alt="Hero Graphic" class="img-fluid">
+        </div>
+      </div>
+    </div>
+
+    <div class="row text-center mt-4" data-aos="fade-up">
+      <div class="col-6 col-md-3">
+        <div class="stat">
+          <div class="h2 fw-bold" data-counter data-target="{{ stats.years_experience }}">0</div>
+          <div class="text-secondary small">Years Experience</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat">
+          <div class="h2 fw-bold" data-counter data-target="{{ stats.projects_delivered }}">0</div>
+          <div class="text-secondary small">Projects Delivered</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat">
+          <div class="h2 fw-bold" data-counter data-target="{{ stats.client_satisfaction }}">0</div>
+          <div class="text-secondary small">Client Satisfaction (%)</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat">
+          <div class="h2 fw-bold" data-counter data-target="{{ stats.team_members }}">0</div>
+          <div class="text-secondary small">Team Members</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-bg-gradient"></div>
+</section>
+<!-- About Us -->
+<section id="about" class="py-5 bg-black-50">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+          <div class="position-relative">
+            <div class="about-image rounded-4 overflow-hidden">
+              <img src="{% static 'images/about-us.jpg' %}" 
+                   alt="Our Team" class="img-fluid w-100">
+            </div>
+            <div class="experience-badge bg-primary text-white rounded-pill py-2 px-4 position-absolute bottom-0 start-0 m-4">
+              <span class="h4 mb-0">7+</span>
+              <div class="small">Years Experience</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
+          <h6 class="text-uppercase text-primary mb-3">About Us</h6>
+          <h2 class="mb-4 text-white">Innovating the Future of Technology Solutions</h2>
+          <p class="text-light mb-4">
+            At OnPoint Software Solutions, we're passionate about delivering cutting-edge technology solutions that drive business growth. 
+            Our team of experts combines creativity with technical excellence to build software that makes a difference.
+          </p>
+          <p class="text-light mb-4">
+            With over 7 years of industry experience, we've helped numerous businesses transform their digital presence and achieve their goals. 
+            Our approach combines innovative thinking with practical solutions to deliver exceptional results.
+          </p>
+          
+          <div class="row g-4 mb-4">
+            <div class="col-sm-6">
+              <div class="d-flex">
+                <div class="me-3">
+                  <div class="icon-wrap">
+                    <i class="bi bi-lightbulb"></i>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="h6 mb-2">Our Mission</h5>
+                  <p class="small text-light mb-0">To empower businesses through innovative and reliable technology solutions.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex">
+                <div class="me-3">
+                  <div class="icon-wrap">
+                    <i class="bi bi-eye"></i>
+                  </div>
+                </div>
+                <div>
+                  <h5 class="h6 mb-2">Our Vision</h5>
+                  <p class="small text-light mb-0">To be the most trusted technology partner for businesses worldwide.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="mt-4">
+            <a href="#contact" class="btn btn-gradient me-3">Get in Touch</a>
+            <a href="#" class="btn btn-outline-light">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Services -->
+<section id="services" class="py-5">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Our Services</h2>
+    <div class="row g-4 mt-1">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up">
+        <div class="card service-card h-100">
+          <div class="card-body">
+            <div class="icon-wrap mb-3"><i class="bi bi-cpu"></i></div>
+            <h5 class="card-title text-white">Custom Software Development</h5>
+            <p class="card-text text-secondary">Robust, scalable systems tailored to your business.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="50">
+        <div class="card service-card h-100">
+          <div class="card-body">
+            <div class="icon-wrap mb-3"><i class="bi bi-window"></i></div>
+            <h5 class="card-title text-white">Website Design & Development</h5>
+            <p class="card-text text-secondary">Beautiful, fast, and SEO-ready websites.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card service-card h-100">
+          <div class="card-body">
+            <div class="icon-wrap mb-3"><i class="bi bi-phone"></i></div>
+            <h5 class="card-title text-white">Mobile App Development</h5>
+            <p class="card-text text-secondary">iOS and Android apps using modern stacks.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+        <div class="card service-card h-100">
+          <div class="card-body">
+            <div class="icon-wrap mb-3"><i class="bi bi-journal-code"></i></div>
+            <h5 class="card-title text-white">GitHub README Writing & Editing</h5>
+            <p class="card-text text-secondary">Clear, polished documentation that stands out.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Price Calculator -->
+<section id="pricing" class="py-5 bg-black-50">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <h6 class="text-uppercase text-primary mb-3">Pricing</h6>
+      <h2 class="text-white mb-4">Estimate Your Project Cost</h2>
+      <p class="text-light mb-4">Use our calculator to get an instant quote for your project</p>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card glass p-4">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <label class="form-label text-light">Project Type</label>
+                <select class="form-select" id="projectType">
+                  <option value="website">Website Development</option>
+                  <option value="webapp">Web Application</option>
+                  <option value="mobile">Mobile App</option>
+                  <option value="ecommerce">E-commerce</option>
+                  <option value="custom">Custom Software</option>
+                </select>
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label text-light">Number of Pages</label>
+                <input type="range" class="form-range" min="1" max="50" value="5" id="pageCount">
+                <div class="d-flex justify-content-between">
+                  <span class="text-light small">1-5</span>
+                  <span class="text-light small">50+</span>
+                </div>
+                <div class="text-center mt-2">
+                  <span class="badge bg-primary"><span id="pageCountValue">5</span> Pages</span>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label class="form-label text-light">Design Complexity</label>
+                <select class="form-select" id="designComplexity">
+                  <option value="basic">Basic (Template-based)</option>
+                  <option value="standard" selected>Standard (Semi-custom)</option>
+                  <option value="premium">Premium (Fully Custom)</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-4">
+                <label class="form-label text-light">Features</label>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="" id="featureSeo">
+                  <label class="form-check-label text-light" for="featureSeo">
+                    SEO Optimization
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="" id="featureResponsive">
+                  <label class="form-check-label text-light" for="featureResponsive">
+                    Responsive Design
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="" id="featureCms">
+                  <label class="form-check-label text-light" for="featureCms">
+                    Content Management
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" value="" id="featureEcommerce">
+                  <label class="form-check-label text-light" for="featureEcommerce">
+                    E-commerce Functionality
+                  </label>
+                </div>
+              </div>
+              
+              <div class="p-4 bg-dark-soft rounded-3">
+                <h5 class="text-white mb-3">Estimated Cost</h5>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-light">Total:</span>
+                  <h3 class="text-gradient mb-0">
+                    <span id="totalCost">
+                      KES 12,750
+                      <small class="text-success d-block mt-1">
+                        <i class="bi bi-stars me-1"></i> 15% startup discount applied
+                      </small>
+                    </span>
+                  </h3>
+                </div>
+                <p class="small text-muted mb-0">This is an estimate. Contact us for a detailed quote.</p>
+              </div>
+              
+              <button class="btn btn-gradient w-100 mt-4" id="getQuoteBtn">Get Detailed Quote</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio -->
+<section id="portfolio" class="py-5 bg-black-50">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Portfolio</h2>
+    <div class="row g-4 mt-1">
+      {% for i in "123456" %}
+      <div class="col-6 col-md-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}0">
+        <div class="portfolio-card">
+          <div class="thumb"></div>
+          <div class="overlay">
+            <div>
+              <h6>Project {{ forloop.counter }}</h6>
+              <p class="small text-secondary mb-0">Brief description of a successful project.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="py-5">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">What Clients Say</h2>
+    <div class="swiper mt-3" data-aos="fade-up">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <p class="mb-3">“OnPoint delivered beyond expectations. The app is fast and beautifully designed.”</p>
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar"></div>
+              <div>
+                <div class="fw-semibold">Jane Doe</div>
+                <div class="small text-secondary">Product Manager, FinTech Co.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <p class="mb-3">“Great communication and superb code quality. Highly recommended.”</p>
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar"></div>
+              <div>
+                <div class="fw-semibold">John Smith</div>
+                <div class="small text-secondary">CTO, HealthTech</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <p class="mb-3">“Our website conversions increased by 40% after the redesign.”</p>
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar"></div>
+              <div>
+                <div class="fw-semibold">Mary Lee</div>
+                <div class="small text-secondary">Founder, EduStart</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Contact -->
+<section id="contact" class="py-5 bg-black-50">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Get In Touch</h2>
+    <div class="row g-4 mt-1">
+      <div class="col-lg-7" data-aos="fade-right">
+        <form method="post" class="card card-body glass">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Name</label>
+              <input name="name" class="form-control form-control-lg" placeholder="Your name" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Phone</label>
+              <input name="phone" class="form-control form-control-lg" placeholder="+254..." />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Message</label>
+              <textarea name="message" rows="5" class="form-control" placeholder="How can we help?" required></textarea>
+            </div>
+            <div class="col-12 d-grid">
+              <button class="btn btn-gradient btn-lg" type="submit">Send Message</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-5" data-aos="fade-left">
+        <div class="card card-body glass h-100">
+          <h5>Contact Info</h5>
+          <ul class="list-unstyled small mb-4">
+            <li><i class="bi bi-envelope me-2"></i><a href="mailto:onpointinfo635@gmail.com" class="text-light-50">onpointinfo635@gmail.com</a></li>
+            <li><i class="bi bi-telephone me-2"></i><a href="tel:+254702502952" class="text-light-50">+254 702502952</a></li>
+          </ul>
+          <p class="text-secondary small mb-0">We typically respond within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
