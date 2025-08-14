@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ service.title }} - OnPoint Software Solutions{% endblock %}
+
+{% block content %}
+<!-- Service Hero -->
+<section class="py-5 mt-5">
+  <div class="container py-4">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'services' %}">Services</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ service.title }}</li>
+          </ol>
+        </nav>
+        <h1 class="display-4 fw-bold mb-3">{{ service.title }}</h1>
+        <p class="lead">{{ service.subtitle }}</p>
+        <a href="{% url 'contact' %}?service={{ service.slug }}" class="btn btn-primary btn-lg mt-3">Get Started</a>
+      </div>
+      <div class="col-lg-6">
+        <img src="{% static service.image %}" alt="{{ service.title }}" class="img-fluid rounded-4">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Service Content -->
+<section class="py-5 bg-black-50">
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="pe-lg-4">
+          <h2 class="h3 mb-4">Overview</h2>
+          {{ service.overview|safe }}
+          
+          <h3 class="h4 mt-5 mb-4">Our Approach</h3>
+          {{ service.approach|safe }}
+          
+          <div class="mt-5">
+            <a href="{% url 'contact' %}?service={{ service.slug }}" class="btn btn-primary">Get a Free Consultation</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 bg-dark-gray p-4">
+          <h3 class="h5 mb-4">Service Details</h3>
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-clock text-primary"></i>
+                </div>
+                <div>
+                  <h4 class="h6 mb-0">Delivery Time</h4>
+                  <small class="text-muted">{{ service.delivery_time }}</small>
+                </div>
+              </div>
+            </li>
+            <li class="mb-3">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-currency-dollar text-primary"></i>
+                </div>
+                <div>
+                  <h4 class="h6 mb-0">Starting From</h4>
+                  <small class="text-muted">{{ service.starting_price }}</small>
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-list-check text-primary"></i>
+                </div>
+                <div>
+                  <h4 class="h6 mb-1">Technologies</h4>
+                  <div class="d-flex flex-wrap gap-2">
+                    {% for tech in service.technologies %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ tech }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="card border-0 bg-dark-gray p-4 mt-4">
+          <h3 class="h5 mb-4">Related Services</h3>
+          <div class="d-flex flex-column gap-3">
+            {% for related in related_services %}
+            <a href="{% url 'service_detail' related.slug %}" class="d-flex align-items-center text-decoration-none text-white-50 hover-text-white">
+              <div class="me-3">
+                <i class="bi bi-arrow-right"></i>
+              </div>
+              <div>
+                <h4 class="h6 mb-0">{{ related.title }}</h4>
+                <small class="text-muted">{{ related.subtitle }}</small>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-gradient-primary text-white">
+  <div class="container py-4">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <h2 class="h3 mb-2">Ready to get started with {{ service.title }}?</h2>
+        <p class="mb-0">Contact us today to discuss your project requirements.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="{% url 'contact' %}?service={{ service.slug }}" class="btn btn-light">Get a Free Quote</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

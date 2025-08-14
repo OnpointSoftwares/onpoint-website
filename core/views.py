@@ -94,9 +94,12 @@ def chat_api(request):
         return JsonResponse({'error': 'No data provided'}, status=400)
     
     try:
-        # Parse the JSON data from the request
-        data = json.loads(request.body)
-        user_message = data.get('message', '').strip()
+        # Get the message from the request
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            user_message = data.get('message', '').strip()
+        else:
+            user_message = request.POST.get('message', '').strip()
         
         if not user_message:
             return JsonResponse({'error': 'Empty message'}, status=400)
