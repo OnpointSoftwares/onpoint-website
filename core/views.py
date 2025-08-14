@@ -172,10 +172,10 @@ def home(request):
         return redirect('home')
 
     stats = {
-        'years_experience': 7,
-        'projects_delivered': 120,
+        'years_experience': 5,
+        'projects_delivered': 12,
         'client_satisfaction': 98,
-        'team_members': 12,
+        'team_members': 5,
     }
     return render(request, 'core/home.html', {'stats': stats})
 
