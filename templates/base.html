@@ -79,50 +79,58 @@
     </div>
   </footer>
 
+  <!-- Scripts -->
   <!-- Load jQuery first -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   
-  <!-- Then load Bootstrap (which depends on jQuery) -->
+  <!-- Then load other dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Other third-party scripts -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="https://unpkg.com/swiper@9/swiper-bundle.min.js"></script>
   
   <script>
     // Debug script loading
-    console.log('Base template: Scripts loading...');
-    console.log('jQuery version:', typeof jQuery !== 'undefined' ? jQuery.fn.jquery : 'jQuery not loaded');
-    console.log('Bootstrap version:', typeof bootstrap !== 'undefined' ? 'Loaded' : 'Bootstrap not loaded');
+    console.log('Base template scripts loading...');
+    console.log('jQuery version:', window.jQuery ? window.jQuery.fn.jquery : 'jQuery not loaded');
+    console.log('Bootstrap version:', window.bootstrap ? 'Loaded' : 'Not loaded');
     
-    // Check if DOM is already loaded
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      console.log('Document ready state:', document.readyState);
-    } else {
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOMContentLoaded event fired');
+    // Initialize AOS
+    document.addEventListener('DOMContentLoaded', function() {
+      AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true
       });
-    }
+    });
   </script>
   
   <!-- Load our main JavaScript file -->
   <script src="{% static 'js/main.js' %}"></script>
   
   <script>
-    // Debug chat widget initialization
-    console.log('Main script loaded, chatWidget:', typeof chatWidget !== 'undefined' ? 'Loaded' : 'Not found');
-    
-    // Manually trigger chat widget initialization if needed
-    if (typeof chatWidget !== 'undefined') {
-      console.log('Manually initializing chat widget...');
-      chatWidget.init();
+    // Wait for the document to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded and parsed');
       
-      // Try again after a short delay in case elements aren't ready yet
-      setTimeout(() => {
-        console.log('Delayed chat widget initialization attempt...');
-        chatWidget.init();
-      }, 1000);
-    }
+      // Debug chat widget initialization
+      console.log('Main script loaded, chatWidget:', window.chatWidget ? 'Loaded' : 'Not found');
+      
+      // Initialize chat widget if it exists
+      if (window.chatWidget && typeof window.chatWidget.init === 'function') {
+        console.log('Initializing chat widget...');
+        window.chatWidget.init();
+      } else {
+        console.error('Chat widget not found or init function missing');
+      }
+    });
+    
+    // Also try initialization when window is fully loaded
+    window.addEventListener('load', function() {
+      console.log('Window fully loaded');
+      if (window.chatWidget && typeof window.chatWidget.init === 'function') {
+        window.chatWidget.init();
+      }
+    });
   </script>
   
   <!-- Chat Toggle Button -->
