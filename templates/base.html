@@ -90,28 +90,6 @@
   <script src="{% static 'js/main.js' %}"></script>
   <script>
     console.log('Main script loaded, chatWidget:', typeof chatWidget !== 'undefined' ? 'Loaded' : 'Not found');
-    
-    // Manual initialization check
-    function checkChatWidget() {
-      console.log('Checking chat widget...');
-      if (typeof chatWidget !== 'undefined') {
-        console.log('chatWidget found, initializing...');
-        try {
-          chatWidget.init();
-          console.log('Chat widget initialized manually');
-        } catch (e) {
-          console.error('Error initializing chat widget manually:', e);
-        }
-      } else {
-        console.warn('chatWidget not found in global scope');
-      }
-    }
-    
-    // Try to initialize after a short delay
-    setTimeout(checkChatWidget, 1000);
-    
-    // Also try when window loads
-    window.addEventListener('load', checkChatWidget);
   </script>
   
   <!-- Chat Toggle Button -->
