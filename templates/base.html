@@ -79,9 +79,40 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script src="https://unpkg.com/swiper@9/swiper-bundle.min.js"></script>
+  <script>
+    console.log('Base template: Scripts loading...');
+    console.log('jQuery version:', typeof jQuery !== 'undefined' ? jQuery.fn.jquery : 'jQuery not loaded');
+    console.log('Bootstrap version:', typeof bootstrap !== 'undefined' ? 'Loaded' : 'Bootstrap not loaded');
+  </script>
   <script src="{% static 'js/main.js' %}"></script>
+  <script>
+    console.log('Main script loaded, chatWidget:', typeof chatWidget !== 'undefined' ? 'Loaded' : 'Not found');
+    
+    // Manual initialization check
+    function checkChatWidget() {
+      console.log('Checking chat widget...');
+      if (typeof chatWidget !== 'undefined') {
+        console.log('chatWidget found, initializing...');
+        try {
+          chatWidget.init();
+          console.log('Chat widget initialized manually');
+        } catch (e) {
+          console.error('Error initializing chat widget manually:', e);
+        }
+      } else {
+        console.warn('chatWidget not found in global scope');
+      }
+    }
+    
+    // Try to initialize after a short delay
+    setTimeout(checkChatWidget, 1000);
+    
+    // Also try when window loads
+    window.addEventListener('load', checkChatWidget);
+  </script>
   
   <!-- Chat Toggle Button -->
   <button type="button" class="btn btn-primary rounded-circle position-fixed" id="chatToggle" style="width: 60px; height: 60px; bottom: 30px; right: 30px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">

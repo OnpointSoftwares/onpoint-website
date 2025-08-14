@@ -644,6 +644,55 @@ body {
   color: var(--primary);
 }
 
+/* Chat Toggle Button */
+#chatToggle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+#chatToggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+/* Chat Modal */
+#chatModal .modal-dialog {
+  max-width: 400px;
+  margin: 0.5rem;
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  transform: translateY(0);
+}
+
+#chatModal .modal-content {
+  border-radius: 12px;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  height: 70vh;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+#chatMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: #121C36;
+}
+
 .message-time {
   display: block;
   font-size: 10px;

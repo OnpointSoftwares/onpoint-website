@@ -199,18 +199,60 @@ const chatWidget = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM fully loaded');
+// Wait for everything to be fully loaded
+window.addEventListener('load', function() {
+  console.log('Window fully loaded');
   
-  // Initialize chat widget
-  try {
-    if (typeof chatWidget !== 'undefined') {
-      chatWidget.init();
-      console.log('Chat widget initialized');
+  // Initialize chat widget with retry logic
+  function initChatWidget(retryCount = 0) {
+    const maxRetries = 3;
+    
+    try {
+      console.log('Initializing chat widget, attempt', retryCount + 1);
+      
+      // Check if all required elements exist
+      const requiredElements = [
+        'chatModal', 'chatToggle', 'chatMessages', 
+        'userInput', 'sendButton', 'typingIndicator'
+      ];
+      
+      const missingElements = requiredElements.filter(id => !document.getElementById(id));
+      
+      if (missingElements.length > 0) {
+        console.warn('Missing required elements:', missingElements);
+        if (retryCount < maxRetries) {
+          console.log(`Retrying in 500ms... (${retryCount + 1}/${maxRetries})`);
+          setTimeout(() => initChatWidget(retryCount + 1), 500);
+        } else {
+          console.error('Max retries reached. Chat widget initialization failed.');
+        }
+        return;
+      }
+      
+      // Initialize if chatWidget is defined
+      if (typeof chatWidget !== 'undefined') {
+        chatWidget.init();
+        console.log('Chat widget initialized successfully');
+      } else {
+        console.error('chatWidget is not defined');
+      }
+    } catch (error) {
+      console.error('Error initializing chat widget:', error);
+      if (retryCount < maxRetries) {
+        console.log(`Retrying after error in 500ms... (${retryCount + 1}/${maxRetries})`);
+        setTimeout(() => initChatWidget(retryCount + 1), 500);
+      }
     }
-  } catch (error) {
-    console.error('Error initializing chat widget:', error);
   }
+  
+  // Start initialization
+  initChatWidget();
+  
+  // Also try to initialize when DOM is fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    initChatWidget();
+  });
   
   // Header sticky effect
   const header = document.getElementById('siteHeader');
