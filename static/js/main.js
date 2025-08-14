@@ -65,15 +65,23 @@ const chatWidget = {
     this.showTypingIndicator();
     
     try {
-      // Send message to server
+      // Get CSRF token from cookie
+      const csrftoken = this.getCookie('csrftoken');
+      
+      // Send message to server as JSON
       const response = await fetch('/chat/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': this.getCookie('csrftoken')
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken
         },
-        body: `message=${encodeURIComponent(userMessage)}`
+        body: JSON.stringify({ message: userMessage }),
+        credentials: 'same-origin' // Include cookies in the request
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       
@@ -194,14 +202,12 @@ const chatWidget = {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM fully loaded');
   
-  // Debug: Log chat widget elements
-  console.log('Chat widget element:', document.querySelector('.chat-widget'));
-  console.log('Chat toggle button:', document.getElementById('chatToggle'));
-  
   // Initialize chat widget
   try {
-    chatWidget.init();
-    console.log('Chat widget initialized');
+    if (typeof chatWidget !== 'undefined') {
+      chatWidget.init();
+      console.log('Chat widget initialized');
+    }
   } catch (error) {
     console.error('Error initializing chat widget:', error);
   }

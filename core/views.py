@@ -29,7 +29,7 @@ def get_gemini_chat():
             print("GEMINI_API_KEY not found in settings")
             return None
             
-        genai.configure(api_key=settings.GEMINI_API_KEY)
+        genai.configure(api_key="AIzaSyD4IVtZuOp8k2wwN7O5Ao5-0FGS7CaU0dA")
         model = genai.GenerativeModel('gemini-1.5-flash')
         chat = model.start_chat(history=[])
         
@@ -94,12 +94,9 @@ def chat_api(request):
         return JsonResponse({'error': 'No data provided'}, status=400)
     
     try:
-        # Get the message from the request
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-            user_message = data.get('message', '').strip()
-        else:
-            user_message = request.POST.get('message', '').strip()
+        # Parse the JSON data from the request
+        data = json.loads(request.body)
+        user_message = data.get('message', '').strip()
         
         if not user_message:
             return JsonResponse({'error': 'Empty message'}, status=400)
