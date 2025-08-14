@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css"/>
   <link rel="stylesheet" href="https://unpkg.com/swiper@9/swiper-bundle.min.css"/>
   <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <script src="{% static 'js/main.js' %}"></script>
 </head>
 <body class="bg-dark text-light">
   <!-- Header -->
@@ -87,7 +88,7 @@
     console.log('jQuery version:', typeof jQuery !== 'undefined' ? jQuery.fn.jquery : 'jQuery not loaded');
     console.log('Bootstrap version:', typeof bootstrap !== 'undefined' ? 'Loaded' : 'Bootstrap not loaded');
   </script>
-  <script src="{% static 'js/main.js' %}"></script>
+  
   <script>
     console.log('Main script loaded, chatWidget:', typeof chatWidget !== 'undefined' ? 'Loaded' : 'Not found');
     
