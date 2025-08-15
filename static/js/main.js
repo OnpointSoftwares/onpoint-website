@@ -1,5 +1,5 @@
 // Chat Widget with Bootstrap Modal
-const chatWidget = (function() {
+(function() {
   // Private variables
   let isInitialized = false;
   let elements = {};
@@ -220,48 +220,29 @@ const chatWidget = (function() {
           setTimeout(() => elements.userInput?.focus(), 500);
         });
         
-        // Send message on button click or Enter key
-        elements.sendButton.addEventListener('click', handleSendMessage);
-        
-        elements.userInput.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') handleSendMessage();
-        });
-        
-        // Auto-resize textarea
-        elements.userInput.addEventListener('input', function() {
-          this.style.height = 'auto';
-          this.style.height = (this.scrollHeight) + 'px';
-        });
-        
-        // Focus input when modal is shown
-        const modal = document.getElementById('chatModal');
-        if (modal) {
-          modal.addEventListener('shown.bs.modal', () => {
-            elements.userInput?.focus();
-          });
-        }
-        
-        isInitialized = true;
-        console.log('Chat widget initialized successfully');
-      } catch (error) {
-        console.error('Error initializing chat widget:', error);
-      }
-    },
-    
-    // Public method to manually send a message (useful for testing)
-    sendMessage: function(message) {
-      if (elements.userInput) {
-        elements.userInput.value = message;
-        handleSendMessage();
-      }
     }
-  };
-})();
+
+    if (elements.userInput) {
+      elements.userInput.value = message;
+      handleSendMessage();
+    }
+  },
+  isInitialized: function() {
+    return isInitialized;
+  }
+};
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  // DOMContentLoaded has already fired
+  setTimeout(initialize, 0);
+}
 
 // Initialize when window loads
 window.addEventListener('load', function() {
   console.log('Window fully loaded - initializing chat widget');
-  
   // Check for required elements
   function checkElements() {
     const requiredElements = [

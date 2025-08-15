@@ -15,7 +15,12 @@ urlpatterns = [
         extra_context={'title': 'Login'}
     ), name='admin_login'),
     path('admin/logout/', auth_views.LogoutView.as_view(next_page='home'), name='admin_logout'),
-    
+    path('about/', views.about, name='about'),
+    path('mobile-development/', views.mobile_development, name='mobile_development'),
+    path('custom-software-development/', views.custom_software_development, name='custom_software_development'),
+    path('web-development/', views.web_development, name='web_development'),
+    path('github-readme/', views.github_readme, name='github_readme'),
+    path('contact-us/', views.contact_us, name='contact_us'),
     # Admin Dashboard URLs
     path('admin/', login_required(views.AdminDashboardView.as_view()), name='admin_dashboard'),
     

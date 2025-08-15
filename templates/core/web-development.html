@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="banner">
+    <img src="{% static 'images/webdev.png' %}" class="img-fluid" alt="Web Development" height="100" class="img-fluid">
+</section>
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">Web Development</h2>
+                <p class="section-subtitle">Building websites that connect you to your audience</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="website-categories">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">Website Categories</h2>
+                <p class="section-subtitle">Explore our website categories</p>
+            </div>
+            <div class="row">
+                <!-- E-commerce Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="E-commerce Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-cart3"></i>
+                            </div>
+                            <h5 class="card-title text-white">E-commerce Websites</h5>
+                            <p class="card-text text-secondary">Custom online stores with secure payment integration, inventory management, and seamless shopping experiences.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Business Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
+                            <h5 class="card-title text-white">Business Websites</h5>
+                            <p class="card-text text-secondary">Professional websites designed to showcase your business, services, and build credibility with potential clients.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Portfolio Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <h5 class="card-title text-white">Portfolio Websites</h5>
+                            <p class="card-text text-secondary">Elegant online portfolios to showcase your creative work, skills, and professional achievements.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Corporate Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Corporate Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-building"></i>
+                            </div>
+                            <h5 class="card-title text-white">Corporate Websites</h5>
+                            <p class="card-text text-secondary">Comprehensive digital presence for large organizations with multiple departments and services.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Educational Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Educational Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-book"></i>
+                            </div>
+                            <h5 class="card-title text-white">Educational Websites</h5>
+                            <p class="card-text text-secondary">Interactive learning platforms and institutional websites for schools and educational organizations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Healthcare Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Healthcare Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <h5 class="card-title text-white">Healthcare Websites</h5>
+                            <p class="card-text text-secondary">HIPAA-compliant websites for medical practices, clinics, and healthcare providers.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real Estate Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Real Estate Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-house-door"></i>
+                            </div>
+                            <h5 class="card-title text-white">Real Estate Websites</h5>
+                            <p class="card-text text-secondary">Property listing platforms and agency websites with IDX integration and virtual tours.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurant Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Restaurant Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-cup-hot"></i>
+                            </div>
+                            <h5 class="card-title text-white">Restaurant Websites</h5>
+                            <p class="card-text text-secondary">Mouth-watering websites with online ordering, reservations, and menu management.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travel & Tourism Websites -->
+                <div class="col-lg-4 mb-4">
+                    <div class="service-card h-100">
+                        <div class="banner">
+                            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="card-img-top" alt="Travel Website" style="height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="card-body">
+                            <div class="icon-wrap mb-3">
+                                <i class="bi bi-airplane"></i>
+                            </div>
+                            <h5 class="card-title text-white">Travel & Tourism</h5>
+                            <p class="card-text text-secondary">Inspire wanderlust with beautiful destination showcases, booking systems, and travel guides.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

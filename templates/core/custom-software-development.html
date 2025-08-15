@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="banner">
+    <img src="{% static 'images/customsoftware.png' %}" class="img-fluid" alt="Custom Software Development" height="100" class="img-fluid">
+</section>
+<section class="py-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">Custom Software Development</h2>
+                <p class="section-subtitle">Building software that connects you to your audience</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="categories">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">Categories</h2>
+                <p class="section-subtitle">Explore our categories</p>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Enterprise Software -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Enterprise Software" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-building-gear"></i>
+                        </div>
+                        <h5 class="card-title text-white">Enterprise Software</h5>
+                        <p class="card-text text-secondary">Custom solutions for large-scale business operations and workflow automation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRM Systems -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="CRM Systems" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h5 class="card-title text-white">CRM Systems</h5>
+                        <p class="card-text text-secondary">Tailored customer relationship management solutions for your business needs.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERP Solutions -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="ERP Solutions" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+                        <h5 class="card-title text-white">ERP Solutions</h5>
+                        <p class="card-text text-secondary">Integrated business process management software for resource planning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Analytics -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Business Analytics" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h5 class="card-title text-white">Business Analytics</h5>
+                        <p class="card-text text-secondary">Data analysis and visualization tools for informed decision-making.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Automation -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Workflow Automation" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h5 class="card-title text-white">Workflow Automation</h5>
+                        <p class="card-text text-secondary">Streamline business processes with custom automation solutions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supply Chain Management -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Supply Chain Management" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h5 class="card-title text-white">Supply Chain Management</h5>
+                        <p class="card-text text-secondary">End-to-end solutions for efficient supply chain operations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HR Management Systems -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="HR Management Systems" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h5 class="card-title text-white">HR Management Systems</h5>
+                        <p class="card-text text-secondary">Comprehensive human resource management solutions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Management -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Inventory Management" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h5 class="card-title text-white">Inventory Management</h5>
+                        <p class="card-text text-secondary">Custom solutions for tracking and managing inventory levels.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Management -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Document Management" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-files"></i>
+                        </div>
+                        <h5 class="card-title text-white">Document Management</h5>
+                        <p class="card-text text-secondary">Efficient document storage, retrieval, and collaboration tools.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

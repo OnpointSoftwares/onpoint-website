@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section id="mobile-development" class="py-5">
+    <div class="banner">
+        <img src="{% static 'images/mobileappdev.png' %}" class="img-fluid" alt="Mobile App Development" height="100" class="img-fluid">
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">Mobile App Development</h2>
+                <p class="section-subtitle">Building apps that connect you to your audience</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="app-categories py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2 class="section-title">App Categories</h2>
+                <p class="section-subtitle">Explore our app categories</p>
+            </div>
+            <!-- Health & Fitness Apps -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Health & Fitness Apps" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <h5 class="card-title text-white">Health & Fitness Apps</h5>
+                        <p class="card-text text-secondary">Track workouts, monitor health metrics, and achieve your fitness goals.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Educational Apps -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Educational Apps" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <h5 class="card-title text-white">Educational Apps</h5>
+                        <p class="card-text text-secondary">Interactive learning experiences for students of all ages.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-commerce Apps -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="E-commerce Apps" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-cart3"></i>
+                        </div>
+                        <h5 class="card-title text-white">E-commerce Apps</h5>
+                        <p class="card-text text-secondary">Mobile shopping experiences with secure payment gateways.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Apps -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Social Media Apps" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-share"></i>
+                        </div>
+                        <h5 class="card-title text-white">Social Media Apps</h5>
+                        <p class="card-text text-secondary">Connect and engage with your audience through social platforms.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business & Productivity -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Business & Productivity" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                        <h5 class="card-title text-white">Business & Productivity</h5>
+                        <p class="card-text text-secondary">Tools to enhance workplace efficiency and collaboration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Travel & Navigation -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Travel & Navigation" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h5 class="card-title text-white">Travel & Navigation</h5>
+                        <p class="card-text text-secondary">Explore the world with intuitive travel and mapping applications.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food & Delivery -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Food & Delivery" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-cup-hot"></i>
+                        </div>
+                        <h5 class="card-title text-white">Food & Delivery</h5>
+                        <p class="card-text text-secondary">Food ordering and delivery solutions for restaurants and customers.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entertainment & Media -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Entertainment & Media" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-controller"></i>
+                        </div>
+                        <h5 class="card-title text-white">Entertainment & Media</h5>
+                        <p class="card-text text-secondary">Streaming, gaming, and media consumption applications.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finance & Banking -->
+            <div class="col-lg-4 mb-4">
+                <div class="service-card h-100">
+                    <div class="banner">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="card-img-top" alt="Finance & Banking" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="icon-wrap mb-3">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <h5 class="card-title text-white">Finance & Banking</h5>
+                        <p class="card-text text-secondary">Secure mobile banking and financial management applications.</p>
+                    </div>
+                </div>
+            </div>           
+    </div>
+</section>
+{% endblock %}

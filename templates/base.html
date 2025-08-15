@@ -7,6 +7,7 @@
   <title>OnPoint Software Solutions</title>
   <meta name="description" content="Innovating Your Digital Future - Custom software, web, mobile, and technical content services."/>
   <meta name="csrf-token" content="{{ csrf_token }}"/>
+  <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -29,12 +30,13 @@
       </button>
       <nav class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-          <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
-          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <li class="nav-item ms-lg-3"><a class="btn btn-gradient btn-sm" href="#contact">Get Started</a></li>
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/#testimonials">Testimonials</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contact-us/">Contact</a></li>
+          <li class="nav-item ms-lg-3"><a class="btn btn-gradient btn-sm" href="/contact-us/">Get Started</a></li>
         </ul>
       </nav>
     </div>

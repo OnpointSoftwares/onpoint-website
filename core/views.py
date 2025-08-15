@@ -87,7 +87,18 @@ def home(request):
     
     projects = Project.objects.all()
     return render(request, 'core/home.html', {'projects': projects})
-
+def about(request):
+    return render(request, 'core/about-us.html')
+def mobile_development(request):
+    return render(request, 'core/mobile-development.html')
+def custom_software_development(request):
+    return render(request, 'core/custom-software-development.html')
+def web_development(request):
+    return render(request, 'core/web-development.html')
+def github_readme(request):
+    return render(request, 'core/github-readme.html')
+def contact_us(request):
+    return render(request, 'core/contact-us.html')
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 @require_http_methods(["POST"])

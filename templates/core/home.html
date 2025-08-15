@@ -9,7 +9,7 @@
         <h1 class="display-4 fw-extrabold mb-3">Design. Build. Ship.</h1>
         <p class="lead text-secondary mb-4">Innovating Your Digital Future — Custom Software, Websites, Mobile Apps, and Expert GitHub README craft.</p>
         <div class="d-flex gap-3">
-          <a href="#contact" class="btn btn-gradient btn-lg">Get Started</a>
+          <a href="/contact-us/" class="btn btn-gradient btn-lg">Get Started</a>
           <a href="#services" class="btn btn-outline-light btn-lg">Our Services</a>
         </div>
       </div>
@@ -67,15 +67,6 @@
         </div>
         <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
           <h6 class="text-uppercase text-primary mb-3">About Us</h6>
-          <h2 class="mb-4 text-white">Innovating the Future of Technology Solutions</h2>
-          <p class="text-light mb-4">
-            At OnPoint Software Solutions, we're passionate about delivering cutting-edge technology solutions that drive business growth. 
-            Our team of experts combines creativity with technical excellence to build software that makes a difference.
-          </p>
-          <p class="text-light mb-4">
-            With over 7 years of industry experience, we've helped numerous businesses transform their digital presence and achieve their goals. 
-            Our approach combines innovative thinking with practical solutions to deliver exceptional results.
-          </p>
           
           <div class="row g-4 mb-4">
             <div class="col-sm-6">
@@ -107,8 +98,8 @@
           </div>
   
           <div class="mt-4">
-            <a href="#contact" class="btn btn-gradient me-3">Get in Touch</a>
-            <a href="#" class="btn btn-outline-light">Learn More</a>
+            <a href="/contact-us/" class="btn btn-gradient me-3">Get in Touch</a>
+            <a href="{% url 'about' %}" class="btn btn-outline-light">Learn More</a>
           </div>
         </div>
       </div>
@@ -121,37 +112,61 @@
     <div class="row g-4 mt-1">
       <div class="col-md-6 col-lg-3" data-aos="fade-up">
         <div class="card service-card h-100">
+          <div class="banner">
+            <img src="{% static 'images/customsoftware.png' %}" class="img-fluid" height="100" alt="Custom Software Development" class="img-fluid">
+          </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-cpu"></i></div>
             <h5 class="card-title text-white">Custom Software Development</h5>
             <p class="card-text text-secondary">Robust, scalable systems tailored to your business.</p>
           </div>
+          <div class="footer">
+            <a href="custom-software-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="50">
         <div class="card service-card h-100">
+          <div class="banner">
+            <img src="{% static 'images/webdev.png' %}" class="img-fluid" height="100" alt="Website Design & Development" class="img-fluid">
+          </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-window"></i></div>
             <h5 class="card-title text-white">Website Design & Development</h5>
             <p class="card-text text-secondary">Beautiful, fast, and SEO-ready websites.</p>
           </div>
+          <div class="footer">
+            <a href="web-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
         <div class="card service-card h-100">
+          <div class="banner">
+            <img src="{% static 'images/mobileappdev.png' %}" class="img-fluid" alt="Mobile App Development" height="100" class="img-fluid">
+          </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-phone"></i></div>
             <h5 class="card-title text-white">Mobile App Development</h5>
             <p class="card-text text-secondary">iOS and Android apps using modern stacks.</p>
           </div>
+          <div class="footer">
+            <a href="mobile-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="150">
         <div class="card service-card h-100">
+          <div class="banner">
+            <img src="{% static 'images/github-readme.png' %}" class="img-fluid" alt="GitHub README Writing & Editing" height="100" class="img-fluid">
+          </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-journal-code"></i></div>
             <h5 class="card-title text-white">GitHub README Writing & Editing</h5>
             <p class="card-text text-secondary">Clear, polished documentation that stands out.</p>
+          </div>
+          <div class="footer">
+            <a href="github-readme/" class="btn btn-outline-light justify-content-center">Learn More</a>
           </div>
         </div>
       </div>
@@ -161,7 +176,7 @@
 
 <!-- Price Calculator -->
 <section id="pricing" class="py-5 bg-black-50">
-  <div class="container">
+      <div class="container">
     <div class="text-center mb-5" data-aos="fade-up">
       <h6 class="text-uppercase text-primary mb-3">Pricing</h6>
       <h2 class="text-white mb-4">Estimate Your Project Cost</h2>
@@ -268,16 +283,18 @@
 
       <div class="col-6 col-md-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}0">
         <div class="portfolio-card">
-          <div class="thumb">
+          <div class="banner">
             <img src="{% static 'images/church/church_project_image1.png' %}" alt="Church Management System" class="img-fluid">
           </div>
-          <div class="overlay">
+          <div class="body">
             <div>
-              <h6>Church Management System</h6>
-              <p class="small text-secondary mb-0">Church Management System</p>
+              <h6>Christekklesians church Website</h6>
+              <p class="small text-secondary mb-0">christekklesians website developed in 2025</p>
             </div>
           </div>
-          <a href="https://www.christekklesians.org" target="_blank" class="btn btn-gradient">View Project</a>
+          <div class="footer">
+            <a href="https://www.christekklesians.org" target="_blank" class="btn btn-gradient">View Project</a>
+          </div>
         </div>
       </div>
     </div>
@@ -328,53 +345,6 @@
         </div>
       </div>
       <div class="swiper-pagination"></div>
-    </div>
-  </div>
-</section>
-
-
-
-<!-- Contact -->
-<section id="contact" class="py-5 bg-black-50">
-  <div class="container">
-    <h2 class="section-title" data-aos="fade-up">Get In Touch</h2>
-    <div class="row g-4 mt-1">
-      <div class="col-lg-7" data-aos="fade-right">
-        <form method="post" class="card card-body glass">
-          {% csrf_token %}
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Name</label>
-              <input name="name" class="form-control form-control-lg" placeholder="Your name" required />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Email</label>
-              <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required />
-            </div>
-            <div class="col-12">
-              <label class="form-label">Phone</label>
-              <input name="phone" class="form-control form-control-lg" placeholder="+254..." />
-            </div>
-            <div class="col-12">
-              <label class="form-label">Message</label>
-              <textarea name="message" rows="5" class="form-control" placeholder="How can we help?" required></textarea>
-            </div>
-            <div class="col-12 d-grid">
-              <button class="btn btn-gradient btn-lg" type="submit">Send Message</button>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="col-lg-5" data-aos="fade-left">
-        <div class="card card-body glass h-100">
-          <h5>Contact Info</h5>
-          <ul class="list-unstyled small mb-4">
-            <li><i class="bi bi-envelope me-2"></i><a href="mailto:onpointinfo635@gmail.com" class="text-light-50">onpointinfo635@gmail.com</a></li>
-            <li><i class="bi bi-telephone me-2"></i><a href="tel:+254702502952" class="text-light-50">+254 702502952</a></li>
-          </ul>
-          <p class="text-secondary small mb-0">We typically respond within 24 hours.</p>
-        </div>
-      </div>
     </div>
   </div>
 </section>
