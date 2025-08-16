@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .article-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+    }
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .article-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .article-meta {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .article-excerpt {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .category-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-primary bg-opacity-10 py-5">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-5 fw-bold mb-3">Our Blog</h1>
+                <p class="lead mb-4">Discover the latest insights, stories, and updates from our team.</p>
+                
+                <!-- Search Form -->
+                <form method="get" class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" class="form-control" placeholder="Search articles..." value="{{ request.GET.q }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Category Filter -->
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="?" class="btn btn-sm {% if not request.GET.category %}btn-dark{% else %}btn-outline-dark{% endif %} mb-2">All</a>
+                    {% for category in categories %}
+                    <a href="?category={{ category.slug }}" 
+                       class="btn btn-sm {% if request.GET.category == category.slug %}btn-dark{% else %}btn-outline-dark{% endif %} mb-2">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-5">
+    {% if featured_article %}
+    <!-- Featured Article -->
+    <div class="card border-0 shadow-sm mb-5 overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-6">
+                {% if featured_article.image %}
+                <img src="{{ featured_article.image.url }}" class="img-fluid rounded-start h-100" alt="{{ featured_article.title }}" style="object-fit: cover; min-height: 350px;">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                    <i class="bi bi-newspaper" style="font-size: 5rem; color: #dee2e6;"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-primary me-2">Featured</span>
+                        <span class="text-muted small">{{ featured_article.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    <h2 class="card-title h3 mb-3">{{ featured_article.title }}</h2>
+                    <p class="card-text mb-4">{{ featured_article.short_description }}</p>
+                    <a href="{% url 'article_detail' featured_article.slug %}" class="btn btn-primary">
+                        Read More <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Articles Grid -->
+    <div class="row g-4">
+        {% for article in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card article-card h-100 border-0 shadow-sm">
+                {% if article.image %}
+                <!-- Debug: Image URL: {{ article.image.url }} -->
+                <img src="{{ article.image.url }}" class="card-img-top article-image" alt="{{ article.title }}" onerror="console.error('Failed to load image: {{ article.image.url }}')">
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-newspaper" style="font-size: 3rem; color: #dee2e6;"></i>
+                </div>
+                {% endif %}
+                <!-- Debug: Article ID: {{ article.id }}, Title: {{ article.title }} -->
+                
+                {% if article.category %}
+                <span class="badge bg-primary category-badge">{{ article.category.name }}</span>
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="article-meta mb-2">
+                        <span><i class="bi bi-calendar3 me-1"></i> {{ article.created_at|date:"F d, Y" }}</span>
+                        {% if article.author %}
+                        <span class="ms-3"><i class="bi bi-person me-1"></i> {{ article.author.get_full_name|default:article.author.username }}</span>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title mb-3">{{ article.title }}</h5>
+                    <p class="card-text article-excerpt">{{ article.short_description }}</p>
+                    <a href="{% url 'article_detail' article.slug %}" class="stretched-link">
+                        Read more <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <h3 class="h4 mt-3">No articles found</h3>
+                <p class="text-muted">Check back later for new content or try a different search term.</p>
+                <a href="{% url 'article_list' %}" class="btn btn-outline-primary">View all articles</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="First">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+                {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" aria-label="Last">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any plugins or additional functionality here
+        
+        // Example: Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Add animation to article cards on scroll
+        const articleCards = document.querySelectorAll('.article-card');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        articleCards.forEach((card, index) => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    });
+</script>
+{% endblock %}

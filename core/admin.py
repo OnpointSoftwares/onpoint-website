@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Project
+from .models import Project, Contact, Article, Comment
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'status', 'client', 'created_at', 'featured', 'admin_thumbnail')
@@ -71,3 +71,8 @@ class ProjectAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(Contact)
+admin.site.register(Article)
+admin.site.register(Comment)
+
+

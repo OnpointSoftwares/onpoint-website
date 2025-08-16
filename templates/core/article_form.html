@@ -1,0 +1,169 @@
+{% extends 'admin/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'admin_article_list' %}">Articles</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% if form.instance.pk %}{{ form.instance.title|truncatewords:5 }}{% else %}New Article{% endif %}
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-0">{{ title|default:'Create New Article' }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            {{ form.title|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.slug|as_crispy_field }}
+                            <div class="form-text text-muted">
+                                The slug is the URL-friendly version of the name. It can only contain letters, numbers, and hyphens.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.short_description|as_crispy_field }}
+                            <div class="form-text text-muted">
+                                A brief summary of the article (max 200 characters).
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.description|as_crispy_field }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% if form.instance.pk %}{% url 'admin_article_detail' form.instance.pk %}{% else %}{% url 'admin_article_list' %}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i> {{ submit_text|default:'Save Article' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Article Status</h6>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% if form.instance.pk %}
+                            Last updated: {{ form.instance.updated_at|date:"M d, Y H:i" }}
+                        {% else %}
+                            Create a new article to get started.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            {% if form.instance.pk %}
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">Article Actions</h6>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'article_detail' form.instance.pk %}" 
+                           class="btn btn-outline-secondary"
+                           target="_blank">
+                            <i class="bi bi-eye me-2"></i> View on Site
+                        </a>
+                        <a href="{% url 'article_delete' form.instance.pk %}" 
+                           class="btn btn-outline-danger"
+                           onclick="return confirm('Are you sure you want to delete this article?')">
+                            <i class="bi bi-trash me-2"></i> Delete Article
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-generate slug from title
+    document.addEventListener('DOMContentLoaded', function() {
+        const titleInput = document.getElementById('id_title');
+        const slugInput = document.getElementById('id_slug');
+        
+        if (titleInput && slugInput) {
+            // Only auto-generate slug if the slug field is empty or hasn't been manually modified
+            let slugManuallyChanged = false;
+            
+            titleInput.addEventListener('blur', function() {
+                if (!slugInput.value || !slugManuallyChanged) {
+                    const slug = titleInput.value
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-')      // Replace spaces with -
+                        .replace(/--+/g, '-');      // Replace multiple - with single -
+                    slugInput.value = slug;
+                }
+            });
+            
+            // Track if the slug field is manually modified
+            slugInput.addEventListener('input', function() {
+                slugManuallyChanged = true;
+            });
+            
+            // Initialize slug field if empty
+            if (!slugInput.value && titleInput.value) {
+                const slug = titleInput.value
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/--+/g, '-');
+                slugInput.value = slug;
+            }
+        }
+        
+        // Initialize any rich text editors or other plugins here
+        // Example: Initialize a rich text editor for the description field
+        if (typeof tinymce !== 'undefined' && document.getElementById('id_description')) {
+            tinymce.init({
+                selector: '#id_description',
+                plugins: 'link lists table code',
+                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link | table | code',
+                height: 400,
+                menubar: false,
+                statusbar: false,
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                setup: function(editor) {
+                    editor.on('change', function() {
+                        editor.save();
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

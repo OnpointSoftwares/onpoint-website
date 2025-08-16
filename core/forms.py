@@ -1,6 +1,5 @@
 from django import forms
-from .models import Project
-
+from .models import Project, Article
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -54,3 +53,11 @@ class ProjectFilterForm(forms.Form):
             'placeholder': 'Search projects...'
         })
     )
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = '__all__'
+        widgets = {
+            'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+        }

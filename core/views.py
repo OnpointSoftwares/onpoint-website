@@ -9,7 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Count, Case, When, Value, IntegerField
+from django.db.models import Q, Count, Case, When, Value, IntegerField, F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.views.generic import (
@@ -20,7 +20,7 @@ import google.generativeai as genai
 import os
 import json
 from datetime import timedelta
-from .models import Contact, Project
+from .models import Contact, Project, Article
 from .forms import ProjectForm, ProjectFilterForm
 
 def get_gemini_chat():
@@ -151,7 +151,7 @@ try:
     model = genai.GenerativeModel('gemini-1.5-flash')
     chat = model.start_chat(history=[])
     CHAT_INSTRUCTIONS = """
-    You are OnPoint Software's AI assistant. You help users with information about OnPoint Software's services.
+    You are OnPoint Software's AI assistant. You help users with information about OnPoint Software's services and pricing.
     
     About OnPoint Software:
     - Custom software development
@@ -160,8 +160,31 @@ try:
     - GitHub README writing & editing
     - 7+ years of experience
     
+    Service Pricing (in Kenyan Shillings):
+    
+    Base Project Prices:
+    - Basic Website: KES 5,000 (1-5 pages)
+    - Web Application: Starting from KES 25,000
+    - Mobile App: Starting from KES 40,000
+    - E-commerce: Starting from KES 60,000
+    - Custom Software: Starting from KES 75,000
+    
+    Design Complexity Multipliers:
+    - Basic (Template-based): 1x base price
+    - Standard (Semi-custom): 1.5x base price
+    - Premium (Fully Custom): 2.5x base price
+    
+    Additional Features (Add-ons):
+    - SEO Optimization: +KES 5,000
+    - Responsive Design: +KES 3,000
+    - Content Management System: +KES 10,000
+    - E-commerce Functionality: +KES 15,000
+    
+    Note: All prices are in Kenyan Shillings (KES) and include a 15% startup discount.
+    
     Be helpful, professional, and concise in your responses.
     If you don't know an answer, say you'll have someone from the team contact them.
+    When discussing pricing, always mention that final quotes may vary based on specific project requirements.
     """
     
     # Initialize chat with instructions
@@ -193,7 +216,15 @@ def home(request):
         'client_satisfaction': 98,
         'team_members': 5,
     }
-    return render(request, 'core/home.html', {'stats': stats})
+    
+    # Get the 3 most recent articles
+    latest_articles = Article.objects.order_by('-created_at')[:3]
+    
+    context = {
+        'stats': stats,
+        'latest_articles': latest_articles,
+    }
+    return render(request, 'core/home.html', context)
 
 
 # Admin Views
@@ -421,3 +452,227 @@ class RecentProjectsAPIView(StaffRequiredMixin, ListView):
             'status': 'success',
             'data': projects
         })
+def public_article_list(request):
+    """
+    Public view for displaying published articles with pagination and featured article.
+    """
+    # Get all published articles, ordered by creation date (newest first)
+    articles_list = Article.objects.filter(is_published=True).order_by('-created_at')
+    
+    # Get the featured article (most recent published article)
+    featured_article = articles_list.first()
+    
+    # If we have a featured article, exclude it from the main articles list
+    if featured_article:
+        articles_list = articles_list.exclude(pk=featured_article.pk)
+    
+    # Pagination - 9 articles per page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(articles_list, 9)
+    
+    try:
+        articles = paginator.page(page)
+    except PageNotAnInteger:
+        articles = paginator.page(1)
+    except EmptyPage:
+        articles = paginator.page(paginator.num_pages)
+    
+    return render(request, 'core/article_list.html', {
+        'featured_article': featured_article,
+        'articles': articles,
+        'page_obj': articles,  # For pagination controls
+        'is_admin': False
+    })
+
+def admin_article_list(request):
+    """
+    Admin view for managing all articles (both published and unpublished).
+    """
+    # Get all articles, ordered by creation date (newest first)
+    articles = Article.objects.all().order_by('-created_at')
+    
+    return render(request, 'admin/article_list.html', {
+        'articles': articles,
+        'is_admin': True
+    })
+def admin_article_detail(request, pk):
+    """
+    Admin view for displaying article details with admin controls.
+    """
+    article = get_object_or_404(Article, pk=pk)
+    
+    # Get related articles (excluding current article)
+    related_articles = Article.objects.filter(
+        is_published=True
+    ).exclude(pk=article.pk).order_by('-created_at')[:3]
+    
+    # Get next and previous articles for navigation
+    next_article = Article.objects.filter(
+        created_at__gt=article.created_at
+    ).order_by('created_at').first()
+    
+    prev_article = Article.objects.filter(
+        created_at__lt=article.created_at
+    ).order_by('-created_at').first()
+    
+    # Get comments for the article
+    comments = article.comments.all().order_by('created_at')
+    
+    # Increment view count
+    article.view_count = F('view_count') + 1
+    article.save(update_fields=['view_count'])
+    article.refresh_from_db()
+    
+    return render(request, 'admin/article_detail.html', {
+        'article': article,
+        'related_articles': related_articles,
+        'next_article': next_article,
+        'prev_article': prev_article,
+        'comments': comments,
+        'is_admin': True
+    })
+
+def article_detail(request, slug=None, pk=None):
+    """
+    Public view for displaying a single article. Can be accessed by either slug or primary key.
+    If both are provided, slug takes precedence.
+    """
+    article = None
+    
+    # Try to get article by slug first (preferred method for public URLs)
+    if slug:
+        article = get_object_or_404(Article, slug=slug, is_published=True)
+    # Fall back to primary key if slug is not provided
+    elif pk:
+        article = get_object_or_404(Article, pk=pk)
+    else:
+        raise Http404("Article not found")
+    
+    # For admin views, check permissions
+    is_admin_view = request.path.startswith('/admin/')
+    if is_admin_view and not request.user.is_staff:
+        raise PermissionDenied
+    
+    # Get related articles (exclude current article)
+    related_articles = Article.objects.filter(
+    ).exclude(
+        pk=article.pk
+    ).order_by('-created_at')[:3]
+    
+    # Get next and previous articles for navigation
+    next_article = Article.objects.filter(
+        created_at__gt=article.created_at
+    ).order_by('created_at').first()
+    
+    prev_article = Article.objects.filter(
+        created_at__lt=article.created_at
+    ).order_by('-created_at').first()
+    
+    # Increment view count (only for non-admin views)
+    if not is_admin_view:
+        article.view_count = F('view_count') + 1
+        article.save(update_fields=['view_count'])
+        article.refresh_from_db()  # Refresh to get the updated view_count
+    
+    # Determine which template to use
+    template = 'admin/article_detail.html' if is_admin_view else 'core/article_detail.html'
+    
+    context = {
+        'article': article,
+        'is_admin': is_admin_view,
+        'related_articles': related_articles,
+        'next_article': next_article,
+        'prev_article': prev_article,
+        'page_title': article.title,
+        'meta_description': article.short_description,
+        'meta_keywords': article.tags.all() if hasattr(article, 'tags') else [],
+    }
+    
+    # Add Open Graph and Twitter card meta tags for public views
+    if not is_admin_view:
+        context.update({
+            'og_title': article.title,
+            'og_description': article.short_description,
+            'og_type': 'article',
+            'twitter_card': 'summary_large_image',
+        })
+        
+        # Add article image if available
+        if hasattr(article, 'image') and article.image:
+            context.update({
+                'og_image': request.build_absolute_uri(article.image.url),
+                'twitter_image': request.build_absolute_uri(article.image.url),
+            })
+    
+    return render(request, template, context)
+def article_create(request):
+    if request.method == 'POST':
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.save()
+            messages.success(request, 'Article created successfully!')
+            return redirect('admin_article_detail', pk=article.pk)
+    else:
+        form = ArticleForm()
+    
+    return render(request, 'core/article_form.html', {
+        'form': form,
+        'title': 'Create New Article',
+        'submit_text': 'Create Article'
+    })
+def article_update(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == 'POST':
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.save()
+            messages.success(request, 'Article updated successfully!')
+            return redirect('admin_article_detail', pk=article.pk)
+    else:
+        form = ArticleForm(instance=article)
+    
+    return render(request, 'core/article_form.html', {
+        'form': form,
+        'title': f'Edit Article: {article.title}',
+        'submit_text': 'Update Article',
+        'article': article
+    })
+def article_delete(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            article_title = article.title
+            article.delete()
+            messages.success(request, f'Article "{article_title}" was deleted successfully.')
+            return redirect('admin_article_list')
+        except Exception as e:
+            messages.error(request, f'Error deleting article: {str(e)}')
+            return redirect('admin_article_detail', pk=article.pk)
+    
+    # For GET request, show confirmation page
+    return render(request, 'core/article_confirm_delete.html', {
+        'article': article,
+        'is_admin': request.path.startswith('/admin/')
+    })
+def add_comment(request, pk):
+    article = get_object_or_404(Article, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.article = article
+            comment.save()
+            messages.success(request, 'Comment added successfully!')
+            return redirect('article_detail', pk=article.pk)
+    else:
+        form = CommentForm()
+    
+    return render(request, 'core/article_detail.html', {
+        'article': article,
+        'form': form,
+        'comments': article.comment_set.all(),
+    })
+    

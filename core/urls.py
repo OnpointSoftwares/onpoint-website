@@ -36,4 +36,16 @@ urlpatterns = [
     # AJAX/API Endpoints
     path('admin/api/project-stats/', login_required(views.ProjectStatsAPIView.as_view()), name='api_project_stats'),
     path('admin/api/recent-projects/', login_required(views.RecentProjectsAPIView.as_view()), name='api_recent_projects'),
+    
+    # Public Article URLs
+    path('blog/', views.public_article_list, name='article_list'),
+    path('blog/<int:pk>/', views.article_detail, name='article_detail'),
+    
+    # Admin Article URLs
+    path('admin/articles/', login_required(views.admin_article_list), name='admin_article_list'),
+    path('admin/articles/create/', login_required(views.article_create), name='article_create'),
+    path('admin/articles/<int:pk>/', login_required(views.admin_article_detail), name='admin_article_detail'),
+    path('admin/articles/<int:pk>/update/', login_required(views.article_update), name='admin_article_update'),
+    path('admin/articles/<int:pk>/delete/', login_required(views.article_delete), name='admin_article_delete'),
+    path('admin/articles/<int:pk>/add-comment/', login_required(views.add_comment), name='add_comment'),
 ]

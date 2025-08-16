@@ -1,0 +1,820 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ og_title|default:article.title }}">
+<meta property="og:description" content="{{ og_description|default:article.short_description }}">
+<meta property="og:type" content="{{ og_type|default:'article' }}">
+{% if og_image %}
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+{% endif %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+<meta name="twitter:card" content="{{ twitter_card|default:'summary_large_image' }}">
+<meta name="twitter:title" content="{{ og_title|default:article.title }}">
+<meta name="twitter:description" content="{{ og_description|default:article.short_description }}">
+{% if twitter_image %}
+<meta name="twitter:image" content="{{ twitter_image }}">
+{% endif %}
+
+<meta name="description" content="{{ meta_description|default:article.short_description }}">
+{% if meta_keywords %}
+<meta name="keywords" content="{% for tag in meta_keywords %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+{% endif %}
+
+<!-- Structured data for rich results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ article.title|escapejs }}",
+  "description": "{{ article.short_description|escapejs }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ article.author.get_full_name|default:article.author.username|escapejs }}"
+  },
+  "datePublished": "{{ article.created_at|date:'c' }}",
+  "dateModified": "{{ article.updated_at|date:'c' }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.build_absolute_uri }}"
+  }{% if article.image %},
+  "image": [
+    "{{ request.scheme }}://{{ request.get_host }}{{ article.image.url }}"
+  ]{% endif %}
+}
+</script>
+
+<style>
+    /* Custom styles for article content */
+    .article-header {
+        position: relative;
+        margin-bottom: 2.5rem;
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .article-meta .author-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+    }
+    
+    .article-meta .meta-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .article-meta .author-name {
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .article-featured-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .article-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #2d3748;
+        margin-bottom: 3rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.75rem;
+    }
+    
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+        margin-top: 2.5rem;
+        margin-bottom: 1.25rem;
+        font-weight: 700;
+        color: #1a202c;
+    }
+    
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .article-content a {
+        color: #2563eb;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .article-content a:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+    
+    .article-content blockquote {
+        border-left: 4px solid #2563eb;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        background-color: #f8fafc;
+        font-style: italic;
+        border-radius: 0 0.5rem 0.5rem 0;
+    }
+    
+    .article-content pre {
+        background-color: #1e293b;
+        color: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 2rem 0;
+        font-family: 'Fira Code', 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.9em;
+        line-height: 1.6;
+    }
+    
+    .article-content code {
+        background-color: #f1f5f9;
+        padding: 0.2em 0.4em;
+        border-radius: 0.25em;
+        font-family: 'Fira Code', 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.9em;
+        color: #dc2626;
+    }
+    
+    .article-content pre code {
+        background-color: transparent;
+        padding: 0;
+        color: inherit;
+        font-size: 1em;
+    }
+    
+    .article-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 2rem 0;
+    }
+    
+    .article-tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: #e0f2fe;
+        color: #0369a1;
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .article-tag:hover {
+        background-color: #bae6fd;
+        color: #075985;
+        text-decoration: none;
+    }
+    
+    .article-actions {
+        display: flex;
+        justify-content: space-between;
+        padding: 1.5rem 0;
+        margin: 2rem 0;
+        border-top: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .article-share {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .share-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #f1f5f9;
+        color: #64748b;
+        transition: all 0.2s;
+    }
+    
+    .share-btn:hover {
+        background-color: #e2e8f0;
+        color: #334155;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .author-bio {
+        background-color: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin: 3rem 0;
+        display: flex;
+        align-items: flex-start;
+    }
+    
+    .author-avatar-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1.5rem;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .author-info h4 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .author-social {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    
+    .author-social a {
+        color: #64748b;
+        transition: color 0.2s;
+    }
+    
+    .author-social a:hover {
+        color: #2563eb;
+        text-decoration: none;
+    }
+    
+    .article-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin: 3rem 0;
+    }
+    
+    .nav-article {
+        display: flex;
+        align-items: center;
+        max-width: 45%;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        transition: all 0.2s;
+    }
+    
+    .nav-article:hover {
+        background-color: #f1f5f9;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .nav-article-prev {
+        text-align: left;
+    }
+    
+    .nav-article-next {
+        text-align: right;
+        margin-left: auto;
+    }
+    
+    .nav-article i {
+        font-size: 1.25rem;
+    }
+    
+    .nav-article-prev i {
+        margin-right: 0.75rem;
+    }
+    
+    .nav-article-next i {
+        margin-left: 0.75rem;
+    }
+    
+    .nav-article-label {
+        display: block;
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-article-title {
+        font-weight: 600;
+        color: #1e293b;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    @media (max-width: 767.98px) {
+        .article-title {
+            font-size: 2rem;
+        }
+        
+        .author-bio {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .author-avatar-large {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+        
+        .author-social {
+            justify-content: center;
+        }
+        
+        .article-navigation {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .nav-article {
+            max-width: 100%;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-content {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        color: #333;
+    }
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 2rem 0;
+    }
+    .article-content h2, 
+    .article-content h3, 
+    .article-content h4, 
+    .article-content h5, 
+    .article-content h6 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    .article-content ul, 
+    .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    .article-content blockquote {
+        border-left: 4px solid #0d6efd;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        background-color: #f8f9fa;
+        font-style: italic;
+    }
+    .article-content pre {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+    }
+    .article-content code {
+        background-color: #f1f1f1;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    .article-content table {
+        width: 100%;
+        margin: 1.5rem 0;
+        border-collapse: collapse;
+    }
+    .article-content th, 
+    .article-content td {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+    }
+    .article-content th {
+        background-color: #f8f9fa;
+    }
+    .article-meta {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    .author-bio {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    .share-buttons .btn {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 0.25rem;
+    }
+    .sticky-sidebar {
+        position: sticky;
+        top: 1.5rem;
+    }
+    @media (max-width: 991.98px) {
+        .sticky-sidebar {
+            position: static;
+            margin-top: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/article.js' %}"></script>
+  
+  <!-- Back to top button -->
+  <a href="#" class="back-to-top position-fixed d-flex align-items-center justify-content-center rounded-circle shadow" style="width: 50px; height: 50px; bottom: 30px; right: 30px; background: #4f46e5; color: white; text-decoration: none; opacity: 0; visibility: hidden; transition: all 0.3s ease;">
+    <i class="bi bi-arrow-up"></i>
+  </a>
+  
+  <style>
+    .back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .back-to-top:hover {
+      background: #4338ca !important;
+      color: white !important;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'article_list' %}">Blog</a></li>
+                    {% if article.category %}
+                    <li class="breadcrumb-item"><a href="{% url 'article_list' %}?category={{ article.category.slug }}">{{ article.category.name }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ article.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Article Header -->
+            <header class="mb-5">
+                <h1 class="display-4 fw-bold mb-3">{{ article.title }}</h1>
+                
+                <!-- Meta Information -->
+                <div class="d-flex flex-wrap align-items-center text-muted mb-4">
+                    <div class="d-flex align-items-center me-4 mb-2">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        <time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:"F d, Y" }}</time>
+                    </div>
+                    {% if article.author %}
+                    <div class="d-flex align-items-center me-4 mb-2">
+                        <i class="bi bi-person me-2"></i>
+                        <span>{{ article.author.get_full_name|default:article.author.username }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="d-flex align-items-center me-4 mb-2">
+                        <i class="bi bi-eye me-2"></i>
+                        <span>{{ article.view_count|default:0 }} views</span>
+                    </div>
+                    {% if article.read_time %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-clock me-2"></i>
+                        <span>{{ article.read_time }} min read</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Featured Image -->
+                {% if article.image %}
+                <figure class="mb-4">
+                    <img src="{{ article.image.url }}" class="img-fluid rounded-3 shadow-sm" alt="{{ article.title }}" style="width: 100%; height: auto; max-height: 500px; object-fit: cover;">
+                    {% if article.image_caption %}
+                    <figcaption class="figure-caption text-center mt-2 text-muted">{{ article.image_caption }}</figcaption>
+                    {% endif %}
+                </figure>
+                {% endif %}
+                
+                <!-- Short Description -->
+                {% if article.short_description %}
+                <div class="lead mb-4">{{ article.short_description }}</div>
+                {% endif %}
+                
+                <!-- Tags -->
+                {% if article.tags.exists %}
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    {% for tag in article.tags.all %}
+                    <a href="{% url 'article_list' %}?tag={{ tag.slug }}" class="badge bg-light text-dark text-decoration-none">
+                        <i class="bi bi-tag me-1"></i> {{ tag.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </header>
+            
+            <!-- Article Content -->
+            <div class="article-content mb-5 text-white">
+                {{ article.description|safe }}
+            </div>
+            
+            <!-- Author Bio -->
+            {% if article.author and article.author.profile.bio %}
+            <div class="author-bio d-flex align-items-center p-4 mb-5">
+                {% if article.author.profile.avatar %}
+                <img src="{{ article.author.profile.avatar.url }}" class="rounded-circle me-4" width="80" height="80" alt="{{ article.author.get_full_name }}">
+                {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person fs-1 text-muted"></i>
+                </div>
+                {% endif %}
+                <div>
+                    <h5 class="mb-1">{{ article.author.get_full_name|default:article.author.username }}</h5>
+                    {% if article.author.profile.title %}
+                    <p class="text-muted mb-2">{{ article.author.profile.title }}</p>
+                    {% endif %}
+                    <p class="mb-0">{{ article.author.profile.bio|truncatewords:30 }}</p>
+                    {% if article.author.profile.website or article.author.profile.twitter or article.author.profile.linkedin %}
+                    <div class="mt-2">
+                        {% if article.author.profile.website %}
+                        <a href="{{ article.author.profile.website }}" class="text-muted me-2" target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-globe"></i>
+                        </a>
+                        {% endif %}
+                        {% if article.author.profile.twitter %}
+                        <a href="https://twitter.com/{{ article.author.profile.twitter }}" class="text-muted me-2" target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        {% endif %}
+                        {% if article.author.profile.linkedin %}
+                        <a href="{{ article.author.profile.linkedin }}" class="text-muted" target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Share Buttons -->
+            <div class="d-flex justify-content-between align-items-center border-top border-bottom py-4 mb-5">
+                <div class="d-flex align-items-center">
+                    <span class="me-3 fw-medium">Share:</span>
+                    <div class="share-buttons">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" 
+                           target="_blank" 
+                           class="btn btn-primary"
+                           data-bs-toggle="tooltip" 
+                           title="Share on Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text={{ article.title|urlencode }}&url={{ request.build_absolute_uri|urlencode }}" 
+                           target="_blank" 
+                           class="btn btn-info text-white"
+                           data-bs-toggle="tooltip" 
+                           title="Share on Twitter">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri|urlencode }}" 
+                           target="_blank" 
+                           class="btn btn-primary"
+                           data-bs-toggle="tooltip" 
+                           title="Share on LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-secondary"
+                                data-bs-toggle="tooltip" 
+                                title="Copy link"
+                                onclick="copyToClipboard('{{ request.build_absolute_uri }}', this)">
+                            <i class="bi bi-link-45deg"></i>
+                        </button>
+                    </div>
+                </div>
+                {% if user.is_staff %}
+                <div class="btn-group" role="group">
+                    <a href="{% url 'admin_article_update' article.pk %}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                    </a>
+                    <a href="{% url 'admin_article_delete' article.pk %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Article Navigation -->
+            <div class="d-flex justify-content-between mb-5">
+                {% if prev_article %}
+                <a href="{% url 'article_detail' prev_article.slug %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i> Previous Article
+                    <div class="small text-muted mt-1">{{ prev_article.title|truncatewords:6 }}</div>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+                
+                {% if next_article %}
+                <a href="{% url 'article_detail' next_article.slug %}" class="btn btn-outline-primary text-end">
+                    Next Article <i class="bi bi-arrow-right ms-2"></i>
+                    <div class="small text-muted mt-1">{{ next_article.title|truncatewords:6 }}</div>
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Related Articles -->
+            {% if related_articles %}
+            <section class="mb-5">
+                <h3 class="h4 mb-4 pb-2 border-bottom">You might also like</h3>
+                <div class="row g-4">
+                    {% for related in related_articles %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    {% if related.image %}
+                                    <img src="{{ related.image.url }}" class="img-fluid rounded-start h-100" alt="{{ related.title }}" style="object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                        <i class="bi bi-newspaper text-muted" style="font-size: 2rem;"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ related.title }}</h5>
+                                        <p class="card-text text-muted small">{{ related.short_description|truncatewords:15 }}</p>
+                                        <a href="{% url 'article_detail' related.slug %}" class="btn btn-link p-0 stretched-link">
+                                            Read more <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+            
+            <!-- Comments Section -->
+            <section id="comments" class="mt-5">
+                <h3 class="h4 mb-4 pb-2 border-bottom">Comments ({{ article.comments.count }})</h3>
+                
+                <!-- Comment Form -->
+                {% if request.user.is_authenticated %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <form method="post" action="{% url 'add_comment' article.pk %}" id="comment-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" id="parent_id" value="">
+                            <div class="mb-3">
+                                <label for="comment-text" class="form-label">Leave a comment</label>
+                                <textarea class="form-control" id="comment-text" name="comment" rows="3" required></textarea>
+                                <div class="form-text">Your email address will not be published.</div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                                <button type="button" class="btn btn-link text-muted d-none" id="cancel-reply">
+                                    Cancel Reply
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-4 mb-4 bg-light rounded-3">
+                    <p class="mb-3">Please <a href="{% url 'login' %}?next={{ request.path|urlencode }}">log in</a> to leave a comment.</p>
+                    <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-outline-primary me-2">Log In</a>
+                    <a href="{% url 'signup' %}?next={{ request.path|urlencode }}" class="btn btn-primary">Sign Up</a>
+                </div>
+                {% endif %}
+                
+                <!-- Comments List -->
+                <div class="comments-list">
+                    {% for comment in article.comments.all %}
+                        {% if not comment.parent %}
+                            {% include 'core/partials/comment_item.html' with comment=comment %}
+                        {% endif %}
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-chat-square-text text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">No comments yet. Be the first to share your thoughts!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="sticky-sidebar">
+                <!-- About Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">About the Blog</h5>
+                        <p class="card-text">Welcome to our blog where we share insights, stories, and updates about our work and industry.</p>
+                        <a href="{% url 'about' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Categories Widget -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Categories</h5>
+                        <ul class="list-unstyled mb-0">
+                            {% for category in categories %}
+                            <li class="mb-2">
+                                <a href="{% url 'article_list' %}?category={{ category.slug }}" class="text-decoration-none">
+                                    <i class="bi bi-arrow-right me-2 text-primary"></i> {{ category.name }}
+                                    <span class="badge bg-light text-dark ms-2">{{ category.article_count }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Popular Posts -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Popular Posts</h5>
+                        <div class="list-group list-group-flush">
+                            {% for popular in popular_posts %}
+                            <a href="{% url 'article_detail' popular.slug %}" class="list-group-item list-group-item-action border-0 px-0 py-2">
+                                <div class="d-flex align-items-center">
+                                    {% if popular.image %}
+                                    <img src="{{ popular.image.url }}" alt="{{ popular.title }}" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded me-3" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-file-text text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0" style="font-size: 0.9rem;">{{ popular.title|truncatewords:6 }}</h6>
+                                        <small class="text-muted">{{ popular.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tags Widget -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Tags</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in tags %}
+                            <a href="{% url 'article_list' %}?tag={{ tag.slug }}" class="badge bg-light text-dark text-decoration-none">
+                                {{ tag.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

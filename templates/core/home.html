@@ -365,4 +365,55 @@
     </div>
   </div>
 </section>
+
+<!-- Latest Articles -->
+<section id="articles" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <h6 class="text-uppercase text-primary mb-3">Our Blog</h6>
+      <h2 class="text-white mb-4">Latest Articles</h2>
+      <p class="lead text-muted mx-auto" style="max-width: 700px;">Stay updated with our latest insights, tutorials, and industry news.</p>
+    </div>
+    
+    <div class="row g-4">
+      {% for article in latest_articles %}
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}">
+        <div class="card h-100 border-0 bg-dark-100 hover-shadow transition-all">
+          <div class="position-relative">
+            <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}">
+            <div class="position-absolute top-0 end-0 m-3">
+              <span class="badge bg-primary">{{ article.created_at|date:"M d" }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title text-white">{{ article.title }}</h5>
+            <p class="card-text text-muted">{{ article.short_description|truncatewords:20 }}</p>
+          </div>
+          <div class="card-footer bg-transparent border-0 pt-0">
+            <a href="{% url 'article_detail' article.id %}" class="btn btn-link px-0">
+              Read More <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <i class="bi bi-newspaper display-1 text-muted mb-3"></i>
+        <h4>No articles yet</h4>
+        <p class="text-muted">Check back soon for our latest articles and updates.</p>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if latest_articles %}
+    <div class="text-center mt-5" data-aos="fade-up">
+      <a href="{% url 'article_list' %}" class="btn btn-outline-light">
+        View All Articles <i class="bi bi-arrow-right ms-2"></i>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}
+
+{% block extra_js %}{% endblock %}
