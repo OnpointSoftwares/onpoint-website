@@ -109,8 +109,17 @@ export const ChatWidget = (function() {
     try {
       // Send message to server
       const csrftoken = getCookie('csrftoken');
+      
+      // Ensure URL is properly initialized
       if (!window.djangoUrls || !window.djangoUrls.chatApi) {
-        throw new Error('Chat API URL is not configured');
+        // Try to get the URL from Django's URL tag if not available
+        try {
+          window.djangoUrls = window.djangoUrls || {};
+          window.djangoUrls.chatApi = '/chat/';
+        } catch (e) {
+          console.error('Failed to initialize chat API URL:', e);
+          throw new Error('Chat service is not properly configured. Please refresh the page and try again.');
+        }
       }
       const response = await fetch(window.djangoUrls.chatApi, {
         method: 'POST',
@@ -137,7 +146,15 @@ export const ChatWidget = (function() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      addBotMessage('Sorry, there was an error processing your message. Please try again.');
+      
+      // More specific error messages
+      if (error.message.includes('quota') || error.message.includes('API')) {
+        addBotMessage(`⚠️ Our chat service is currently experiencing high demand. Please try again in a few minutes. If the issue persists, you can reach us directly at onpointinfo635@gmail.com`);
+      } else if (error.message.includes('Network')) {
+        addBotMessage('🔌 Unable to connect to the chat service. Please check your internet connection and try again.');
+      } else {
+        addBotMessage('⚠️ Sorry, there was an error processing your message. Please try again later or contact us at onpointinfo635@gmail.com');
+      }
     } finally {
       hideTypingIndicator();
     }

@@ -116,16 +116,19 @@
     });
   </script>
   
-  <!-- Load our main JavaScript file -->
+  <!-- Load configuration first -->
   <script>
     // Pass Django URLs to JavaScript
     window.djangoUrls = {
-      chatApi: "{% url 'chat_api' %}",
+      chatApi: "{% url 'chat_api' %}",  // This will resolve to '/chat/'
       // Add other URLs here if needed
     };
+    console.log('Django URLs initialized:', window.djangoUrls);
   </script>
-  <script type="module" src="{% static 'js/main.js' %}"></script>
+  
+  <!-- Load JavaScript files -->
   <script type="module" src="{% static 'js/chat-widget.js' %}"></script>
+  <script type="module" src="{% static 'js/main.js' %}"></script>
   
   <!-- Wait for the document to be fully loaded -->
   <script>
