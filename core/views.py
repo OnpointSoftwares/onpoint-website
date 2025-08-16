@@ -457,7 +457,7 @@ def public_article_list(request):
     Public view for displaying published articles with pagination and featured article.
     """
     # Get all published articles, ordered by creation date (newest first)
-    articles_list = Article.objects.filter(is_published=True).order_by('-created_at')
+    articles_list = Article.objects.all().order_by('-created_at')
     
     # Get the featured article (most recent published article)
     featured_article = articles_list.first()
