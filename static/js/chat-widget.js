@@ -121,7 +121,7 @@ export const ChatWidget = (function() {
           throw new Error('Chat service is not properly configured. Please refresh the page and try again.');
         }
       }
-      const response = await fetch('chat/', {
+      const response = await fetch('/chat/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
