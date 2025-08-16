@@ -34,18 +34,18 @@
                             <td>{{ article.updated_at|date:"M d, Y" }}</td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    <a href="{% url 'article_detail' article.pk %}" 
+                                    <a href="{% url 'admin_article_detail' article.pk %}" 
                                        class="btn btn-sm btn-outline-secondary"
                                        target="_blank"
                                        title="View on site">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{% url 'article_update' article.pk %}" 
+                                    <a href="{% url 'admin_article_update' article.pk %}" 
                                        class="btn btn-sm btn-outline-primary"
                                        title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <a href="{% url 'article_delete' article.pk %}" 
+                                    <a href="{% url 'admin_article_delete' article.pk %}" 
                                        class="btn btn-sm btn-outline-danger"
                                        title="Delete">
                                         <i class="bi bi-trash"></i>
