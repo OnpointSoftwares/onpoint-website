@@ -93,7 +93,7 @@
                     </div>
                     <h2 class="card-title h3 mb-3">{{ featured_article.title }}</h2>
                     <p class="card-text mb-4">{{ featured_article.short_description }}</p>
-                    <a href="{% url 'admin_article_detail' featured_article.slug %}" class="btn btn-primary">
+                    <a href="{% url 'article_detail' featured_article.slug %}" class="btn btn-primary">
                         Read More <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>
