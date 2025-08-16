@@ -109,7 +109,10 @@ export const ChatWidget = (function() {
     try {
       // Send message to server
       const csrftoken = getCookie('csrftoken');
-      const response = await fetch('/chat_api/', {
+      if (!window.djangoUrls || !window.djangoUrls.chatApi) {
+        throw new Error('Chat API URL is not configured');
+      }
+      const response = await fetch(window.djangoUrls.chatApi, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -116,12 +116,19 @@
     });
   </script>
   
-  <!-- Load our main JavaScript file as ES module -->
-  <script type="module" src="{% static 'js/main.js' %}"></script>
-  {% block extra_js %}{% endblock %}
-  
+  <!-- Load our main JavaScript file -->
   <script>
-    // Wait for the document to be fully loaded
+    // Pass Django URLs to JavaScript
+    window.djangoUrls = {
+      chatApi: "{% url 'chat_api' %}",
+      // Add other URLs here if needed
+    };
+  </script>
+  <script type="module" src="{% static 'js/main.js' %}"></script>
+  <script type="module" src="{% static 'js/chat-widget.js' %}"></script>
+  
+  <!-- Wait for the document to be fully loaded -->
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOM fully loaded and parsed');
       
