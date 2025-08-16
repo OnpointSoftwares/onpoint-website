@@ -139,10 +139,21 @@ def chat_api(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
-        print(f"Error in chat_api: {str(e)}")
+        error_message = str(e)
+        print(f"Error in chat_api: {error_message}")
+        
+        # Handle specific Gemini API errors
+        if "quota" in error_message.lower():
+            return JsonResponse({
+                'response': 'Our chat service is currently experiencing high demand. Please try again later or contact us directly at onpointinfo635@gmail.com',
+                'error': 'API quota exceeded',
+                'status': 'error'
+            }, status=429)
+            
         return JsonResponse({
-            'response': 'Sorry, I encountered an error. Please try again later or contact us directly.',
-            'error': str(e)
+            'response': 'Sorry, I encountered an error. Please try again later or contact us directly at onpointinfo635@gmail.com',
+            'error': error_message,
+            'status': 'error'
         }, status=500)
 
 # Configure Gemini API

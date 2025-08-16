@@ -122,7 +122,9 @@ export const ChatWidget = (function() {
       });
       
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Network response was not ok';
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
