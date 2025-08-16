@@ -101,6 +101,8 @@ def contact_us(request):
     return render(request, 'core/contact-us.html')
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+@require_http_methods(["POST"])
+@ensure_csrf_cookie
 def chat_api(request):
     if not request.body:
         return JsonResponse({'error': 'No data provided'}, status=400)
