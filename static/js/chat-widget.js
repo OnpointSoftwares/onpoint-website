@@ -109,7 +109,7 @@ export const ChatWidget = (function() {
     try {
       // Send message to server
       const csrftoken = getCookie('csrftoken');
-      const response = await fetch('/chat/', {
+      const response = await fetch('/chat_api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
