@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<article class="resource-detail">
+    <!-- Resource Header -->
+    <header class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto text-center">
+                    <div class="mb-4">
+                        <span class="badge bg-primary bg-opacity-20 text-primary px-3 py-2 mb-3">
+                            {{ resource.get_status_display }}
+                        </span>
+                        <h1 class="display-4 fw-bold mb-3">{{ resource.title }}</h1>
+                        <div class="d-flex justify-content-center align-items-center text-muted mb-4">
+                            <div class="d-flex align-items-center me-4">
+                                {% if resource.author.profile.avatar %}
+                                <img src="{{ resource.author.profile.avatar.url }}" class="rounded-circle me-2" width="40" height="40" alt="{{ resource.author.get_full_name }}">
+                                {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <span class="d-block text-white">{{ resource.author.get_full_name|default:resource.author.username }}</span>
+                                    <small>Published on {{ resource.published_at|date:"F j, Y" }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center me-4">
+                                <i class="bi {% if resource.is_video %}bi-play-circle{% elif resource.is_document %}bi-file-earmark-pdf{% else %}bi-clock{% endif %} me-2"></i>
+                                <span>{% if resource.is_video %}Video{% elif resource.is_document %}PDF Document{% else %}{{ resource.read_time }} min read{% endif %}</span>
+                            </div>
+                            {% if resource.is_document %}
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-filetype-pdf me-2"></i>
+                                <span>{{ resource.file_extension }} File</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Resource Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% if resource.is_video %}
+                <!-- Video Player -->
+                <div class="ratio ratio-16x9 mb-5 shadow-lg rounded-3 overflow-hidden">
+                    {{ resource.video_embed_code|safe }}
+                </div>
+                {% elif resource.is_document %}
+                <!-- PDF Document Viewer -->
+                <div class="card border-0 shadow-sm mb-5">
+                    <div class="card-header bg-light py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ resource.title }}</h5>
+                            <a href="{{ resource.document.url }}" class="btn btn-outline-primary btn-sm" download>
+                                <i class="bi bi-download me-1"></i> Download PDF
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <iframe 
+                            src="{{ resource.document.url }}#view=fitH" 
+                            class="w-100" 
+                            style="height: 70vh; border: none;"
+                            frameborder="0"
+                        ></iframe>
+                    </div>
+                </div>
+                {% elif resource.image %}
+                <!-- Image with Caption -->
+                <figure class="figure mb-5">
+                    <img src="{{ resource.image.url }}" class="figure-img img-fluid rounded shadow" alt="{{ resource.image_caption|default:resource.title }}">
+                    {% if resource.image_caption %}
+                    <figcaption class="figure-caption text-center mt-2 text-muted">{{ resource.image_caption }}</figcaption>
+                    {% endif %}
+                </figure>
+                {% endif %}
+
+                <!-- Main Content -->
+                <div class="resource-content mb-5">
+                    {% if resource.is_document %}
+                        <h2>Document Summary</h2>
+                        <p class="lead">{{ resource.short_description }}</p>
+                        <hr>
+                        <h3>Document Preview</h3>
+                        <p class="text-muted">Use the viewer above to browse through the document or download it for offline reading.</p>
+                    {% else %}
+                        {{ resource.description|safe|linebreaks }}
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center border-top border-bottom py-3 mb-5">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Share:</span>
+                        <div class="btn-group" role="group">
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ resource.title|urlencode }}" 
+                               class="btn btn-outline-secondary btn-sm" target="_blank">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ resource.title|urlencode }}" 
+                               class="btn btn-outline-secondary btn-sm" target="_blank">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                               class="btn btn-outline-secondary btn-sm" target="_blank">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-muted">
+                            <i class="bi bi-eye me-1"></i> {{ resource.view_count }} views
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Author Bio -->
+                <div class="card mb-5 border-0 shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-2 d-flex align-items-center justify-content-center p-3">
+                            {% if resource.author.profile.avatar %}
+                            <img src="{{ resource.author.profile.avatar.url }}" class="img-fluid rounded-circle" alt="{{ resource.author.get_full_name }}" width="100">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                <i class="bi bi-person text-white" style="font-size: 3rem;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <h5 class="card-title">About {{ resource.author.get_full_name|default:resource.author.username }}</h5>
+                                {% if resource.author.profile.bio %}
+                                    <p class="card-text">{{ resource.author.profile.bio }}</p>
+                                {% else %}
+                                    <p class="card-text text-muted">No bio available.</p>
+                                {% endif %}
+                                <div class="mt-3">
+                                    {% if resource.author.profile.website %}
+                                    <a href="{{ resource.author.profile.website }}" class="btn btn-outline-primary btn-sm me-2" target="_blank">
+                                        <i class="bi bi-globe me-1"></i> Website
+                                    </a>
+                                    {% endif %}
+                                    {% if resource.author.profile.twitter %}
+                                    <a href="https://twitter.com/{{ resource.author.profile.twitter }}" class="btn btn-outline-primary btn-sm me-2" target="_blank">
+                                        <i class="bi bi-twitter me-1"></i> Twitter
+                                    </a>
+                                    {% endif %}
+                                    {% if resource.author.profile.linkedin %}
+                                    <a href="{{ resource.author.profile.linkedin }}" class="btn btn-outline-primary btn-sm" target="_blank">
+                                        <i class="bi bi-linkedin me-1"></i> LinkedIn
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Related Resources -->
+{% if related_resources %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="section-title">You Might Also Like</h3>
+                <p class="text-muted">Explore more learning resources</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for resource in related_resources %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    {% if resource.image %}
+                    <img src="{{ resource.image.url }}" class="card-img-top" alt="{{ resource.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-journal-text text-white" style="font-size: 4rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary">{{ resource.get_status_display }}</span>
+                            <small class="text-muted"><i class="bi bi-clock me-1"></i> {{ resource.read_time }} min read</small>
+                        </div>
+                        <h5 class="card-title">{{ resource.title }}</h5>
+                        <p class="card-text text-muted">{{ resource.short_description|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{{ resource.get_absolute_url }}" class="btn btn-outline-primary w-100">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">Want to learn more?</h3>
+                <p class="mb-0">Subscribe to our newsletter to get the latest learning resources and updates.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <a href="/subscribe/" class="btn btn-light btn-lg">Subscribe Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

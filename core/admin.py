@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Project, Contact, Article, Comment
+from django.utils.safestring import mark_safe
+from django.urls import reverse
+from .models import LearningResource, Project, Contact, Article, Comment
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'category', 'status', 'client', 'created_at', 'featured', 'admin_thumbnail')
@@ -68,6 +70,44 @@ class ProjectAdmin(admin.ModelAdmin):
                 save=False
             )
         
+        super().save_model(request, obj, form, change)
+
+@admin.register(LearningResource)
+class LearningResourceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'resource_type', 'status', 'view_count', 'created_at', 'admin_thumbnail')
+    list_filter = ('status', 'resource_type', 'created_at')
+    search_fields = ('title', 'short_description', 'description', 'document_text')
+    list_editable = ('status',)
+    readonly_fields = ('view_count', 'created_at', 'updated_at', 'published_at', 'admin_thumbnail')
+    prepopulated_fields = {'slug': ('title',)}
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('title', 'slug', 'resource_type', 'status', 'author')
+        }),
+        ('Content', {
+            'fields': ('short_description', 'description', 'content', 'read_time')
+        }),
+        ('Media', {
+            'fields': ('image', 'admin_thumbnail', 'image_caption', 'video_url', 'document')
+        }),
+        ('Metadata', {
+            'fields': ('view_count', 'created_at', 'updated_at', 'published_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def admin_thumbnail(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="100" />')
+        return "No Image"
+    admin_thumbnail.short_description = 'Thumbnail'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('author')
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.author_id:
+            obj.author = request.user
         super().save_model(request, obj, form, change)
 
 admin.site.register(Project, ProjectAdmin)

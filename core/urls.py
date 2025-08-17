@@ -48,4 +48,7 @@ urlpatterns = [
     path('admin/articles/<int:pk>/update/', login_required(views.article_update), name='admin_article_update'),
     path('admin/articles/<int:pk>/delete/', login_required(views.article_delete), name='admin_article_delete'),
     path('admin/articles/<int:pk>/add-comment/', login_required(views.add_comment), name='add_comment'),
+    # Learning resources
+    path('learning-resources/', views.learning_resource_list, name='learning_resource_list'),
+    path('learning-resources/<slug:slug>/', views.learning_resource_detail, name='learning_resource_detail'),
 ]

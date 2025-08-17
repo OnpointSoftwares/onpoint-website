@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="banner">
+    <div class="banner-overlay">
+        <div class="container">
+            <div class="row align-items-center justify-content-center" style="min-height: 300px;">
+                <div class="col-lg-8 text-center">
+                    <h1 class="display-4 text-white fw-bold mb-3">Learning Resources</h1>
+                    <p class="lead text-white mb-4">Discover our curated collection of educational materials, tutorials, and guides to help you grow your skills.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#resources" class="btn btn-primary btn-lg px-4">Browse Resources</a>
+                        <a href="#featured" class="btn btn-outline-light btn-lg px-4">Featured</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="resources" class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title">Explore Our Learning Resources</h2>
+                <p class="text-muted">Handpicked materials to help you learn and grow in your tech journey</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for resource in learning_resources %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    {% if resource.image %}
+                    <img src="{{ resource.image.url }}" class="card-img-top" alt="{{ resource.title }}" style="height: 200px; object-fit: cover;">
+                    {% elif resource.is_video %}
+                    <div class="position-relative">
+                        <div class="bg-dark" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-play-circle text-white" style="font-size: 4rem;"></i>
+                        </div>
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-danger">Video</span>
+                        </div>
+                    </div>
+                    {% elif resource.is_document %}
+                    <div class="bg-light" style="height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <i class="bi bi-file-earmark-pdf text-danger" style="font-size: 4rem;"></i>
+                        <span class="mt-2 text-muted">{{ resource.file_extension }} Document</span>
+                    </div>
+                    {% else %}
+                    <div class="bg-secondary" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-journal-text text-white" style="font-size: 4rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">{{ resource.get_status_display }}</span>
+                                {% if resource.is_video %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger">Video</span>
+                                {% elif resource.is_document %}
+                                <span class="badge bg-info bg-opacity-10 text-info">PDF</span>
+                                {% else %}
+                                <span class="badge bg-success bg-opacity-10 text-success">Article</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                <i class="bi {% if resource.is_video %}bi-play-circle{% elif resource.is_document %}bi-file-earmark-pdf{% else %}bi-clock{% endif %} me-1"></i>
+                                {% if resource.is_video %}Watch{% else %}{{ resource.read_time }} min read{% endif %}
+                            </small>
+                        </div>
+                        <h5 class="card-title">{{ resource.title }}</h5>
+                        <p class="card-text text-muted">{{ resource.short_description|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            {% if resource.author.profile.avatar %}
+                            <img src="{{ resource.author.profile.avatar.url }}" class="rounded-circle me-2" width="30" height="30" alt="{{ resource.author.get_full_name }}">
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                <i class="bi bi-person text-white"></i>
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">{{ resource.author.get_full_name|default:resource.author.username }}</small>
+                        </div>
+                        <a href="{{ resource.get_absolute_url }}" class="btn btn-sm btn-outline-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-3 shadow-sm">
+                    <i class="bi bi-journal-text display-1 text-muted mb-4"></i>
+                    <h4 class="mb-3">No Learning Resources Available</h4>
+                    <p class="text-muted mb-4">Check back later for new resources or subscribe to our newsletter to stay updated.</p>
+                    <a href="/contact/" class="btn btn-primary">Contact Us</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if is_paginated %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-3">Can't find what you're looking for?</h3>
+                <p class="mb-0">Let us know what learning resources you'd like to see. We're always adding new content based on your feedback.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <a href="/contact/" class="btn btn-light btn-lg">Request a Resource</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q, Count, Case, When, Value, IntegerField, F
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
@@ -20,7 +21,7 @@ import google.generativeai as genai
 import os
 import json
 from datetime import timedelta
-from .models import Contact, Project, Article
+from .models import Contact, Project, Article,LearningResource
 from .forms import ProjectForm, ProjectFilterForm
 
 def get_gemini_chat():
@@ -687,3 +688,62 @@ def add_comment(request, pk):
         'comments': article.comment_set.all(),
     })
     
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+def learning_resource_list(request):
+    # Get published resources by default
+    resources_list = LearningResource.objects.filter(status='published').order_by('-published_at', '-created_at')
+    
+    # Get filter parameters
+    status = request.GET.get('status', '')
+    search = request.GET.get('search', '')
+    
+    # Apply filters
+    if status:
+        resources_list = resources_list.filter(status=status)
+    if search:
+        resources_list = resources_list.filter(
+            Q(title__icontains=search) | 
+            Q(short_description__icontains=search) |
+            Q(description__icontains=search)
+        )
+    
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(resources_list, 9)  # Show 9 resources per page
+    
+    try:
+        resources = paginator.page(page)
+    except PageNotAnInteger:
+        resources = paginator.page(1)
+    except EmptyPage:
+        resources = paginator.page(paginator.num_pages)
+    
+    context = {
+        'learning_resources': resources,
+        'is_paginated': resources.has_other_pages(),
+        'page_obj': resources,
+        'status_filter': status,
+        'search_query': search,
+    }
+    
+    return render(request, 'core/learning_resource_list.html', context)
+
+def learning_resource_detail(request, slug):
+    """View for displaying a single learning resource."""
+    resource = get_object_or_404(LearningResource, slug=slug, status='published')
+    
+    # Increment view count
+    resource.increment_view_count()
+    
+    # Get related resources (excluding current resource)
+    related_resources = LearningResource.objects.filter(
+        status='published'
+    ).exclude(id=resource.id).order_by('?')[:3]  # Get 3 random related resources
+    
+    context = {
+        'resource': resource,
+        'related_resources': related_resources,
+    }
+    
+    return render(request, 'core/learning_resource_detail.html', context)
