@@ -1,0 +1,443 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+    {% if article %}Edit Article - {{ article.title }}{% else %}Create New Article{% endif %} - Admin Panel
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'admin_article_list' %}">Articles</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% if article %}{{ article.title|truncatewords:3 }}{% else %}New Article{% endif %}
+                    </li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-gradient">
+                        {% if article %}Edit Article{% else %}Create New Article{% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if article %}
+                            Update article content and settings
+                        {% else %}
+                            Write and publish a new article for your blog
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if article %}
+                    <a href="{% url 'article_detail' article.pk %}" class="btn btn-outline-secondary" target="_blank">
+                        <i class="bi bi-eye me-1"></i> Preview
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-1"></i> Delete
+                    </button>
+                    {% endif %}
+                    <button type="submit" form="articleForm" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>
+                        {% if article %}Update{% else %}Publish{% endif %} Article
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pencil-square me-2 text-primary"></i>
+                        Article Content
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="articleForm" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-icon me-3">
+                                    <i class="bi bi-info-circle-fill text-primary"></i>
+                                </div>
+                                <h5 class="mb-0">Basic Information</h5>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="id_title" class="form-label">Article Title *</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.title.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="id_status" class="form-label">Status</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label for="id_slug" class="form-label">URL Slug</label>
+                                    {{ form.slug }}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Auto-generated from title. Only letters, numbers, and hyphens.
+                                    </div>
+                                    {% if form.slug.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.slug.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_author" class="form-label">Author</label>
+                                    {{ form.author }}
+                                    {% if form.author.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.author.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-icon me-3">
+                                    <i class="bi bi-file-text-fill text-success"></i>
+                                </div>
+                                <h5 class="mb-0">Content</h5>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_short_description" class="form-label">Short Description</label>
+                                {{ form.short_description }}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Brief summary for article previews (max 200 characters)
+                                </div>
+                                {% if form.short_description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.short_description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_content" class="form-label">Article Content *</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Media Section -->
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-icon me-3">
+                                    <i class="bi bi-image-fill text-warning"></i>
+                                </div>
+                                <h5 class="mb-0">Featured Image</h5>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_image" class="form-label">Upload Image</label>
+                                    {{ form.image }}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Recommended size: 1200x600px
+                                    </div>
+                                    {% if form.image.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.image.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_image_caption" class="form-label">Image Caption</label>
+                                    {{ form.image_caption }}
+                                    {% if form.image_caption.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.image_caption.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Image Preview -->
+                            {% if article.image %}
+                            <div class="mt-3">
+                                <div class="image-preview">
+                                    <img src="{{ article.image.url }}" alt="Current image" class="img-thumbnail" style="max-width: 300px;">
+                                    <p class="text-muted small mt-1">Current image</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- SEO & Metadata -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="section-icon me-3">
+                                    <i class="bi bi-search text-info"></i>
+                                </div>
+                                <h5 class="mb-0">SEO & Metadata</h5>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="id_tags" class="form-label">Tags</label>
+                                    {{ form.tags }}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Separate tags with commas
+                                    </div>
+                                    {% if form.tags.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.tags.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="id_read_time" class="form-label">Read Time (minutes)</label>
+                                    {{ form.read_time }}
+                                    {% if form.read_time.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.read_time.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Publishing Options -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-calendar-event me-2 text-primary"></i>
+                        Publishing
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <div class="d-flex align-items-center">
+                            {% if article.status == 'published' %}
+                                <span class="status-badge status-active me-2">Published</span>
+                            {% elif article.status == 'draft' %}
+                                <span class="status-badge status-pending me-2">Draft</span>
+                            {% else %}
+                                <span class="status-badge status-cancelled me-2">Unpublished</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if article.created_at %}
+                    <div class="mb-3">
+                        <label class="form-label">Created</label>
+                        <p class="text-muted mb-0">{{ article.created_at|date:"M d, Y g:i A" }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if article.updated_at %}
+                    <div class="mb-3">
+                        <label class="form-label">Last Updated</label>
+                        <p class="text-muted mb-0">{{ article.updated_at|date:"M d, Y g:i A" }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if article.view_count %}
+                    <div class="mb-3">
+                        <label class="form-label">Views</label>
+                        <p class="text-muted mb-0">{{ article.view_count|default:0 }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-lightning-charge me-2 text-warning"></i>
+                        Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="saveAsDraft()">
+                            <i class="bi bi-file-earmark me-1"></i> Save as Draft
+                        </button>
+                        {% if article %}
+                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                            <i class="bi bi-eye me-1"></i> Preview Article
+                        </a>
+                        {% endif %}
+                        <button type="button" class="btn btn-outline-info btn-sm" onclick="generateSlug()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Regenerate Slug
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+{% if article %}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Article</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<strong>{{ article.title }}</strong>"?</p>
+                <p class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="{% url 'admin_article_delete' article.pk %}" class="btn btn-danger">Delete Article</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-generate slug from title
+    document.addEventListener('DOMContentLoaded', function() {
+        const titleInput = document.getElementById('id_title');
+        const slugInput = document.getElementById('id_slug');
+        
+        if (titleInput && slugInput) {
+            titleInput.addEventListener('input', function() {
+                if (!slugInput.value || slugInput.dataset.autoGenerated !== 'false') {
+                    const slug = this.value
+                        .toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-')
+                        .trim('-');
+                    slugInput.value = slug;
+                    slugInput.dataset.autoGenerated = 'true';
+                }
+            });
+            
+            slugInput.addEventListener('input', function() {
+                this.dataset.autoGenerated = 'false';
+            });
+        }
+    });
+    
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    
+    // Quick Actions
+    function saveAsDraft() {
+        const statusField = document.getElementById('id_status');
+        if (statusField) {
+            statusField.value = 'draft';
+            document.getElementById('articleForm').submit();
+        }
+    }
+    
+    function generateSlug() {
+        const titleInput = document.getElementById('id_title');
+        const slugInput = document.getElementById('id_slug');
+        
+        if (titleInput && slugInput && titleInput.value) {
+            const slug = titleInput.value
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim('-');
+            slugInput.value = slug;
+            slugInput.dataset.autoGenerated = 'true';
+        }
+    }
+    
+    // Image preview
+    const imageInput = document.getElementById('id_image');
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create or update image preview
+                    let preview = document.querySelector('.image-preview');
+                    if (!preview) {
+                        preview = document.createElement('div');
+                        preview.className = 'image-preview mt-3';
+                        imageInput.parentNode.appendChild(preview);
+                    }
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" class="img-thumbnail" style="max-width: 300px;">
+                        <p class="text-muted small mt-1">New image preview</p>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Articles Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1 text-gradient">Articles Management</h1>
+                    <p class="text-muted mb-0">Create, edit, and manage your blog articles</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="bi bi-funnel me-1"></i> Filters
+                    </button>
+                    <a href="{% url 'article_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i> New Article
+                    </a>
+                </div>
+            </div>
+            <nav aria-label="breadcrumb" class="mt-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Articles</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card bg-primary text-white h-100 fade-in-up">
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase mb-2 opacity-75">Total Articles</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_articles|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-lg bg-white-10 rounded-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-journal-text fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white h-100 fade-in-up" style="animation-delay: 0.1s;">
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase mb-2 opacity-75">Published</h6>
+                            <h2 class="mb-0 fw-bold">{{ published_articles|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-lg bg-white-10 rounded-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-check-circle fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-white h-100 fade-in-up" style="animation-delay: 0.2s;">
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase mb-2 opacity-75">Drafts</h6>
+                            <h2 class="mb-0 fw-bold">{{ draft_articles|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-lg bg-white-10 rounded-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-file-earmark fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-info text-white h-100 fade-in-up" style="animation-delay: 0.3s;">
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-uppercase mb-2 opacity-75">Total Views</h6>
+                            <h2 class="mb-0 fw-bold">{{ total_views|default:"0" }}</h2>
+                        </div>
+                        <div class="icon-lg bg-white-10 rounded-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-eye fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles List -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list-ul me-2 text-primary"></i>
+                All Articles
+            </h5>
+            <div class="d-flex gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-sort-down me-1"></i> Sort
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="?sort=created_at">Newest First</a></li>
+                        <li><a class="dropdown-item" href="?sort=-created_at">Oldest First</a></li>
+                        <li><a class="dropdown-item" href="?sort=title">Title A-Z</a></li>
+                        <li><a class="dropdown-item" href="?sort=-title">Title Z-A</a></li>
+                        <li><a class="dropdown-item" href="?sort=view_count">Most Viewed</a></li>
+                    </ul>
+                </div>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="view" id="grid-view" autocomplete="off" checked>
+                    <label class="btn btn-outline-secondary btn-sm" for="grid-view">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                    </label>
+                    <input type="radio" class="btn-check" name="view" id="list-view" autocomplete="off">
+                    <label class="btn btn-outline-secondary btn-sm" for="list-view">
+                        <i class="bi bi-list"></i>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <!-- Grid View -->
+            <div id="grid-container" class="p-4">
+                {% if articles %}
+                <div class="row g-4">
+                    {% for article in articles %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card article-card h-100 shadow-sm">
+                            {% if article.image %}
+                            <div class="article-image">
+                                <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}">
+                                <div class="article-overlay">
+                                    <div class="article-actions">
+                                        <a href="{% url 'admin_article_update' article.pk %}" class="btn btn-light btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-light btn-sm" target="_blank">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="article-image-placeholder">
+                                <i class="bi bi-image fs-1 text-muted"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    {% if article.status == 'published' %}
+                                        <span class="status-badge status-active">Published</span>
+                                    {% elif article.status == 'draft' %}
+                                        <span class="status-badge status-pending">Draft</span>
+                                    {% else %}
+                                        <span class="status-badge status-cancelled">Unpublished</span>
+                                    {% endif %}
+                                    
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{% url 'admin_article_update' article.pk %}">
+                                                <i class="bi bi-pencil me-2"></i>Edit
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{% url 'article_detail' article.pk %}" target="_blank">
+                                                <i class="bi bi-eye me-2"></i>View
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'admin_article_delete' article.pk %}">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <h6 class="card-title">
+                                    <a href="{% url 'admin_article_update' article.pk %}" class="text-decoration-none">
+                                        {{ article.title|truncatewords:8 }}
+                                    </a>
+                                </h6>
+                                
+                                <p class="card-text text-muted small flex-grow-1">
+                                    {{ article.short_description|truncatewords:15|default:"No description available." }}
+                                </p>
+                                
+                                <div class="article-meta mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center text-muted small">
+                                        <span>
+                                            <i class="bi bi-person me-1"></i>
+                                            {{ article.author|default:"Admin" }}
+                                        </span>
+                                        <span>
+                                            <i class="bi bi-eye me-1"></i>
+                                            {{ article.view_count|default:0 }}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        {{ article.created_at|date:"M d, Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-journal-x display-1 text-muted"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">No Articles Found</h5>
+                    <p class="text-muted mb-4">Start creating engaging content for your audience.</p>
+                    <a href="{% url 'article_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i> Create Your First Article
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- List View -->
+            <div id="list-container" class="d-none">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Article</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for article in articles %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            {% if article.image %}
+                                                <img src="{{ article.image.url }}" alt="{{ article.title }}" 
+                                                     class="rounded" width="50" height="50" style="object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                     style="width: 50px; height: 50px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">
+                                                <a href="{% url 'admin_article_update' article.pk %}" class="text-decoration-none">
+                                                    {{ article.title|truncatewords:10 }}
+                                                </a>
+                                            </h6>
+                                            <p class="text-muted small mb-0">{{ article.short_description|truncatewords:10 }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ article.author|default:"Admin" }}</td>
+                                <td>
+                                    {% if article.status == 'published' %}
+                                        <span class="status-badge status-active">Published</span>
+                                    {% elif article.status == 'draft' %}
+                                        <span class="status-badge status-pending">Draft</span>
+                                    {% else %}
+                                        <span class="status-badge status-cancelled">Unpublished</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ article.view_count|default:0 }}</td>
+                                <td>{{ article.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'admin_article_update' article.pk %}">
+                                                <i class="bi bi-pencil me-2"></i>Edit
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{% url 'article_detail' article.pk %}" target="_blank">
+                                                <i class="bi bi-eye me-2"></i>View
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'admin_article_delete' article.pk %}">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-journal-x display-4 d-block mb-3"></i>
+                                        No articles found. <a href="{% url 'article_create' %}">Create your first article</a>.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if articles.has_other_pages %}
+        <div class="card-footer bg-white">
+            <nav aria-label="Articles pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if articles.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ articles.previous_page_number }}">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in articles.paginator.page_range %}
+                        {% if articles.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > articles.number|add:'-3' and num < articles.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if articles.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ articles.next_page_number }}">
+                                Next <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Articles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="get">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="status-filter" class="form-label">Status</label>
+                        <select class="form-select" id="status-filter" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="unpublished">Unpublished</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author-filter" class="form-label">Author</label>
+                        <select class="form-select" id="author-filter" name="author">
+                            <option value="">All Authors</option>
+                            {% for author in authors %}
+                            <option value="{{ author.id }}">{{ author.get_full_name|default:author.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="search-filter" class="form-label">Search</label>
+                        <input type="text" class="form-control" id="search-filter" name="search" placeholder="Search articles...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // View toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const gridView = document.getElementById('grid-view');
+        const listView = document.getElementById('list-view');
+        const gridContainer = document.getElementById('grid-container');
+        const listContainer = document.getElementById('list-container');
+        
+        gridView.addEventListener('change', function() {
+            if (this.checked) {
+                gridContainer.classList.remove('d-none');
+                listContainer.classList.add('d-none');
+            }
+        });
+        
+        listView.addEventListener('change', function() {
+            if (this.checked) {
+                listContainer.classList.remove('d-none');
+                gridContainer.classList.add('d-none');
+            }
+        });
+    });
+</script>
+
+<style>
+.article-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.article-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.article-card:hover .article-image img {
+    transform: scale(1.05);
+}
+
+.article-image-placeholder {
+    height: 200px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.article-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.article-card:hover .article-overlay {
+    opacity: 1;
+}
+
+.article-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.article-meta {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 0.75rem;
+}
+</style>
+{% endblock %}

@@ -48,11 +48,11 @@ class Project(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planning')
     featured = models.BooleanField(default=False)
     technologies = models.CharField(max_length=255, help_text="Comma-separated list of technologies used")
-    image = models.ImageField(upload_to='projects/')
+    image = models.ImageField(upload_to='projects/', blank=True, null=True)
     thumbnail = models.ImageField(upload_to='projects/thumbnails/', blank=True, null=True)
     github_url = models.URLField(blank=True, null=True)
     live_url = models.URLField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
@@ -63,8 +63,6 @@ class Project(models.Model):
         
     class Meta:
         ordering = ['-created_at']
-    
-    class Meta:
         verbose_name = "Project"
         verbose_name_plural = "Projects"
 class Article(models.Model):
@@ -89,7 +87,7 @@ class Article(models.Model):
         null=True, 
         related_name='articles'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at =  models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(blank=True, null=True)
     
@@ -134,7 +132,7 @@ class Comment(models.Model):
         related_name='replies'
     )
     text = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q, Count, Case, When, Value, IntegerField, F
+from django.db.models import Q, Count, Case, When, Value, IntegerField, F, Sum
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
@@ -10,7 +10,6 @@ from django.contrib.auth import login, authenticate
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Count, Case, When, Value, IntegerField, F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.views.generic import (
@@ -22,7 +21,7 @@ import os
 import json
 from datetime import timedelta
 from .models import Contact, Project, Article,LearningResource
-from .forms import ProjectForm, ProjectFilterForm
+from .forms import ProjectForm, ProjectFilterForm, ArticleForm
 
 def get_gemini_chat():
     try:
@@ -86,8 +85,31 @@ def home(request):
         
         return redirect('home')
     
-    projects = Project.objects.all()
-    return render(request, 'core/home.html', {'projects': projects})
+    # Get featured projects for portfolio section
+    featured_projects = Project.objects.filter(featured=False, status__in=['completed', 'launched']).order_by('-created_at')[:6]
+    
+    # Get all completed/launched projects for stats
+    all_projects = Project.objects.filter(status__in=['completed', 'launched'])
+    
+    # Get the 3 most recent articles for blog section
+    latest_articles = Article.objects.filter(status='published').order_by('-created_at')[:3]
+    
+    # Calculate dynamic stats
+    stats = {
+        'years_experience': 5,  # You can make this dynamic based on your start date
+        'projects_delivered': all_projects.count(),
+        'client_satisfaction': 98,  # You can calculate this from testimonials/ratings
+        'team_members': 8,  # Update based on your actual team size
+    }
+    
+    context = {
+        'projects': featured_projects,
+        'stats': stats,
+        'latest_articles': latest_articles,
+    }
+    for project in featured_projects:
+        print(project)
+    return render(request, 'core/home.html', context)
 def about(request):
     return render(request, 'core/about-us.html')
 def mobile_development(request):
@@ -207,36 +229,7 @@ except Exception as e:
     model = None
     chat = None
 
-def home(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        message = request.POST.get('message')
-        subject = f"New Contact from {name}"
-        body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\n\nMessage:\n{message}"
-        try:
-            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], fail_silently=True)
-            messages.success(request, 'Thanks! We will get back to you shortly.')
-        except Exception:
-            messages.success(request, 'Thanks! We will get back to you shortly.')
-        return redirect('home')
-
-    stats = {
-        'years_experience': 5,
-        'projects_delivered': 12,
-        'client_satisfaction': 98,
-        'team_members': 5,
-    }
-    
-    # Get the 3 most recent articles
-    latest_articles = Article.objects.order_by('-created_at')[:3]
-    
-    context = {
-        'stats': stats,
-        'latest_articles': latest_articles,
-    }
-    return render(request, 'core/home.html', context)
+# Duplicate home function removed - using the first home function with projects
 
 
 # Admin Views
@@ -262,23 +255,68 @@ class AdminDashboardView(StaffRequiredMixin, TemplateView):
         projects = Project.objects.all()
         total_projects = projects.count()
         active_projects = projects.filter(status__in=['in_progress', 'on_hold']).count()
-        completed_projects = projects.filter(status='completed').count()
+        completed_projects = projects.filter(status__in=['completed', 'launched']).count()
+        planning_projects = projects.filter(status='planning').count()
         
-        # Project status distribution
-        status_distribution = projects.values('status').annotate(
-            count=Count('id'),
-            percentage=Count('id') * 100 / total_projects if total_projects > 0 else 0
-        )
+        # Project status distribution with proper formatting
+        status_stats = {}
+        for status_code, status_label in Project.STATUS_CHOICES:
+            count = projects.filter(status=status_code).count()
+            percentage = (count * 100.0 / total_projects) if total_projects > 0 else 0
+            status_stats[status_code] = {
+                'count': count,
+                'percentage': percentage,
+                'label': status_label
+            }
         
-        # Recent projects
+        # Article statistics
+        articles = Article.objects.all()
+        total_articles = articles.count()
+        published_articles = articles.filter(status='published').count()
+        draft_articles = articles.filter(status='draft').count()
+        total_views = articles.aggregate(total_views=Sum('view_count'))['total_views'] or 0
+        
+        # Recent activities
         recent_projects = projects.order_by('-created_at')[:5]
+        recent_articles = articles.order_by('-created_at')[:5]
+        
+        # Monthly statistics (last 30 days)
+        from datetime import datetime, timedelta
+        last_month = datetime.now() - timedelta(days=30)
+        
+        new_projects_month = projects.filter(created_at__gte=last_month).count()
+        new_articles_month = articles.filter(created_at__gte=last_month).count()
+        
+        # Growth calculations
+        projects_growth = 0
+        articles_growth = 0
+        if total_projects > 0:
+            projects_growth = (new_projects_month * 100.0 / total_projects)
+        if total_articles > 0:
+            articles_growth = (new_articles_month * 100.0 / total_articles)
         
         context.update({
+            # Project stats
             'total_projects': total_projects,
             'active_projects': active_projects,
             'completed_projects': completed_projects,
-            'status_distribution': status_distribution,
+            'planning_projects': planning_projects,
+            'status_stats': status_stats,
             'recent_projects': recent_projects,
+            
+            # Article stats
+            'total_articles': total_articles,
+            'published_articles': published_articles,
+            'draft_articles': draft_articles,
+            'total_views': total_views,
+            'recent_articles': recent_articles,
+            
+            # Growth stats
+            'new_projects_month': new_projects_month,
+            'new_articles_month': new_articles_month,
+            'projects_growth': round(projects_growth, 1),
+            'articles_growth': round(articles_growth, 1),
+            
             'title': 'Dashboard',
         })
         
@@ -337,9 +375,25 @@ class ProjectCreateView(StaffRequiredMixin, CreateView):
         return context
     
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
+        # Auto-generate slug if not provided or empty
+        if not form.instance.slug or form.instance.slug.strip() == '':
+            from django.utils.text import slugify
+            import uuid
+            base_slug = slugify(form.instance.title)
+            # Ensure uniqueness by checking existing slugs
+            slug = base_slug
+            counter = 1
+            while Project.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            form.instance.slug = slug
+        
         messages.success(self.request, 'Project created successfully!')
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
 
 
 class ProjectDetailView(StaffRequiredMixin, DetailView):
@@ -372,8 +426,17 @@ class ProjectUpdateView(StaffRequiredMixin, UpdateView):
         return reverse_lazy('project_detail', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
-        form.instance.updated_by = self.request.user
-        return super().form_valid(form)
+        # Debug: Check featured field
+        print(f"DEBUG UPDATE: Featured field in form.cleaned_data: {form.cleaned_data.get('featured')}")
+        print(f"DEBUG UPDATE: Featured field in form.instance: {form.instance.featured}")
+        print(f"DEBUG UPDATE: Featured field in POST data: {self.request.POST.get('featured')}")
+        
+        # Note: Project model doesn't have updated_by field, using updated_at auto field
+        result = super().form_valid(form)
+        
+        # Debug: Check if it was saved
+        print(f"DEBUG UPDATE: Featured field after save: {self.object.featured}")
+        return result
 
 
 class ProjectDeleteView(StaffRequiredMixin, DeleteView):
@@ -469,7 +532,7 @@ def public_article_list(request):
     Public view for displaying published articles with pagination and featured article.
     """
     # Get all published articles, ordered by creation date (newest first)
-    articles_list = Article.objects.all().order_by('-created_at')
+    articles_list = Article.objects.filter(status='published').order_by('-created_at')
     
     # Get the featured article (most recent published article)
     featured_article = articles_list.first()
@@ -503,9 +566,27 @@ def admin_article_list(request):
     # Get all articles, ordered by creation date (newest first)
     articles = Article.objects.all().order_by('-created_at')
     
-    return render(request, 'admin/article_list.html', {
+    # Calculate statistics
+    total_articles = articles.count()
+    published_articles = articles.filter(status='published').count()
+    draft_articles = articles.filter(status='draft').count()
+    total_views = articles.aggregate(total_views=Sum('view_count'))['total_views'] or 0
+    
+    return render(request, 'admin/article_list_modern.html', {
         'articles': articles,
-        'is_admin': True
+        'is_admin': True,
+        # Individual statistics for template
+        'total_articles': total_articles,
+        'published_articles': published_articles,
+        'draft_articles': draft_articles,
+        'total_views': total_views,
+        # Also keep stats dict for potential future use
+        'stats': {
+            'total': total_articles,
+            'published': published_articles,
+            'drafts': draft_articles,
+            'total_views': total_views,
+        }
     })
 def admin_article_detail(request, pk):
     """
@@ -515,7 +596,7 @@ def admin_article_detail(request, pk):
     
     # Get related articles (excluding current article)
     related_articles = Article.objects.filter(
-        is_published=True
+        status='published'
     ).exclude(pk=article.pk).order_by('-created_at')[:3]
     
     # Get next and previous articles for navigation
@@ -553,7 +634,7 @@ def article_detail(request, slug=None, pk=None):
     
     # Try to get article by slug first (preferred method for public URLs)
     if slug:
-        article = get_object_or_404(Article, slug=slug, is_published=True)
+        article = get_object_or_404(Article, slug=slug, status='published')
     # Fall back to primary key if slug is not provided
     elif pk:
         article = get_object_or_404(Article, pk=pk)
@@ -619,36 +700,36 @@ def article_detail(request, slug=None, pk=None):
     return render(request, template, context)
 def article_create(request):
     if request.method == 'POST':
-        form = ArticleForm(request.POST)
+        form = ArticleForm(request.POST, request.FILES)
         if form.is_valid():
             article = form.save(commit=False)
+            if not article.author:
+                article.author = request.user
             article.save()
             messages.success(request, 'Article created successfully!')
             return redirect('admin_article_detail', pk=article.pk)
     else:
         form = ArticleForm()
     
-    return render(request, 'core/article_form.html', {
+    return render(request, 'admin/article_form.html', {
         'form': form,
         'title': 'Create New Article',
-        'submit_text': 'Create Article'
+        'article': None,
     })
 def article_update(request, pk):
     article = get_object_or_404(Article, pk=pk)
     if request.method == 'POST':
-        form = ArticleForm(request.POST, instance=article)
+        form = ArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
-            article = form.save(commit=False)
-            article.save()
+            article = form.save()
             messages.success(request, 'Article updated successfully!')
             return redirect('admin_article_detail', pk=article.pk)
     else:
         form = ArticleForm(instance=article)
     
-    return render(request, 'core/article_form.html', {
+    return render(request, 'admin/article_form.html', {
         'form': form,
         'title': f'Edit Article: {article.title}',
-        'submit_text': 'Update Article',
         'article': article
     })
 def article_delete(request, pk):

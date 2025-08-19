@@ -7,34 +7,72 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'admin:project_list' %}">Projects</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
                 <li class="breadcrumb-item active" aria-current="page">
                     {% if project %}{{ project.title }}{% else %}New Project{% endif %}
                 </li>
             </ol>
         </nav>
         <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">{{ title }}</h1>
-            {% if project %}
-            <a href="{% url 'admin:project_detail' project.slug %}" class="btn btn-outline-secondary">
-                <i class="bi bi-eye me-1"></i> View Project
-            </a>
-            {% endif %}
+            <div>
+                <h1 class="h3 mb-1 text-gradient">{{ title }}</h1>
+                <p class="text-muted mb-0">
+                    {% if project %}
+                        Edit project details and settings
+                    {% else %}
+                        Create a new project for your portfolio
+                    {% endif %}
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if project %}
+                <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-eye me-1"></i> Preview
+                </a>
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash me-1"></i> Delete
+                </button>
+                {% endif %}
+                <button type="submit" form="projectForm" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i> 
+                    {% if project %}Update{% else %}Create{% endif %} Project
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>
+                    Project Details
+                </h5>
+            </div>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
+                <form id="projectForm" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                     {% csrf_token %}
                     
+                    <!-- Display form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
                     <!-- Basic Information -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Basic Information</h5>
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="section-icon me-3">
+                                <i class="bi bi-info-circle-fill text-primary"></i>
+                            </div>
+                            <h5 class="mb-0">Basic Information</h5>
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -47,6 +85,23 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_slug" class="form-label">URL Slug</label>
+                                    {{ form.slug }}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Leave empty to auto-generate from title
+                                    </div>
+                                    {% if form.slug.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.slug.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="id_category" class="form-label">Category *</label>
@@ -98,8 +153,13 @@
                     </div>
                     
                     <!-- Client Information -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Client Information</h5>
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="section-icon me-3">
+                                <i class="bi bi-person-badge-fill text-success"></i>
+                            </div>
+                            <h5 class="mb-0">Client Information</h5>
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -167,8 +227,13 @@
                     </div>
                     
                     <!-- Media & Links -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Media & Links</h5>
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="section-icon me-3">
+                                <i class="bi bi-image-fill text-warning"></i>
+                            </div>
+                            <h5 class="mb-0">Media & Links</h5>
+                        </div>
                         <div class="row g-3">
                             <div class="col-12">
                                 <div class="form-group">
@@ -214,7 +279,7 @@
                     </div>
                     
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'admin:project_list' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-1"></i> Cancel
                         </a>
                         <div>
@@ -246,6 +311,11 @@
                     <div class="form-text">
                         Featured projects are displayed prominently on the portfolio page.
                     </div>
+                    {% if form.featured.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.featured.errors.0 }}
+                        </div>
+                    {% endif %}
                 </div>
                 
                 <div class="mb-3">

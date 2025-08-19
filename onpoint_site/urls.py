@@ -9,8 +9,8 @@ def _static_serve(prefix, **kwargs):
     return static_serve(request, path, **kwargs)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    path('admin/', admin.site.urls),
 ]
 
 # Serve static files using Django in development

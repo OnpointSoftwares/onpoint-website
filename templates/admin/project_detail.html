@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load pdf_filters %}
 
 {% block title %}{{ project.title }} - Admin Panel{% endblock %}
 
@@ -7,21 +8,286 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'admin:project_list' %}">Projects</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ project.title|truncatechars:30 }}</li>
             </ol>
         </nav>
         <div class="d-flex justify-content-between align-items-center">
             <h1 class="h3 mb-0">Project Details</h1>
             <div>
-                <a href="{% url 'admin:project_update' project.pk %}" class="btn btn-outline-primary me-2">
+                <a href="{% url 'project_update' project.pk %}" class="btn btn-outline-primary me-2">
                     <i class="bi bi-pencil me-1"></i> Edit
                 </a>
-                <a href="{% url 'admin:project_list' %}" class="btn btn-outline-secondary">
+                <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-1"></i> Back to List
                 </a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Project Details Content -->
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Project Information Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Project Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Title</label>
+                        <p class="fw-bold">{{ project.title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Category</label>
+                        <p>{{ project.get_category_display|default:"Not specified" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Status</label>
+                        <p>
+                            {% if project.status == 'planning' %}
+                                <span class="badge bg-warning">{{ project.get_status_display }}</span>
+                            {% elif project.status == 'in_progress' %}
+                                <span class="badge bg-primary">{{ project.get_status_display }}</span>
+                            {% elif project.status == 'on_hold' %}
+                                <span class="badge bg-secondary">{{ project.get_status_display }}</span>
+                            {% elif project.status == 'completed' %}
+                                <span class="badge bg-success">{{ project.get_status_display }}</span>
+                            {% elif project.status == 'launched' %}
+                                <span class="badge bg-info">{{ project.get_status_display }}</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">{{ project.get_status_display }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Featured</label>
+                        <p>
+                            {% if project.featured %}
+                                <span class="badge bg-success"><i class="bi bi-star-fill me-1"></i>Featured</span>
+                            {% else %}
+                                <span class="text-muted">Not featured</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Start Date</label>
+                        <p>{{ project.start_date|date:"F d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">End Date</label>
+                        <p>{{ project.end_date|date:"F d, Y"|default:"Ongoing" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">Client</label>
+                        <p>{{ project.client|default:"Not specified" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted">URL Slug</label>
+                        <p><code>{{ project.slug }}</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Description Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-text me-2"></i>Description
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Short Description</label>
+                    <p>{{ project.short_description|default:"No short description provided." }}</p>
+                </div>
+                <div>
+                    <label class="form-label text-muted">Full Description</label>
+                    <div class="border rounded p-3 bg-light">
+                        {{ project.description|linebreaks|default:"No detailed description provided." }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technologies Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-gear me-2"></i>Technologies
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if project.technologies %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tech in project.technologies|split:"," %}
+                            <span class="badge bg-primary">{{ tech|trim }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No technologies specified.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Project Links Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>Project Links
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Website</label>
+                        {% if project.website %}
+                            <p><a href="{{ project.website }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-globe me-1"></i>Visit Website
+                            </a></p>
+                        {% else %}
+                            <p class="text-muted">Not provided</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">GitHub</label>
+                        {% if project.github_url %}
+                            <p><a href="{{ project.github_url }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-github me-1"></i>View Code
+                            </a></p>
+                        {% else %}
+                            <p class="text-muted">Not provided</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Live Demo</label>
+                        {% if project.live_url %}
+                            <p><a href="{{ project.live_url }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-play-circle me-1"></i>View Demo
+                            </a></p>
+                        {% else %}
+                            <p class="text-muted">Not provided</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Project Image Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-image me-2"></i>Project Images
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if project.image %}
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Main Image</label>
+                        <div class="border rounded overflow-hidden">
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="img-fluid w-100" style="max-height: 200px; object-fit: cover;">
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if project.thumbnail %}
+                    <div>
+                        <label class="form-label text-muted">Thumbnail</label>
+                        <div class="border rounded overflow-hidden">
+                            <img src="{{ project.thumbnail.url }}" alt="{{ project.title }} thumbnail" class="img-fluid w-100" style="max-height: 120px; object-fit: cover;">
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if not project.image and not project.thumbnail %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-image display-4 d-block mb-2"></i>
+                        <p>No images uploaded</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Project Stats Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>Project Stats
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 text-center">
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <i class="bi bi-calendar-plus text-primary display-6"></i>
+                            <h6 class="mt-2 mb-1">Created</h6>
+                            <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <i class="bi bi-arrow-clockwise text-success display-6"></i>
+                            <h6 class="mt-2 mb-1">Updated</h6>
+                            <small class="text-muted">{{ project.updated_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'project_update' project.pk %}" class="btn btn-primary">
+                        <i class="bi bi-pencil me-2"></i>Edit Project
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash me-2"></i>Delete Project
+                    </button>
+                    <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the project "<strong>{{ project.title }}</strong>"?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'project_delete' project.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
