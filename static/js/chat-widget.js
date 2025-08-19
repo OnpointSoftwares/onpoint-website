@@ -107,32 +107,54 @@ export const ChatWidget = (function() {
     showTypingIndicator();
     
     try {
-      // Send message to server
-      const csrftoken = getCookie('csrftoken');
+      // Get CSRF token from window object or cookie
+      let csrftoken = window.csrfToken || getCookie('csrftoken');
       
-      // Ensure URL is properly initialized
-      if (!window.djangoUrls || !window.djangoUrls.chatApi) {
-        // Try to get the URL from Django's URL tag if not available
-        try {
-          window.djangoUrls = window.djangoUrls || {};
-          window.djangoUrls.chatApi = '/chat/';
-        } catch (e) {
-          console.error('Failed to initialize chat API URL:', e);
-          throw new Error('Chat service is not properly configured. Please refresh the page and try again.');
+      if (!csrftoken) {
+        // Last resort: try to get from meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+          csrftoken = metaTag.getAttribute('content');
         }
       }
-      const response = await fetch('/chat/', {
+      
+      if (!csrftoken) {
+        throw new Error('CSRF token not found. Please refresh the page and try again.');
+      }
+      
+      // Ensure the token is a string and not empty
+      csrftoken = String(csrftoken).trim();
+      if (!csrftoken) {
+        throw new Error('Invalid CSRF token. Please refresh the page and try again.');
+      }
+      
+      // Ensure URL is properly initialized
+      const chatApiUrl = (window.djangoUrls && window.djangoUrls.chatApi) || '/chat/';
+      
+      const response = await fetch(chatApiUrl, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({ message: message })
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || 'Network response was not ok';
+        // Handle CSRF token mismatch specifically
+        if (response.status === 403) {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
+        
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { error: 'Invalid server response' };
+        }
+        const errorMessage = errorData.error || `Server responded with status ${response.status}`;
         throw new Error(errorMessage);
       }
       
