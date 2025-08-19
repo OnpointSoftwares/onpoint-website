@@ -703,13 +703,19 @@ def article_detail(request, slug=None, pk=None):
     article = None
     
     # Try to get article by slug first (preferred method for public URLs)
-    if slug:
+    if slug is not None:
         article = get_object_or_404(Article, slug=slug, status='published')
     # Fall back to primary key if slug is not provided
-    elif pk:
-        article = get_object_or_404(Article, pk=pk)
+    elif pk is not None:
+        article = get_object_or_404(Article, pk=pk, status='published')
     else:
         raise Http404("Article not found")
+        
+    # If the article was found by slug but the URL used a primary key,
+    # redirect to the canonical slug URL for SEO
+    if pk is not None and slug is None and article.slug:
+        from django.shortcuts import redirect
+        return redirect('article_detail_by_slug', slug=article.slug, permanent=True)
     
     # For admin views, check permissions
     is_admin_view = request.path.startswith('/admin/')

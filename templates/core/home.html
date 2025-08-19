@@ -408,7 +408,7 @@
             <p class="card-text text-muted">{{ article.short_description|truncatewords:20 }}</p>
           </div>
           <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="{% url 'article_detail' article.slug %}" class="btn btn-link px-0">
+            <a href="{% url 'article_detail_by_slug' article.slug %}" class="btn btn-link px-0">
               Read More <i class="bi bi-arrow-right ms-1"></i>
             </a>
           </div>

@@ -64,7 +64,8 @@ urlpatterns = [
     
     # Public Article URLs
     path('blog/', views.public_article_list, name='article_list'),
-    path('blog/<int:pk>/', views.article_detail, name='article_detail'),
+    path('blog/<slug:slug>/', views.article_detail, name='article_detail_by_slug'),
+    path('blog/id/<int:pk>/', views.article_detail, name='article_detail'),
     
     # Article Management URLs (protected by staff_required)
     path('admin/articles/', staff_required(views.admin_article_list), name='admin_article_list'),
