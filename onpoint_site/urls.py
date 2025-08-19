@@ -1,16 +1,35 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve
-from django.contrib.staticfiles.views import serve as static_serve
+from django.views.generic import RedirectView
+from django.contrib.auth import views as auth_views
+from django.conf.urls import handler403
 
-def _static_serve(prefix, **kwargs):
-    return static_serve(request, path, **kwargs)
+# Custom 403 handler
+def custom_permission_denied_view(request, exception=None):
+    from django.shortcuts import render
+    return render(request, '403.html', status=403)
+
+handler403 = 'onpoint_site.urls.custom_permission_denied_view'
+
+# Admin site settings
+admin.site.site_header = 'OnPoint Admin'
+admin.site.site_title = 'OnPoint Administration'
+admin.site.index_title = 'Welcome to OnPoint Admin'
 
 urlpatterns = [
+    # Core app URLs (includes our custom admin)
     path('', include('core.urls')),
-    path('admin/', admin.site.urls),
+    
+    # Auth URLs - Use the built-in auth views
+    path('accounts/', include('django.contrib.auth.urls')),
+    
+    # Redirect admin login to the custom login page
+    path('admin/login/', RedirectView.as_view(url='/accounts/login/', permanent=True)),
+    
+    # Django admin (disabled in favor of custom admin)
+    # path('django-admin/', admin.site.urls),
 ]
 
 # Serve static files using Django in development

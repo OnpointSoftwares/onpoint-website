@@ -1,5 +1,7 @@
 from django import forms
-from .models import Project, Article
+from .models import Project, Article, Comment
+from django.core.exceptions import ValidationError
+import re
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -168,6 +170,80 @@ class ProjectFilterForm(forms.Form):
             'placeholder': 'Search projects...'
         })
     )
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Write your comment here...',
+                'required': 'required'
+            })
+        }
+        labels = {
+            'text': 'Comment',
+        }
+        help_texts = {
+            'text': 'Your comment will be visible after moderation.'
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        
+        # Add is_active field for staff users only
+        if self.request and self.request.user.is_staff:
+            self.fields['is_active'] = forms.BooleanField(
+                required=False,
+                initial=True,
+                label='Approve this comment',
+                help_text='Uncheck to hold for moderation',
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'form-check-input',
+                    'role': 'switch'
+                })
+            )
+    
+    def clean_text(self):
+        text = self.cleaned_data.get('text', '').strip()
+        if len(text) < 10:
+            raise ValidationError('Comment is too short. Please provide more details.')
+        if len(text) > 2000:
+            raise ValidationError('Comment is too long. Maximum 2000 characters allowed.')
+        
+        # Check for spam-like patterns
+        spam_keywords = ['http://', 'https://', 'www.', '.com', '.net', '.org']
+        if any(keyword in text.lower() for keyword in spam_keywords):
+            self.cleaned_data['is_active'] = False
+            
+        return text
+    
+    def save(self, commit=True, *args, **kwargs):
+        comment = super().save(commit=False)
+        
+        # Set the author if user is authenticated
+        if self.request and self.request.user.is_authenticated:
+            comment.author = self.request.user
+        
+        # Set is_active based on staff approval or spam detection
+        if 'is_active' in self.cleaned_data:
+            comment.is_active = self.cleaned_data['is_active']
+        elif self.request and self.request.user.is_staff:
+            # Default to True for staff if not set
+            comment.is_active = True
+        else:
+            # For non-staff, default to False (needs moderation)
+            comment.is_active = False
+        
+        if commit:
+            comment.save()
+        
+        return comment
+        return email
+
+
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article

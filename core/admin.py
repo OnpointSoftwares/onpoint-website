@@ -110,9 +110,7 @@ class LearningResourceAdmin(admin.ModelAdmin):
             obj.author = request.user
         super().save_model(request, obj, form, change)
 
-admin.site.register(Project, ProjectAdmin)
-admin.site.register(Contact)
-admin.site.register(Article)
-admin.site.register(Comment)
-
-
+# admin.site.register(Project, ProjectAdmin)
+# admin.site.register(Contact)
+# admin.site.register(Article)
+# admin.site.register(Comment)

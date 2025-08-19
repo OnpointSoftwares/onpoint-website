@@ -1,0 +1,66 @@
+{% load crispy_forms_tags %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Leave a Comment</h5>
+    </div>
+    <div class="card-body">
+        {% if user.is_authenticated %}
+            <p class="text-muted mb-3">
+                Commenting as <strong>{{ user.get_full_name|default:user.username }}</strong> 
+                <a href="{% url 'logout' %}?next={{ request.path }}" class="text-decoration-none ms-2">
+                    <small>Not you?</small>
+                </a>
+            </p>
+        {% endif %}
+        
+        <form method="post" action="{% url 'add_comment' article_id=article.id %}" class="comment-form">
+            {% csrf_token %}
+            
+            {% if not user.is_authenticated %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                {{ form.content|as_crispy_field }}
+            </div>
+            
+            {% if form.is_approved %}
+                <div class="mb-3 form-check form-switch">
+                    {{ form.is_approved|as_crispy_field }}
+                </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-send-fill me-1"></i> Post Comment
+                </button>
+                
+                {% if not user.is_authenticated %}
+                    <div class="form-text">
+                        By submitting, you agree to our 
+                        <a href="{% url 'terms' %}" target="_blank">Terms of Service</a> and 
+                        <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a>.
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+    <div class="text-center mt-3">
+        <p class="text-muted">
+            <a href="{% url 'login' %}?next={{ request.path }}" class="text-decoration-none">
+                <i class="bi bi-person-fill"></i> Log in to comment with your account
+            </a>
+        </p>
+    </div>
+{% endif %}

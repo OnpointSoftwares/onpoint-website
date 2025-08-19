@@ -20,8 +20,13 @@ import google.generativeai as genai
 import os
 import json
 from datetime import timedelta
-from .models import Contact, Project, Article,LearningResource
-from .forms import ProjectForm, ProjectFilterForm, ArticleForm
+from .models import Contact, Project, Article, LearningResource, Comment
+from .forms import ProjectForm, ProjectFilterForm, ArticleForm, CommentForm
+from django.core.mail import mail_admins
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 def get_gemini_chat():
     try:
@@ -472,6 +477,63 @@ class ProjectStatusUpdateView(StaffRequiredMixin, View):
         return JsonResponse({'error': 'Invalid status'}, status=400)
 
 
+# Comment Management Views
+class CommentListView(StaffRequiredMixin, ListView):
+    """
+    View for listing all comments with filtering and moderation options.
+    """
+    model = Comment
+    template_name = 'admin/comment_list.html'
+    context_object_name = 'comments'
+    paginate_by = 20
+    ordering = ['-created_at']
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status = self.request.GET.get('status', '')
+        
+        if status == 'pending':
+            queryset = queryset.filter(is_approved=False)
+        elif status == 'approved':
+            queryset = queryset.filter(is_approved=True)
+            
+        return queryset.select_related('article', 'user')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_filter'] = self.request.GET.get('status', 'all')
+        context['pending_count'] = Comment.objects.filter(is_approved=False).count()
+        return context
+
+
+class CommentApproveView(StaffRequiredMixin, View):
+    """
+    View for approving a comment.
+    """
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, pk=self.kwargs['pk'])
+        comment.is_approved = True
+        comment.save(update_fields=['is_approved', 'updated_at'])
+        
+        messages.success(request, 'Comment has been approved and published.')
+        return redirect('comment_list')
+
+
+class CommentDeleteView(StaffRequiredMixin, DeleteView):
+    """
+    View for deleting a comment.
+    """
+    model = Comment
+    template_name = 'admin/comment_confirm_delete.html'
+    success_url = reverse_lazy('comment_list')
+    
+    def delete(self, request, *args, **kwargs):
+        comment = self.get_object()
+        comment.delete()
+        messages.success(request, 'Comment has been deleted successfully.')
+        return redirect(self.success_url)
+
+
 # API Views
 class ProjectStatsAPIView(StaffRequiredMixin, View):
     """API endpoint for project statistics"""
@@ -646,56 +708,58 @@ def article_detail(request, slug=None, pk=None):
     if is_admin_view and not request.user.is_staff:
         raise PermissionDenied
     
-    # Get related articles (exclude current article)
+    # Track article view
+    article.increment_view_count()
+    
+    # Get related articles (excluding current article)
     related_articles = Article.objects.filter(
-    ).exclude(
-        pk=article.pk
-    ).order_by('-created_at')[:3]
+        status='published',
+        category=article.category
+    ).exclude(pk=article.pk)[:3]
     
-    # Get next and previous articles for navigation
-    next_article = Article.objects.filter(
-        created_at__gt=article.created_at
-    ).order_by('created_at').first()
+    # Get comments for the article (approved only for non-staff)
+    comments = article.comment_set.all()
+    if not request.user.is_staff:
+        comments = comments.filter(is_approved=True)
     
-    prev_article = Article.objects.filter(
-        created_at__lt=article.created_at
-    ).order_by('-created_at').first()
+    # Get comment form
+    comment_form = get_comment_form(request)
     
-    # Increment view count (only for non-admin views)
-    if not is_admin_view:
-        article.view_count = F('view_count') + 1
-        article.save(update_fields=['view_count'])
-        article.refresh_from_db()  # Refresh to get the updated view_count
+    # Determine the template to use
+    template = 'core/article_detail.html'
+    if request.path.startswith('/admin/'):
+        template = 'admin/article_detail.html'
     
-    # Determine which template to use
-    template = 'admin/article_detail.html' if is_admin_view else 'core/article_detail.html'
-    
+    # Prepare context
     context = {
         'article': article,
-        'is_admin': is_admin_view,
         'related_articles': related_articles,
-        'next_article': next_article,
-        'prev_article': prev_article,
-        'page_title': article.title,
-        'meta_description': article.short_description,
-        'meta_keywords': article.tags.all() if hasattr(article, 'tags') else [],
+        'comments': comments,
+        'comment_form': comment_form,
+        'is_admin': request.path.startswith('/admin/'),
     }
     
-    # Add Open Graph and Twitter card meta tags for public views
-    if not is_admin_view:
+    # Add Open Graph and Twitter Card meta tags
+    if article.seo_title:
+        context['og_title'] = article.seo_title
+        context['twitter_title'] = article.seo_title
+    else:
+        context['og_title'] = f"{article.title} | OnPoint Software Solutions"
+        context['twitter_title'] = article.title
+    
+    if article.seo_description:
+        context['og_description'] = article.seo_description
+        context['twitter_description'] = article.seo_description
+    elif article.short_description:
+        context['og_description'] = article.short_description
+        context['twitter_description'] = article.short_description
+    
+    # Add article image if available
+    if hasattr(article, 'image') and article.image:
         context.update({
-            'og_title': article.title,
-            'og_description': article.short_description,
-            'og_type': 'article',
-            'twitter_card': 'summary_large_image',
+            'og_image': request.build_absolute_uri(article.image.url),
+            'twitter_image': request.build_absolute_uri(article.image.url),
         })
-        
-        # Add article image if available
-        if hasattr(article, 'image') and article.image:
-            context.update({
-                'og_image': request.build_absolute_uri(article.image.url),
-                'twitter_image': request.build_absolute_uri(article.image.url),
-            })
     
     return render(request, template, context)
 def article_create(request):
@@ -744,54 +808,130 @@ def article_delete(request, pk):
         except Exception as e:
             messages.error(request, f'Error deleting article: {str(e)}')
             return redirect('admin_article_detail', pk=article.pk)
+
+
+def add_comment(request, article_id):
+    """
+    View for adding a new comment to an article.
+    Handles both authenticated and anonymous users.
+    """
+    article = get_object_or_404(Article, pk=article_id)
     
-    # For GET request, show confirmation page
-    return render(request, 'core/article_confirm_delete.html', {
-        'article': article,
-        'is_admin': request.path.startswith('/admin/')
-    })
-def add_comment(request, pk):
-    article = get_object_or_404(Article, pk=pk)
+    # Check if comments are closed
+    if hasattr(article, 'comments_closed') and article.comments_closed and not request.user.is_staff:
+        messages.error(request, 'Comments are closed for this article.')
+        return redirect('article_detail', pk=article.pk)
+    
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request=request)
         if form.is_valid():
+            # Save the comment with the article and author
             comment = form.save(commit=False)
             comment.article = article
+            
+            # Set the author if user is authenticated
+            if request.user.is_authenticated:
+                comment.author = request.user
+            
+            # Save the comment (this will handle is_active based on form and user permissions)
             comment.save()
-            messages.success(request, 'Comment added successfully!')
-            return redirect('article_detail', pk=article.pk)
+            
+            # Send notification to admin for new comments that need moderation
+            if not comment.is_active and hasattr(settings, 'ADMINS') and settings.ADMINS:
+                try:
+                    from django.core.mail import mail_admins
+                    from django.urls import reverse
+                    
+                    mail_admins(
+                        f'New Comment Awaiting Moderation: {article.title}',
+                        f'A new comment has been posted on "{article.title}" and is awaiting moderation.\n\n'
+                        f'Comment by: {comment.author.username if comment.author else "Anonymous"}\n'
+                        f'Comment: {comment.text[:200]}{"..." if len(comment.text) > 200 else ""}\n\n'
+                        f'Approve: {request.build_absolute_uri(reverse("admin:core_comment_changelist") + "?is_active__exact=0")}',
+                        fail_silently=True,
+                    )
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f'Error sending comment notification email: {e}')
+            
+            messages.success(
+                request, 
+                'Your comment has been submitted.' + 
+                (' It will be visible after moderation.' if not comment.is_active else '')
+            )
+            
+            # Redirect to the article's comment section
+            return redirect(f"{reverse('article_detail', kwargs={'pk': article.pk})}#comment-{comment.id}")
+        else:
+            # If form is invalid, save the form data in session to repopulate on redirect
+            request.session['comment_form_data'] = request.POST
+            request.session['comment_form_errors'] = form.errors.get_json_data()
+            messages.error(request, 'There was an error with your submission. Please correct the errors below.')
+    
+    # Redirect back to the article (handles both GET and invalid POST)
+    return redirect(f"{reverse('article_detail', kwargs={'pk': article.pk})}#comment-form")
+
+
+def get_comment_form(request, article_id=None):
+    """Helper function to get a comment form with proper initial data"""
+    initial = {}
+    
+    # Set initial data for authenticated users
+    if request.user.is_authenticated:
+        initial.update({
+            'name': request.user.get_full_name() or request.user.username,
+            'email': request.user.email,
+        })
+    
+    # Get any saved form data from session (for repopulating after validation errors)
+    form_data = request.session.pop('comment_form_data', None)
+    
+    if form_data:
+        form = CommentForm(form_data, request=request)
+        # Manually set errors from session
+        if 'comment_form_errors' in request.session:
+            form._errors = request.session.pop('comment_form_errors')
     else:
-        form = CommentForm()
+        form = CommentForm(initial=initial, request=request)
     
-    return render(request, 'core/article_detail.html', {
-        'article': article,
-        'form': form,
-        'comments': article.comment_set.all(),
-    })
-    
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    return form
+
 
 def learning_resource_list(request):
-    # Get published resources by default
-    resources_list = LearningResource.objects.filter(status='published').order_by('-published_at', '-created_at')
+    """
+    View for displaying a paginated list of published learning resources.
+    Supports filtering by resource type and search functionality.
+    """
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from .models import LearningResource
     
-    # Get filter parameters
-    status = request.GET.get('status', '')
-    search = request.GET.get('search', '')
+    # Get filter parameters from request
+    resource_type = request.GET.get('type', '').lower()
+    search_query = request.GET.get('q', '').strip()
+    
+    # Start with base queryset of published resources
+    resources = LearningResource.objects.filter(status='published')
     
     # Apply filters
-    if status:
-        resources_list = resources_list.filter(status=status)
-    if search:
-        resources_list = resources_list.filter(
-            Q(title__icontains=search) | 
-            Q(short_description__icontains=search) |
-            Q(description__icontains=search)
+    if resource_type and resource_type in dict(LearningResource.RESOURCE_TYPE_CHOICES):
+        resources = resources.filter(resource_type=resource_type)
+    
+    # Apply search
+    if search_query:
+        resources = resources.filter(
+            Q(title__icontains=search_query) |
+            Q(short_description__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(content__icontains=search_query)
         )
+    
+    # Order by most recently published first
+    resources = resources.order_by('-published_at')
     
     # Pagination
     page = request.GET.get('page', 1)
-    paginator = Paginator(resources_list, 9)  # Show 9 resources per page
+    paginator = Paginator(resources, 10)  # 10 items per page
     
     try:
         resources = paginator.page(page)
@@ -800,15 +940,26 @@ def learning_resource_list(request):
     except EmptyPage:
         resources = paginator.page(paginator.num_pages)
     
+    # Get resource type counts for filter sidebar
+    type_counts = LearningResource.objects.filter(status='published')\
+        .values('resource_type')\
+        .annotate(count=models.Count('resource_type'))
+    
+    # Convert to a dictionary for easier template access
+    type_counts_dict = {item['resource_type']: item['count'] for item in type_counts}
+    
     context = {
-        'learning_resources': resources,
+        'learning_resources': resources,  # Changed from 'resources' to match template
+        'search_query': search_query,
+        'selected_type': resource_type,
+        'type_counts': type_counts_dict,
+        'resource_types': dict(LearningResource.RESOURCE_TYPE_CHOICES),
         'is_paginated': resources.has_other_pages(),
         'page_obj': resources,
-        'status_filter': status,
-        'search_query': search,
     }
     
     return render(request, 'core/learning_resource_list.html', context)
+
 
 def learning_resource_detail(request, slug):
     """View for displaying a single learning resource."""

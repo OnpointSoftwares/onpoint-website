@@ -1,0 +1,114 @@
+{% load static %}
+
+<div class="comments-section mb-5">
+    <h4 class="mb-4 pb-2 border-bottom">
+        <i class="bi bi-chat-square-text me-2"></i>
+        {% if comments %}
+            {{ comments.count }} Comment{{ comments.count|pluralize }}
+        {% else %}
+            No Comments Yet
+        {% endif %}
+    </h4>
+    
+    {% if comments %}
+        <div class="comments-list">
+            {% for comment in comments %}
+                {% include 'comments/comment.html' with comment=comment %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-chat-square-text fs-1 d-block mb-2"></i>
+            <p>Be the first to share your thoughts!</p>
+        </div>
+    {% endif %}
+    
+    {% if user.is_authenticated or not article.comments_closed %}
+        <div class="mt-5">
+            <h5 class="mb-4">Leave a Comment</h5>
+            {% include 'comments/comment_form.html' with article=article form=form %}
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-4">
+            <i class="bi bi-info-circle"></i> 
+            Comments are closed for this article.
+        </div>
+    {% endif %}
+</div>
+
+{% if user.is_staff %}
+<div class="card bg-light border-0 mt-4">
+    <div class="card-body p-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                <i class="bi bi-shield-lock"></i> Admin Tools
+            </small>
+            <div class="btn-group">
+                <a href="{% url 'comment_list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-list-ul"></i> Manage All Comments
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" 
+                        data-bs-toggle="modal" data-bs-target="#commentSettingsModal">
+                    <i class="bi bi-gear"></i> Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comment Settings Modal -->
+<div class="modal fade" id="commentSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Comment Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'article_update' article.id %}" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="commentsClosed" name="comments_closed"
+                               {% if article.comments_closed %}checked{% endif %}>
+                        <label class="form-check-label" for="commentsClosed">
+                            Close comments
+                        </label>
+                        <div class="form-text">
+                            When enabled, new comments cannot be added to this article.
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% block extra_js %}
+<script>
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+});
+
+// Form validation
+(function () {
+    'use strict';
+    var forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+{% endblock %}
