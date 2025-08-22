@@ -28,8 +28,14 @@ urlpatterns = [
     # Redirect admin login to the custom login page
     path('admin/login/', RedirectView.as_view(url='/accounts/login/', permanent=True)),
     
-    # Django admin (disabled in favor of custom admin)
-    # path('django-admin/', admin.site.urls),
+    # Coding challenges app
+    path('challenges/', include('coding_challenges.urls')),
+    
+    # LMS app
+    path('lms/', include('lms.urls', namespace='lms')),
+    
+    # Django admin (enabled for model management)
+    path('django-admin/', admin.site.urls),
 ]
 
 # Serve static files using Django in development
@@ -38,6 +44,8 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     # In production, these should be served by your web server (Nginx/Apache)
+    from django.views.static import serve
+    from django.urls import re_path
     urlpatterns += [
         re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
         re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),

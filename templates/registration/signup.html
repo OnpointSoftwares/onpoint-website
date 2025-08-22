@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up | OnPoint Software Solutions{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="login-card fade-in-up">
+    <div class="login-header text-center p-4">
+      <h2 class="text-white mb-1">Create Account</h2>
+      <p class="text-white-50">Join OnPoint to access your dashboard</p>
+    </div>
+
+    <div class="login-body p-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if form.errors and not form.non_field_errors %}
+        {# Field-specific errors will render below each input #}
+      {% endif %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'signup' %}" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="id_username" class="form-label">Username</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-person-fill"></i>
+            </span>
+            <input type="text" name="username" id="id_username"
+                   class="form-control form-control-lg{% if form.username.errors %} is-invalid{% endif %}"
+                   placeholder="Choose a username" required autofocus
+                   value="{{ form.username.value|default:'' }}">
+          </div>
+          {% if form.username.errors %}
+            <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+          {% else %}
+            <div class="form-text">3-150 characters. Letters, digits and @/./+/-/_ only.</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <label for="id_password1" class="form-label">Password</label>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-lock-fill"></i>
+            </span>
+            <input type="password" name="password1" id="id_password1"
+                   class="form-control form-control-lg{% if form.password1.errors %} is-invalid{% endif %}"
+                   placeholder="Create a strong password" required>
+          </div>
+          {% if form.password1.errors %}
+            <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+          {% else %}
+            <div class="form-text">At least 8 characters. Avoid common or numeric-only passwords.</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label for="id_password2" class="form-label">Confirm Password</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-shield-lock-fill"></i>
+            </span>
+            <input type="password" name="password2" id="id_password2"
+                   class="form-control form-control-lg{% if form.password2.errors %} is-invalid{% endif %}"
+                   placeholder="Re-enter your password" required>
+          </div>
+          {% if form.password2.errors %}
+            <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-person-plus-fill me-2"></i> Create Account
+          </button>
+        </div>
+
+        <div class="text-center mt-3">
+          <span class="text-muted small">Already have an account?</span>
+          <a href="{% url 'login' %}" class="small text-decoration-none">Log in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 520px;
+  width: 100%;
+}
+
+.login-header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  padding: 2rem;
+  color: white;
+}
+
+.login-body { padding: 2rem; }
+
+.fade-in-up { animation: fadeInUp 0.6s ease-out; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

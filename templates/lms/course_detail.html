@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }} - OnPoint LMS{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-md-8">
+      <h1 class="h3">{{ course.title }}</h1>
+      <p class="text-muted">By {{ course.instructor.user.get_full_name|default:course.instructor.user.username }} • {{ course.get_difficulty_display }}</p>
+      {% if course.image %}
+      <img src="{{ course.image.url }}" class="img-fluid rounded mb-3" alt="{{ course.title }}">
+      {% endif %}
+      <div class="lead">{{ course.description }}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="h4 mb-0">{% if course.is_paid %}${{ course.price }}{% else %}Free{% endif %}</span>
+          </div>
+          {% if user.is_authenticated %}
+            <a href="{% url 'lms:enroll_course' course.slug %}" class="btn btn-primary w-100">{% if course.is_paid %}Purchase & Enroll{% else %}Enroll for Free{% endif %}</a>
+          {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary w-100">Login to Enroll</a>
+          {% endif %}
+          <hr>
+          <ul class="list-unstyled small">
+            <li>Category: {{ course.category.name }}</li>
+            <li>Level: {{ course.get_difficulty_display }}</li>
+            <li>Instructor: {{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

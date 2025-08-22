@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'coding_challenges.apps.CodingChallengesConfig',
+    'lms',
 ]
 
 MIDDLEWARE = [
@@ -116,6 +118,15 @@ CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+# Judge0 Code Runner settings
+JUDGE0_API_URL = os.environ.get('JUDGE0_API_URL', 'https://judge0-ce.p.rapidapi.com')
+# If you are using RapidAPI, you may set JUDGE0_API_HOST and JUDGE0_API_KEY
+JUDGE0_API_HOST = os.environ.get('JUDGE0_API_HOST', 'judge0-ce.p.rapidapi.com')
+JUDGE0_API_KEY = os.environ.get('JUDGE0_API_KEY', '4063869391mshafb793812d957c1p1ce4b9jsn7a1b4845c3e6')
+
+# UI preferences
+DEFAULT_THEME = os.environ.get('DEFAULT_THEME', 'light')  # 'light' or 'dark'
 
 # HTTPS settings (uncomment in production with SSL)
 # SECURE_SSL_REDIRECT = True

@@ -252,7 +252,8 @@ class ArticleForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter article title'}),
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'auto-generated-from-title'}),
             'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Brief description for SEO and previews'}),
-            'description': forms.Textarea(attrs={'rows': 10, 'class': 'form-control', 'placeholder': 'Article content...'}),
+            # Add a class to enable rich text editor initialization in templates
+            'description': forms.Textarea(attrs={'rows': 10, 'class': 'form-control rich-text-editor', 'placeholder': 'Article content...'}),
             'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'image_caption': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Image caption (optional)'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
@@ -273,3 +274,21 @@ class ArticleForm(forms.ModelForm):
         self.fields['short_description'].help_text = 'Brief description for SEO and article previews'
         self.fields['status'].help_text = 'Set to "Published" to make this article visible to the public'
         self.fields['read_time'].help_text = 'Estimated reading time in minutes'
+
+class ArticleQuickForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title', 'short_description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter article title'}),
+            'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Brief description for SEO and previews'}),
+        }
+
+class ProjectQuickForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['title', 'short_description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter project title'}),
+            'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Brief description for SEO and previews'}),
+        }

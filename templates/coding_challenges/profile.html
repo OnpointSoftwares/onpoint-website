@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+              <span class="fw-bold">{{ user.username|first|upper }}</span>
+            </div>
+            <div>
+              <h5 class="mb-0">{{ user.username }}</h5>
+              <div class="text-muted small">Joined {{ user.date_joined|date:"M Y" }}</div>
+            </div>
+          </div>
+          <hr>
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="small text-muted">Points</div>
+              <div class="h5 mb-0">{{ profile.points }}</div>
+            </div>
+            <div>
+              <div class="small text-muted">Solved</div>
+              <div class="h5 mb-0">{{ profile.solved_count }}</div>
+            </div>
+          </div>
+          <hr>
+          <div>
+            <div class="small text-muted mb-1">Badges</div>
+            {% for b in profile.badges.all %}
+              <span class="badge bg-light text-dark border me-1"><i class="bi bi-award text-warning me-1"></i>{{ b.name }}</span>
+            {% empty %}
+              <div class="text-muted small">No badges yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h6 class="mb-3">Recent Submissions</h6>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Challenge</th>
+                  <th>Lang</th>
+                  <th>Status</th>
+                  <th>Runtime</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in submissions %}
+                  <tr>
+                    <td><a href="{% url 'coding_challenges:challenge_detail' s.challenge.slug %}">{{ s.challenge.title }}</a></td>
+                    <td>{{ s.get_language_display }}</td>
+                    <td><span class="badge bg-{% if s.status == 'passed' %}success{% elif s.status == 'failed' %}danger{% elif s.status == 'error' %}secondary{% else %}warning text-dark{% endif %}">{{ s.status|title }}</span></td>
+                    <td>{% if s.runtime_ms %}{{ s.runtime_ms }} ms{% else %}-{% endif %}</td>
+                    <td class="text-muted small">{{ s.created_at|date:"M d, H:i" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="5" class="text-center text-muted">No submissions yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

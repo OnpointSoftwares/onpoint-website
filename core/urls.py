@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect
 from . import views
-from .auth_views import CustomLogoutView, custom_login_required
+from .auth_views import CustomLogoutView, CustomLoginView, custom_login_required
 
 def staff_required(view_func=None, redirect_field_name=None, login_url='home'):
     """
@@ -29,13 +29,15 @@ urlpatterns = [
     path('chat/', views.chat_api, name='chat_api'),
     
     # Authentication URLs
-    path('accounts/login/', auth_views.LoginView.as_view(
+    path('accounts/login/', CustomLoginView.as_view(
         template_name='registration/login.html',
         redirect_authenticated_user=True,
         extra_context={'title': 'Login'}
     ), name='login'),
     path('accounts/logout/', CustomLogoutView.as_view(), name='admin_logout'),
     path('about/', views.about, name='about'),
+    # Authentication
+    path('accounts/signup/', views.signup, name='signup'),
     path('mobile-development/', views.mobile_development, name='mobile_development'),
     path('custom-software-development/', views.custom_software_development, name='custom_software_development'),
     path('web-development/', views.web_development, name='web_development'),
@@ -47,6 +49,7 @@ urlpatterns = [
     # Project Management URLs (protected by staff_required)
     path('admin/projects/', staff_required(views.ProjectListView.as_view()), name='project_list'),
     path('admin/projects/create/', staff_required(views.ProjectCreateView.as_view()), name='project_create'),
+    path('admin/projects/quick-add/', staff_required(views.project_quick_create), name='project_quick_create'),
     path('admin/projects/<int:pk>/', staff_required(views.ProjectDetailView.as_view()), name='project_detail'),
     path('admin/projects/<int:pk>/update/', staff_required(views.ProjectUpdateView.as_view()), name='project_update'),
     path('admin/projects/<int:pk>/delete/', staff_required(views.ProjectDeleteView.as_view()), name='project_delete'),
@@ -61,6 +64,9 @@ urlpatterns = [
     # AJAX/API Endpoints
     path('admin/api/project-stats/', staff_required(views.ProjectStatsAPIView.as_view()), name='api_project_stats'),
     path('admin/api/recent-projects/', staff_required(views.RecentProjectsAPIView.as_view()), name='api_recent_projects'),
+
+    # LMS Admin Management
+    path('admin/lms/', include('lms.admin_urls')),
     
     # Public Article URLs
     path('blog/', views.public_article_list, name='article_list'),
@@ -70,6 +76,7 @@ urlpatterns = [
     # Article Management URLs (protected by staff_required)
     path('admin/articles/', staff_required(views.admin_article_list), name='admin_article_list'),
     path('admin/articles/create/', staff_required(views.article_create), name='article_create'),
+    path('admin/articles/quick-add/', staff_required(views.article_quick_create), name='article_quick_create'),
     path('admin/articles/<int:pk>/', staff_required(views.admin_article_detail), name='admin_article_detail'),
     path('admin/articles/<int:pk>/update/', staff_required(views.article_update), name='admin_article_update'),
     path('admin/articles/<int:pk>/delete/', staff_required(views.article_delete), name='admin_article_delete'),

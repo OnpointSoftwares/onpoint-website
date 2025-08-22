@@ -1,5 +1,5 @@
-from django.contrib.auth.views import LogoutView
-from django.urls import reverse_lazy
+from django.contrib.auth.views import LogoutView, LoginView
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.shortcuts import redirect
 
@@ -23,3 +23,21 @@ def custom_login_required(view_func):
             return redirect('home')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+class CustomLoginView(LoginView):
+    """Custom login view with role-based redirects."""
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        user = self.request.user
+        # Admins (superuser or staff) -> Admin dashboard
+        if user.is_superuser or user.is_staff:
+            return reverse('admin_dashboard')
+        # Instructors -> Instructor dashboard
+        try:
+            if hasattr(user, 'instructor_profile') and user.instructor_profile is not None:
+                return reverse('lms:instructor_dashboard')
+        except Exception:
+            pass
+        # Normal users -> Home
+        return reverse('home')

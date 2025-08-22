@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Instructor Dashboard - OnPoint LMS{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Instructor Dashboard</h1>
+    <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-1"></i> New Course
+    </a>
+  </div>
+  <div class="row g-3">
+    {% for course in courses %}
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-1">{{ course.title }}</h5>
+          <p class="text-muted small mb-2">{{ course.category.name }} • {{ course.get_difficulty_display }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group">
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'lms:course_detail' course.slug %}">View</a>
+              <a class="btn btn-outline-secondary btn-sm" href="{% url 'lms:instructor_course_manage' course.slug %}">Manage</a>
+            </div>
+            <span class="small text-muted">{{ course.enrollments.count }} students</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info d-flex justify-content-between align-items-center">
+          <div>You haven't created any courses yet.</div>
+          <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-sm btn-primary">Create your first course</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Courses - OnPoint LMS{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-journal-text me-2"></i>Browse Courses</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'lms:student_dashboard' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-collection-play me-1"></i> My Learning</a>
+      <button class="btn btn-outline-secondary btn-sm d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersCanvas" aria-controls="filtersCanvas">
+        <i class="bi bi-sliders me-1"></i> Filters
+      </button>
+    </div>
+  </div>
+
+  <form method="get" class="row g-2 mb-4 d-none d-md-flex">
+    <div class="col-md-4">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search courses...">
+      </div>
+    </div>
+    <div class="col-md-2">
+      <select name="category" class="form-select">
+        <option value="">All Categories</option>
+        {% for c in categories %}
+          <option value="{{ c.slug }}" {% if request.GET.category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="price" class="form-select">
+        <option value="">All</option>
+        <option value="free" {% if request.GET.price == 'free' %}selected{% endif %}>Free</option>
+        <option value="paid" {% if request.GET.price == 'paid' %}selected{% endif %}>Paid</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="difficulty" class="form-select">
+        <option value="">Any Level</option>
+        <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+        <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+        <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="sort" class="form-select">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
+        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+        <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+      </select>
+    </div>
+  </form>
+
+  <!-- Offcanvas filters for mobile -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="filtersCanvas" aria-labelledby="filtersCanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="filtersCanvasLabel">Filters</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <form method="get" class="vstack gap-3">
+        <div>
+          <label class="form-label">Search</label>
+          <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search courses...">
+        </div>
+        <div>
+          <label class="form-label">Category</label>
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for c in categories %}
+              <option value="{{ c.slug }}" {% if request.GET.category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Price</label>
+          <select name="price" class="form-select">
+            <option value="">All</option>
+            <option value="free" {% if request.GET.price == 'free' %}selected{% endif %}>Free</option>
+            <option value="paid" {% if request.GET.price == 'paid' %}selected{% endif %}>Paid</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Difficulty</label>
+          <select name="difficulty" class="form-select">
+            <option value="">Any Level</option>
+            <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+            <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+            <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Sort by</label>
+          <select name="sort" class="form-select">
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
+            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i>Apply</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    {% for course in courses %}
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0 course-card">
+        <div class="position-relative">
+          {% if course.image %}
+            <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
+          {% else %}
+            <img src="{% static 'img/course-placeholder.svg' %}" class="card-img-top bg-body-tertiary" alt="{{ course.title }}">
+          {% endif %}
+          <div class="position-absolute top-0 start-0 m-2 d-flex gap-1">
+            <span class="badge bg-dark-subtle text-dark border"><i class="bi bi-layers me-1"></i> {{ course.category.name }}</span>
+            <span class="badge bg-primary"><i class="bi bi-speedometer me-1"></i> {{ course.get_difficulty_display }}</span>
+          </div>
+          <div class="position-absolute top-0 end-0 m-2">
+            {% if course.is_paid %}
+              <span class="badge bg-success"><i class="bi bi-cash-coin me-1"></i>${{ course.price }}</span>
+            {% else %}
+              <span class="badge bg-info text-dark"><i class="bi bi-gift me-1"></i>Free</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ course.title }}</h5>
+          <p class="text-muted small mb-2"><i class="bi bi-person-video3 me-1"></i> {{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</p>
+          <p class="card-text flex-grow-1">{{ course.description|truncatewords:20 }}</p>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="text-warning"><i class="bi bi-star-fill me-1"></i>{{ course.rating_avg|default:0|floatformat:1 }} <span class="text-muted">({{ course.rating_count|default:0 }})</span></span>
+            <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-eye me-1"></i> View</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <div class="col-12"><div class="alert alert-info">No courses found.</div></div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj %}
+  <nav class="mt-4" aria-label="Course pagination">
+    <ul class="pagination justify-content-center">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        {% if page_obj.has_previous %}
+          <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode|cut:'page='|cut:'&&' }}&{% endif %}page={{ page_obj.previous_page_number }}" tabindex="-1">Previous</a>
+        {% else %}
+          <span class="page-link" tabindex="-1" aria-disabled="true">Previous</span>
+        {% endif %}
+      </li>
+      {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode|cut:'page='|cut:'&&' }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+      {% endfor %}
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        {% if page_obj.has_next %}
+          <a class="page-link" href="?{% if request.GET %}{{ request.GET.urlencode|cut:'page='|cut:'&&' }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+        {% else %}
+          <span class="page-link" aria-disabled="true">Next</span>
+        {% endif %}
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<style>
+  .course-card { transition: transform .15s ease, box-shadow .15s ease; }
+  .course-card:hover { transform: translateY(-4px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; }
+  .badge.bg-dark-subtle { background-color: rgba(255,255,255,.15) !important; }
+  .text-light-50 { color: rgba(255,255,255,.6); }
+</style>
+{% endblock %}

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -17,12 +18,15 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, View, TemplateView
 )
 from django.urls import reverse_lazy
+from django.urls import reverse
 import google.generativeai as genai
 import os
 import json
 from datetime import timedelta
 from .models import Contact, Project, Article, LearningResource, Comment
-from .forms import ProjectForm, ProjectFilterForm, ArticleForm, CommentForm
+from coding_challenges.models import Challenge as CodeChallenge
+from lms.models import Course
+from .forms import ProjectForm, ProjectFilterForm, ArticleForm, CommentForm, ArticleQuickForm, ProjectQuickForm
 from django.core.mail import mail_admins
 import logging
 
@@ -92,13 +96,19 @@ def home(request):
         return redirect('home')
     
     # Get featured projects for portfolio section
-    featured_projects = Project.objects.filter(featured=False, status__in=['completed', 'launched']).order_by('-created_at')[:6]
+    featured_projects = Project.objects.filter(featured=True, status__in=['completed', 'launched']).order_by('-created_at')[:6]
     
     # Get all completed/launched projects for stats
     all_projects = Project.objects.filter(status__in=['completed', 'launched'])
     
     # Get the 3 most recent articles for blog section
     latest_articles = Article.objects.filter(status='published').order_by('-created_at')[:3]
+
+    # Get sample coding challenges (latest 3)
+    sample_challenges = CodeChallenge.objects.all().order_by('-created_at')[:3]
+
+    # Get sample LMS courses (published, latest 3)
+    sample_courses = Course.objects.filter(published=True).order_by('-created_at')[:3]
     
     # Calculate dynamic stats
     stats = {
@@ -112,12 +122,34 @@ def home(request):
         'projects': featured_projects,
         'stats': stats,
         'latest_articles': latest_articles,
+        'sample_challenges': sample_challenges,
+        'sample_courses': sample_courses,
     }
     for project in featured_projects:
         print(project)
     return render(request, 'core/home.html', context)
 def about(request):
     return render(request, 'core/about-us.html')
+
+def signup(request):
+    """User registration view using Django's UserCreationForm."""
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Account created successfully. Welcome!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/signup.html', {'form': form, 'title': 'Create Account'})
 def mobile_development(request):
     return render(request, 'core/mobile-development.html')
 def custom_software_development(request):
@@ -793,6 +825,77 @@ def article_create(request):
         'title': 'Create New Article',
         'article': None,
     })
+
+def article_quick_create(request):
+    """
+    Minimal quick-add view for creating an Article with only essential fields.
+    Uses ArticleQuickForm and redirects to full edit view after creation.
+    """
+    if request.method == 'POST':
+        form = ArticleQuickForm(request.POST)
+        if form.is_valid():
+            article = form.save(commit=False)
+            # Default author to current user if available
+            if not getattr(article, 'author', None):
+                article.author = request.user
+            # Ensure a slug exists and is unique
+            if not getattr(article, 'slug', None) or (article.slug or '').strip() == '':
+                from django.utils.text import slugify
+                base_slug = slugify(article.title)
+                slug = base_slug
+                counter = 1
+                while Article.objects.filter(slug=slug).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                article.slug = slug
+            # Default status to draft for quick adds
+            if not getattr(article, 'status', None):
+                article.status = 'draft'
+            article.save()
+            messages.success(request, 'Article created successfully! You can now add more details.')
+            return redirect('admin_article_update', pk=article.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ArticleQuickForm()
+    return render(request, 'admin/article_quick_form.html', {
+        'form': form,
+        'title': 'Quick Add Article',
+    })
+
+def project_quick_create(request):
+    """
+    Minimal quick-add view for creating a Project with only essential fields.
+    Uses ProjectQuickForm and redirects to full edit view after creation.
+    """
+    if request.method == 'POST':
+        form = ProjectQuickForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            # Auto-generate slug if missing
+            if not getattr(project, 'slug', None) or (project.slug or '').strip() == '':
+                from django.utils.text import slugify
+                base_slug = slugify(project.title)
+                slug = base_slug
+                counter = 1
+                while Project.objects.filter(slug=slug).exists():
+                    slug = f"{base_slug}-{counter}"
+                    counter += 1
+                project.slug = slug
+            # Provide sensible defaults
+            if not getattr(project, 'status', None):
+                project.status = 'planning'
+            project.save()
+            messages.success(request, 'Project created successfully! You can now add more details.')
+            return redirect('project_update', pk=project.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ProjectQuickForm()
+    return render(request, 'admin/project_quick_form.html', {
+        'form': form,
+        'title': 'Quick Add Project',
+    })
 def article_update(request, pk):
     article = get_object_or_404(Article, pk=pk)
     if request.method == 'POST':
@@ -821,6 +924,11 @@ def article_delete(request, pk):
         except Exception as e:
             messages.error(request, f'Error deleting article: {str(e)}')
             return redirect('admin_article_detail', pk=article.pk)
+    
+    # For GET requests, render a confirmation page
+    return render(request, 'core/article_confirm_delete.html', {
+        'article': article,
+    })
 
 
 def add_comment(request, article_id):

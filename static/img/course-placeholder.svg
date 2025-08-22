@@ -1,0 +1,18 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d6efd"/>
+      <stop offset="100%" stop-color="#6610f2"/>
+    </linearGradient>
+    <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="2" fill="rgba(255,255,255,0.2)"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <rect width="1200" height="675" fill="url(#dots)"/>
+  <g fill="#fff" opacity="0.9">
+    <path d="M420 210h360c19.9 0 36 16.1 36 36v183c0 19.9-16.1 36-36 36H420c-19.9 0-36-16.1-36-36V246c0-19.9 16.1-36 36-36zm0 24c-6.6 0-12 5.4-12 12v183c0 6.6 5.4 12 12 12h360c6.6 0 12-5.4 12-12V246c0-6.6-5.4-12-12-12H420z"/>
+    <path d="M566 312l94 55-94 55v-110z"/>
+  </g>
+  <text x="50%" y="85%" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Inter, Arial, sans-serif" font-size="28">Course Image Placeholder</text>
+</svg>

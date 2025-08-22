@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ challenge.title }} | Challenges{% endblock %}
+{% block content %}
+<div class="container py-4" data-challenge-id="{{ challenge.id }}">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'coding_challenges:dashboard' %}">Challenges</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ challenge.title }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-7">
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h2 class="h4 mb-0">{{ challenge.title }}</h2>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-{% if challenge.difficulty == 'easy' %}success{% elif challenge.difficulty == 'medium' %}warning text-dark{% else %}danger{% endif %}">{{ challenge.get_difficulty_display }}</span>
+            </div>
+          </div>
+          <div class="text-muted small mb-3">
+            {% for t in challenge.tags.all %}<span class="badge bg-light text-dark border me-1">#{{ t.name }}</span>{% endfor %}
+          </div>
+          <h6>Description</h6>
+          <div class="mb-3">{{ challenge.problem_statement|safe }}</div>
+          <div class="row g-3">
+            <div class="col-6 col-md-4">
+              <div class="p-2 border rounded small"><i class="bi bi-clock me-1"></i> {{ challenge.time_limit_ms }} ms</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="p-2 border rounded small"><i class="bi bi-hdd me-1"></i> {{ challenge.memory_limit_kb|floatformat:0 }} KB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h6 class="mb-2">Examples</h6>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <textarea class="form-control" style="height: 120px" readonly id="exIn">{{ challenge.example_input }}</textarea>
+                <label for="exIn">Input</label>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="form-floating">
+                <textarea class="form-control" style="height: 120px" readonly id="exOut">{{ challenge.example_output }}</textarea>
+                <label for="exOut">Expected Output</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="mb-0">Submit Solution</h6>
+            {% if request.user.is_authenticated %}
+              <span class="small text-muted">Logged in as {{ request.user.username }}</span>
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary">Sign in</a>
+            {% endif %}
+          </div>
+          <form id="submissionForm" method="post" action="{% url 'coding_challenges:submit_solution' challenge.slug %}">
+            {% csrf_token %}
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                {{ form.language.label_tag }}
+                {{ form.language }}
+              </div>
+              <div class="col-6 text-end">
+                <div class="form-check form-switch mt-4">
+                  <input class="form-check-input" type="checkbox" id="darkToggle">
+                  <label class="form-check-label" for="darkToggle">Dark mode</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-2">
+              {{ form.code }}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <button class="btn btn-primary" type="submit"><i class="bi bi-play-fill me-1"></i> Run & Submit</button>
+              <button class="btn btn-outline-secondary" type="button" id="btnUseExample">Use example input</button>
+            </div>
+          </form>
+          <div id="submissionStatus" class="mt-3" style="display:none;">
+            <div class="d-flex align-items-center gap-2">
+              <div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>
+              <span class="text-muted">Evaluating your code...</span>
+            </div>
+            <div class="mt-2 small" id="statusDetail"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mt-3">
+        <div class="card-body">
+          <h6 class="mb-2">Recent Submissions</h6>
+          <div class="list-group list-group-flush">
+            {% for s in recent_submissions %}
+              <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ s.get_language_display }} • <span class="text-muted small">{{ s.created_at|date:"M d, H:i" }}</span></div>
+                  <div class="small text-muted">Status: {{ s.status|title }}{% if s.runtime_ms %} • {{ s.runtime_ms }} ms{% endif %}</div>
+                </div>
+                <span class="badge bg-{% if s.status == 'passed' %}success{% elif s.status == 'failed' %}danger{% elif s.status == 'error' %}secondary{% else %}warning text-dark{% endif %}">{{ s.status|title }}</span>
+              </div>
+            {% empty %}
+              <div class="text-muted small">No submissions yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+(function(){
+  const form = document.getElementById('submissionForm');
+  const statusBox = document.getElementById('submissionStatus');
+  const statusDetail = document.getElementById('statusDetail');
+  const btnUseExample = document.getElementById('btnUseExample');
+  const exIn = document.getElementById('exIn');
+  const codeArea = form.querySelector('textarea');
+  const darkToggle = document.getElementById('darkToggle');
+
+  if (btnUseExample && exIn && codeArea) {
+    btnUseExample.addEventListener('click', () => {
+      const header = '// Read from stdin if needed\n';
+      codeArea.value = header + codeArea.value;
+    });
+  }
+
+  // CSRF helper for Django
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  };
+  const csrftoken = getCookie('csrftoken');
+
+  // Simple dark mode for textarea
+  const applyDark = (on) => {
+    if (!codeArea) return;
+    codeArea.style.backgroundColor = on ? '#0d1117' : '';
+    codeArea.style.color = on ? '#c9d1d9' : '';
+    codeArea.style.borderColor = on ? '#30363d' : '';
+  };
+  darkToggle && darkToggle.addEventListener('change', (e) => applyDark(e.target.checked));
+
+  form && form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusBox.style.display = 'block';
+    statusDetail.textContent = '';
+
+    // Collect values
+    const languageEl = form.querySelector('[name="language"]');
+    const code = codeArea ? codeArea.value : '';
+    const language = languageEl ? languageEl.value : 'python';
+    const stdin = exIn ? exIn.value : '';
+
+    // Prepare CSRF token from hidden input or cookie
+    const csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrfToken = csrfInput ? csrfInput.value : csrftoken;
+
+    // Run code via API to get a token
+    const runUrl = "{% url 'coding_challenges:api_run_code' %}";
+    let token = null;
+    try {
+      const resp = await fetch(runUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
+        },
+        body: JSON.stringify({ language, code, stdin })
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data || data.ok === false || !data.token) {
+        statusDetail.textContent = (data && (data.message || data.error)) || 'Runner unavailable. Please try again.';
+        return;
+      }
+      token = data.token;
+    } catch (err) {
+      statusDetail.textContent = 'Network error while starting execution. Please retry.';
+      return;
+    }
+
+    // Poll status endpoint
+    const started = Date.now();
+    const maxMs = 20000; // stop after 20s for snappier UX
+    let attempts = 0;
+    const maxAttempts = 40; // allow more frequent short polls early
+
+    const poll = async () => {
+      // Stop if over budget
+      if (Date.now() - started > maxMs || attempts >= maxAttempts) {
+        statusDetail.innerHTML = `<div class="alert alert-warning">Evaluation timed out. Please try again in a moment.</div>`;
+        return;
+      }
+      attempts += 1;
+      try {
+        const url = `{% url 'coding_challenges:api_submission_status' 'TOKEN' %}`.replace('TOKEN', token);
+        const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!r.ok) {
+          throw new Error(`Status check failed (${r.status})`);
+        }
+        const s = await r.json();
+        if (!s || s.ok === false || !s.status) {
+          throw new Error('Invalid response from server');
+        }
+        if (s.status === 'queued' || s.status === 'running') {
+          statusDetail.textContent = `Status: ${s.status}...`;
+          // faster early polls, then back off
+          const delay = attempts < 5 ? 250 : (attempts < 10 ? 600 : 1200);
+          setTimeout(poll, delay);
+        } else {
+          const cls = s.status==='passed' ? 'alert-success' : (s.status==='failed' ? 'alert-danger' : (s.status==='timeout' ? 'alert-warning' : 'alert-secondary'));
+          const out = s.stdout ? `<pre class='mt-2 mb-0 small'>${s.stdout}</pre>` : '';
+          const err = s.stderr ? `<pre class='mt-2 mb-0 small text-danger'>${s.stderr}</pre>` : '';
+          statusDetail.innerHTML = `<div class="alert ${cls}">Result: <b>${s.status}</b>${out}${err}</div>`;
+        }
+      } catch (e) {
+        // Backoff and retry within the time/attempt budget
+        statusDetail.textContent = `Checking status... (retrying)`;
+        setTimeout(poll, 1200);
+      }
+    };
+    poll();
+  });
+})();
+</script>
+{% endblock %}
+{% endblock %}

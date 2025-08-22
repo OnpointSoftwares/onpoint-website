@@ -347,6 +347,26 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- TinyMCE (Rich Text Editor) -->
+<script src="https://cdn.tiny.cloud/1/i0obrbdlevvwd9xusxkir7hr14ad77rzz73k5th67zwpz8z2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.tinymce) {
+            tinymce.init({
+                selector: 'textarea.rich-text-editor',
+                menubar: false,
+                plugins: 'lists link image table code codesample media autolink charmap preview fullscreen',
+                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | code preview fullscreen',
+                toolbar_mode: 'sliding',
+                branding: false,
+                contextmenu: false,
+                height: 420,
+                content_style: 'body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; font-size: 16px; }',
+                convert_urls: false,
+            });
+        }
+    });
+</script>
 <script>
     // Auto-generate slug from title
     document.addEventListener('DOMContentLoaded', function() {

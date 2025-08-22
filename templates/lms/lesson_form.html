@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OnPoint LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">{{ title }}</h1>
+    <div class="d-flex gap-2">
+      <a href="{% url 'lms:instructor_course_manage' course.slug %}" class="btn btn-light">Back to Manage</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-white"><strong>Lesson Details</strong></div>
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="id_lesson-title">Title</label>
+          {{ form.title }}
+          {% if form.title.errors %}
+            <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_lesson-order">Order</label>
+          {{ form.order }}
+          {% if form.order.errors %}
+            <div class="invalid-feedback d-block">{{ form.order.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_lesson-video_url">Video URL</label>
+          {{ form.video_url }}
+          {% if form.video_url.errors %}
+            <div class="invalid-feedback d-block">{{ form.video_url.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="id_lesson-content">Content</label>
+          {{ form.content }}
+          {% if form.content.errors %}
+            <div class="invalid-feedback d-block">{{ form.content.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <a class="btn btn-outline-secondary" href="{% url 'lms:instructor_course_manage' course.slug %}">Cancel</a>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://cdn.tiny.cloud/1/i0obrbdlevvwd9xusxkir7hr14ad77rzz73k5th67zwpz8z2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.tinymce) {
+        tinymce.init({
+          selector: 'textarea.richtext',
+          plugins: 'link lists image code table autoresize',
+          toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+          menubar: false,
+          skin: 'oxide-dark',
+          content_css: 'dark',
+          min_height: 300,
+          convert_urls: false
+        });
+      }
+    });
+  </script>
+{% endblock %}

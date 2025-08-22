@@ -1,0 +1,73 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OnPoint Admin{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0"><i class="bi bi-trophy me-2"></i>{{ title }}</h2>
+    <a href="{% url 'admin_challenge_list' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i> Back to Challenges
+    </a>
+  </div>
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+      {% for error in form.non_field_errors %}
+        <div>{{ error }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+          {% for field in form %}
+            <div class="col-md-6">
+              <label class="form-label text-warning" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a href="{% url 'admin_challenge_list' %}" class="btn btn-light">Cancel</a>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- TinyMCE (Rich Text Editor) -->
+<script src="https://cdn.tiny.cloud/1/i0obrbdlevvwd9xusxkir7hr14ad77rzz73k5th67zwpz8z2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.tinymce) {
+      tinymce.init({
+        selector: 'textarea.rich-text-editor',
+        menubar: false,
+        plugins: 'lists link table code codesample autolink charmap preview fullscreen',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link | removeformat | code preview fullscreen',
+        toolbar_mode: 'sliding',
+        branding: false,
+        contextmenu: false,
+        height: 380,
+        content_style: 'body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; font-size: 16px; }',
+        convert_urls: false,
+      });
+    }
+  });
+  
+</script>
+{% endblock %}

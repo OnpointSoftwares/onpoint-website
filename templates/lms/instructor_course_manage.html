@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OnPoint LMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h4 mb-0">Manage: {{ course.title }}</h1>
+      <div class="text-muted small">{{ course.category.name }} • {{ course.get_difficulty_display }}</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-secondary">View Public Page</a>
+      <a href="{% url 'lms:instructor_dashboard' %}" class="btn btn-light">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header bg-white"><strong>Lessons</strong></div>
+        <div class="card-body">
+          {% if lessons %}
+            <ol class="list-group list-group-numbered">
+              {% for lesson in lessons %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold">{{ lesson.title }}</div>
+                  <div class="small text-muted">Order: {{ lesson.order }}</div>
+                </div>
+                <div>
+                  <a href="{% url 'lms:instructor_lesson_edit' course.slug lesson.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                  <a href="{% url 'lms:instructor_lesson_delete' course.slug lesson.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </div>
+              </li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <div class="text-muted">No lessons yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card mb-4">
+        <div class="card-header bg-white"><strong>Add Lesson</strong></div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="add_lesson" value="1" />
+            <div class="mb-3">
+              <label class="form-label" for="id_lesson-title">Title</label>
+              {{ lesson_form.title }}
+              {% if lesson_form.title.errors %}
+                <div class="invalid-feedback d-block">{{ lesson_form.title.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_lesson-order">Order</label>
+              {{ lesson_form.order }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_lesson-video_url">Video URL</label>
+              {{ lesson_form.video_url }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_lesson-content">Content</label>
+              {{ lesson_form.content }}
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary">Add Lesson</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header bg-white"><strong>Add Resource</strong></div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="add_resource" value="1" />
+            <div class="mb-3">
+              <label class="form-label" for="id_resource-title">Title</label>
+              {{ resource_form.title }}
+              {% if resource_form.title.errors %}
+                <div class="invalid-feedback d-block">{{ resource_form.title.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="id_resource-file">File</label>
+              {{ resource_form.file }}
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary">Add Resource</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://cdn.tiny.cloud/1/i0obrbdlevvwd9xusxkir7hr14ad77rzz73k5th67zwpz8z2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.tinymce) {
+        tinymce.init({
+          selector: 'textarea.richtext',
+          plugins: 'link lists image code table autoresize',
+          toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+          menubar: false,
+          skin: 'oxide-dark',
+          content_css: 'dark',
+          min_height: 250,
+          convert_urls: false
+        });
+      }
+    });
+  </script>
+{% endblock %}

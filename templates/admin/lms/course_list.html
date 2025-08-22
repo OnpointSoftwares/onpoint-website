@@ -1,0 +1,84 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Courses - OnPoint Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-journal-code me-2"></i> Courses</h2>
+    <a href="{% url 'admin_course_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> New Course
+    </a>
+  </div>
+
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search courses...">
+      </div>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-outline-secondary" type="submit">Filter</button>
+    </div>
+  </form>
+
+  <div class="row g-3">
+    {% for course in page_obj %}
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="card h-100 shadow-sm">
+          {% if course.image %}
+            <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 180px; object-fit: cover;">
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-1">{{ course.title }}</h5>
+            <p class="text-warning small mb-2">
+              {% if course.category %}<i class="bi bi-tag me-1"></i>{{ course.category.name }} • {% endif %}
+              {% if course.instructor %}<i class="bi bi-person-circle me-1"></i>{{ course.instructor.user.get_full_name|default:course.instructor.user.username }}{% endif %}
+            </p>
+            <p class="card-text flex-grow-1">{{ course.short_description|default:course.description|truncatechars:130 }}</p>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="badge bg-{{ course.level|default:'secondary' }} text-capitalize">{{ course.level|default:'general' }}</span>
+              <div class="btn-group">
+                <a href="{% url 'admin_course_update' course.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'admin_course_delete' course.pk %}" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">No courses found.</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+    <nav class="mt-4" aria-label="Courses pagination">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+          {% if page_obj.has_previous %}
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q }}">Previous</a>
+          {% else %}
+            <span class="page-link">Previous</span>
+          {% endif %}
+        </li>
+        <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+          {% if page_obj.has_next %}
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q }}">Next</a>
+          {% else %}
+            <span class="page-link">Next</span>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+{% endblock %}

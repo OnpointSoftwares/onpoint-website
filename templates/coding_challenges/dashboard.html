@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Coding Challenges{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+    <div class="mb-3 mb-md-0">
+      <h1 class="h3 mb-1">Coding Challenges</h1>
+      <div class="text-muted small">Practice problems with difficulty levels and tags. Filter to find the right challenge.</div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'coding_challenges:leaderboard' %}" class="btn btn-outline-primary"><i class="bi bi-trophy me-1"></i> Leaderboard</a>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'coding_challenges:profile' %}" class="btn btn-primary"><i class="bi bi-person-circle me-1"></i> My Profile</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-primary">Sign In</a>
+      {% endif %}
+      {% if request.user.is_staff or perms.coding_challenges.add_challenge %}
+        <a href="{% url 'coding_challenges:challenge_create' %}" class="btn btn-success">
+          <i class="bi bi-plus-lg me-1"></i> Add Challenge
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label small text-muted">Search</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="{{ search|default:'' }}" class="form-control" placeholder="Search problems...">
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted">Difficulty</label>
+          <select name="difficulty" class="form-select">
+            <option value="">All difficulties</option>
+            <option value="easy" {% if difficulty == 'easy' %}selected{% endif %}>Easy</option>
+            <option value="medium" {% if difficulty == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="hard" {% if difficulty == 'hard' %}selected{% endif %}>Hard</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="form-label small text-muted">Tag</label>
+          <select name="tag" class="form-select">
+            <option value="">All tags</option>
+            {% for t in tags %}
+              <option value="{{ t.slug }}" {% if tag_slug == t.slug %}selected{% endif %}>{{ t.name }} ({{ t.count }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-2 d-flex gap-2">
+          <button class="btn btn-secondary w-100" type="submit"><i class="bi bi-funnel me-1"></i> Filter</button>
+          <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-outline-secondary w-100"><i class="bi bi-arrow-counterclockwise me-1"></i> Reset</a>
+        </div>
+      </form>
+      <div class="d-flex flex-wrap align-items-center justify-content-between mt-3">
+        <div class="text-muted small">
+          Showing {{ challenges|length }} result{% if challenges|length != 1 %}s{% endif %}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% if search %}<span class="badge bg-light text-dark border"><i class="bi bi-search me-1"></i>{{ search }}</span>{% endif %}
+          {% if difficulty %}
+            <span class="badge bg-{% if difficulty == 'easy' %}success{% elif difficulty == 'medium' %}warning text-dark{% else %}danger{% endif %}">{{ difficulty|title }}</span>
+          {% endif %}
+          {% if tag_slug %}
+            <span class="badge bg-info text-dark"><i class="bi bi-tag me-1"></i>{{ tag_slug }}</span>
+          {% endif %}
+          {% if request.user.is_staff or perms.coding_challenges.add_challenge %}
+            <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-gear me-1"></i> Manage</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    {% for c in challenges %}
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-{% if c.difficulty == 'easy' %}success{% elif c.difficulty == 'medium' %}warning text-dark{% else %}danger{% endif %}">{{ c.get_difficulty_display }}</span>
+              {% if c.id in solved_ids %}
+                <span class="badge bg-primary"><i class="bi bi-check2-circle me-1"></i>Solved</span>
+              {% endif %}
+            </div>
+            <h5 class="card-title mb-2"><a href="{% url 'coding_challenges:challenge_detail' c.slug %}" class="text-decoration-none">{{ c.title }}</a></h5>
+            <p class="card-text text-muted small flex-grow-1">{{ c.problem_statement|truncatewords:24 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="small text-muted">
+                <i class="bi bi-clock me-1"></i>{{ c.time_limit_ms }} ms
+                <span class="ms-2"><i class="bi bi-hdd me-1"></i>{{ c.memory_limit_kb|floatformat:0 }} KB</span>
+              </div>
+              <a href="{% url 'coding_challenges:challenge_detail' c.slug %}" class="btn btn-outline-primary btn-sm">Solve</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between">
+          <div>No challenges found. Try adjusting filters.</div>
+          {% if request.user.is_staff or perms.coding_challenges.add_challenge %}
+            <a href="{% url 'coding_challenges:challenge_create' %}" class="btn btn-sm btn-success mt-2 mt-md-0">
+              <i class="bi bi-plus-lg me-1"></i> Add Your First Challenge
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="mt-3">
+    {% if challenges.has_other_pages %}
+      <nav aria-label="Challenges pagination" class="d-flex justify-content-center">
+        <ul class="pagination mb-0">
+          {% if challenges.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ challenges.previous_page_number }}&q={{ search }}&difficulty={{ difficulty }}&tag={{ tag_slug }}">Previous</a></li>
+          {% endif %}
+          <li class="page-item disabled"><span class="page-link">Page {{ challenges.number }} of {{ challenges.paginator.num_pages }}</span></li>
+          {% if challenges.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ challenges.next_page_number }}&q={{ search }}&difficulty={{ difficulty }}&tag={{ tag_slug }}">Next</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

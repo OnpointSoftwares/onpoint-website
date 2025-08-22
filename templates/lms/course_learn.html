@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load lms_filters %}
+{% block title %}Learn: {{ course.title }} - OnPoint LMS{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-md-8">
+      <h1 class="h4 mb-3">{{ course.title }}</h1>
+      {% if course.lessons.all %}
+        {% for lesson in course.lessons.all %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Lesson {{ forloop.counter }}: {{ lesson.title }}</h5>
+              {% if lesson.video_url %}
+                <div class="ratio ratio-16x9 mb-3">
+                  {# Prefer HTML5 video if the URL ends with .mp4; else fallback to embedded iframe #}
+                  {% if lesson.video_url|is_mp4 %}
+                    <video class="w-100 tracked-video" controls preload="metadata"
+                           data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}">
+                      <source src="{{ lesson.video_url }}" type="video/mp4">
+                    </video>
+                  {% else %}
+                    <iframe class="tracked-iframe" src="{{ lesson.video_url|to_embed }}" title="{{ lesson.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen
+                            data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}"></iframe>
+                  {% endif %}
+                </div>
+              {% endif %}
+              <div>{{ lesson.content|default_if_none:''|safe }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">No lessons yet.</div>
+      {% endif %}
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">Resources</div>
+        <div class="list-group list-group-flush">
+          {% for r in course.resources.all %}
+            <a class="list-group-item list-group-item-action" href="{{ r.file.url }}" download>{{ r.title }}</a>
+          {% empty %}
+            <div class="list-group-item">No resources</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  const csrftoken = (function() {
+    const m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  })();
+  const endpoint = "{% url 'lms:update_progress' %}";
+
+  function trackVideo(videoEl, courseSlug, lessonId) {
+    let lastTime = 0;
+    let accum = 0;
+
+    const send = (completed = false) => {
+      const now = videoEl.currentTime || 0;
+      const delta = Math.max(0, now - lastTime);
+      accum += delta;
+      lastTime = now;
+      if (accum < 10 && !completed) return; // throttle ~10s
+      const form = new FormData();
+      form.append('course_slug', courseSlug);
+      form.append('lesson_id', lessonId);
+      form.append('last_position', now.toFixed(2));
+      form.append('watched_delta', accum.toFixed(2));
+      form.append('completed', completed ? 'true' : 'false');
+      fetch(endpoint, { method: 'POST', body: form, headers: { 'X-CSRFToken': csrftoken }})
+        .catch(() => {});
+      accum = 0;
+    };
+
+    videoEl.addEventListener('loadedmetadata', () => {
+      lastTime = videoEl.currentTime || 0;
+    });
+    videoEl.addEventListener('pause', () => send(false));
+    videoEl.addEventListener('ended', () => send(true));
+    window.addEventListener('beforeunload', () => send(false));
+    setInterval(() => send(false), 10000);
+  }
+
+  document.querySelectorAll('video.tracked-video').forEach(v => {
+    const courseSlug = v.getAttribute('data-course-slug');
+    const lessonId = v.getAttribute('data-lesson-id');
+    trackVideo(v, courseSlug, lessonId);
+  });
+})();
+</script>
+{% endblock %}
