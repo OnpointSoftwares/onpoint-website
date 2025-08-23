@@ -931,12 +931,12 @@ def article_delete(request, pk):
     })
 
 
-def add_comment(request, article_id):
+def add_comment(request, pk):
     """
     View for adding a new comment to an article.
     Handles both authenticated and anonymous users.
     """
-    article = get_object_or_404(Article, pk=article_id)
+    article = get_object_or_404(Article, pk=pk)
     
     # Check if comments are closed
     if hasattr(article, 'comments_closed') and article.comments_closed and not request.user.is_staff:
@@ -960,9 +960,6 @@ def add_comment(request, article_id):
             # Send notification to admin for new comments that need moderation
             if not comment.is_active and hasattr(settings, 'ADMINS') and settings.ADMINS:
                 try:
-                    from django.core.mail import mail_admins
-                    from django.urls import reverse
-                    
                     mail_admins(
                         f'New Comment Awaiting Moderation: {article.title}',
                         f'A new comment has been posted on "{article.title}" and is awaiting moderation.\n\n'
@@ -1100,3 +1097,6 @@ def learning_resource_detail(request, slug):
     }
     
     return render(request, 'core/learning_resource_detail.html', context)
+
+def bizflow_pos_docs(request):
+    return render(request, 'core/bizflow_pos_docs.html')

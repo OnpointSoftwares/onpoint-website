@@ -84,4 +84,5 @@ urlpatterns = [
     # Learning resources
     path('learning-resources/', views.learning_resource_list, name='learning_resource_list'),
     path('learning-resources/<slug:slug>/', views.learning_resource_detail, name='learning_resource_detail'),
+    path('bizflow_pos/docs/', views.bizflow_pos_docs, name='bizflow_pos_docs'),
 ]
