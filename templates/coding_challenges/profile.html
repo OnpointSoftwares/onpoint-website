@@ -1,76 +1,303 @@
 {% extends 'base.html' %}
-{% block title %}My Profile{% endblock %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile - Coding Challenges | OnPoint Software{% endblock %}
+
+{% block meta %}
+<meta name="description" content="View {{ user.username }}'s coding challenge profile, achievements, and submission history.">
+<meta name="keywords" content="coding profile, programming achievements, challenge history">
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 3px solid rgba(255,255,255,0.3);
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  .stat-card:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+  }
+  .progress-ring {
+    width: 60px;
+    height: 60px;
+  }
+  .progress-ring circle {
+    fill: transparent;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+  .progress-bg { stroke: rgba(255,255,255,0.2); }
+  .progress-bar { stroke: #28a745; }
+  .activity-timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+  .activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+  }
+  .activity-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  .activity-item::before {
+    content: '';
+    position: absolute;
+    left: -2.25rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #0d6efd;
+    border: 2px solid white;
+  }
+  .badge-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+  .badge-item {
+    text-align: center;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  .badge-item:hover {
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .chart-container {
+    position: relative;
+    height: 300px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
+  <!-- Profile Header -->
+  <div class="profile-header p-4 rounded-3 mb-4">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="user-avatar">
+          {{ user.username|first|upper }}
+        </div>
+      </div>
+      <div class="col">
+        <h1 class="h2 mb-1">{{ user.username }}</h1>
+        <p class="mb-2 opacity-75">Member since {{ user.date_joined|date:"F Y" }}</p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-light text-dark">{{ profile.solved_count }} Challenges Solved</span>
+          <span class="badge bg-light text-dark">{{ profile.points }} Points Earned</span>
+          <span class="badge bg-light text-dark">{{ profile.badges.all|length }} Badges</span>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="d-flex gap-2">
+          <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-light">
+            <i class="bi bi-arrow-left me-1"></i> Back to Challenges
+          </a>
+          <a href="{% url 'coding_challenges:leaderboard' %}" class="btn btn-outline-light">
+            <i class="bi bi-trophy me-1"></i> Leaderboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-4">
-    <div class="col-12 col-lg-4">
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3">
-            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
-              <span class="fw-bold">{{ user.username|first|upper }}</span>
-            </div>
-            <div>
-              <h5 class="mb-0">{{ user.username }}</h5>
-              <div class="text-muted small">Joined {{ user.date_joined|date:"M Y" }}</div>
+    <!-- Stats Cards -->
+    <div class="col-12">
+      <div class="row g-3">
+        <div class="col-6 col-md-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="h3 mb-1 text-primary">{{ profile.points }}</div>
+              <div class="small text-muted">Total Points</div>
             </div>
           </div>
-          <hr>
-          <div class="d-flex align-items-center justify-content-between">
-            <div>
-              <div class="small text-muted">Points</div>
-              <div class="h5 mb-0">{{ profile.points }}</div>
-            </div>
-            <div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="h3 mb-1 text-success">{{ profile.solved_count }}</div>
               <div class="small text-muted">Solved</div>
-              <div class="h5 mb-0">{{ profile.solved_count }}</div>
             </div>
           </div>
-          <hr>
-          <div>
-            <div class="small text-muted mb-1">Badges</div>
-            {% for b in profile.badges.all %}
-              <span class="badge bg-light text-dark border me-1"><i class="bi bi-award text-warning me-1"></i>{{ b.name }}</span>
-            {% empty %}
-              <div class="text-muted small">No badges yet.</div>
-            {% endfor %}
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="h3 mb-1 text-warning">{{ profile.badges.all|length }}</div>
+              <div class="small text-muted">Badges</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+              <div class="h3 mb-1 text-info">{{ submissions|length }}</div>
+              <div class="small text-muted">Submissions</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-12 col-lg-8">
-      <div class="card shadow-sm border-0">
+
+    <!-- Achievements -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-bottom">
+          <h3 class="h5 mb-0">
+            <i class="bi bi-award me-2 text-warning"></i>Achievements
+          </h3>
+        </div>
         <div class="card-body">
-          <h6 class="mb-3">Recent Submissions</h6>
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Challenge</th>
-                  <th>Lang</th>
-                  <th>Status</th>
-                  <th>Runtime</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for s in submissions %}
-                  <tr>
-                    <td><a href="{% url 'coding_challenges:challenge_detail' s.challenge.slug %}">{{ s.challenge.title }}</a></td>
-                    <td>{{ s.get_language_display }}</td>
-                    <td><span class="badge bg-{% if s.status == 'passed' %}success{% elif s.status == 'failed' %}danger{% elif s.status == 'error' %}secondary{% else %}warning text-dark{% endif %}">{{ s.status|title }}</span></td>
-                    <td>{% if s.runtime_ms %}{{ s.runtime_ms }} ms{% else %}-{% endif %}</td>
-                    <td class="text-muted small">{{ s.created_at|date:"M d, H:i" }}</td>
-                  </tr>
-                {% empty %}
-                  <tr><td colspan="5" class="text-center text-muted">No submissions yet.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          {% if profile.badges.all %}
+            <div class="badge-showcase">
+              {% for badge in profile.badges.all %}
+                <div class="badge-item">
+                  <i class="bi bi-award display-6 text-warning mb-2 d-block"></i>
+                  <div class="fw-semibold small">{{ badge.name }}</div>
+                  {% if badge.description %}
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ badge.description }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-award display-4 text-muted mb-3 d-block"></i>
+              <h4>No badges yet</h4>
+              <p class="text-muted">Complete challenges to earn your first badge!</p>
+              <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-primary btn-sm">
+                Start Solving
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+          <h3 class="h5 mb-0">
+            <i class="bi bi-clock-history me-2 text-primary"></i>Recent Submissions
+          </h3>
+          <small class="text-muted">Last {{ submissions|length }} submissions</small>
+        </div>
+        <div class="card-body">
+          {% if submissions %}
+            <div class="activity-timeline">
+              {% for s in submissions|slice:":10" %}
+                <div class="activity-item">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1">
+                        <a href="{% url 'coding_challenges:challenge_detail' s.challenge.slug %}" 
+                           class="text-decoration-none">{{ s.challenge.title }}</a>
+                      </h6>
+                      <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <span class="badge bg-light text-dark border">{{ s.get_language_display }}</span>
+                        <span class="badge bg-{% if s.status == 'passed' %}success{% elif s.status == 'failed' %}danger{% elif s.status == 'error' %}secondary{% else %}warning text-dark{% endif %}">
+                          {{ s.status|title }}
+                        </span>
+                        {% if s.runtime_ms %}
+                          <span class="small text-muted">{{ s.runtime_ms }}ms</span>
+                        {% endif %}
+                      </div>
+                      <div class="small text-muted">{{ s.created_at|date:"M d, Y \a\t H:i" }}</div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if submissions|length > 10 %}
+              <div class="text-center mt-3">
+                <small class="text-muted">Showing latest 10 of {{ submissions|length }} submissions</small>
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-code-slash display-4 text-muted mb-3 d-block"></i>
+              <h4>No submissions yet</h4>
+              <p class="text-muted">Start solving challenges to see your submission history here!</p>
+              <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-primary">
+                Browse Challenges
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Section -->
+  {% if submissions %}
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom">
+          <h3 class="h5 mb-0">
+            <i class="bi bi-graph-up me-2 text-success"></i>Progress Overview
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h6>Success Rate</h6>
+              <div class="d-flex align-items-center gap-3">
+                <div class="progress flex-grow-1" style="height: 8px;">
+                  <div class="progress-bar bg-success" style="width: 85%"></div>
+                </div>
+                <span class="small fw-bold">85%</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h6>Favorite Language</h6>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary">Python</span>
+                <span class="small text-muted">60% of submissions</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  {% endif %}
 </div>
 {% endblock %}

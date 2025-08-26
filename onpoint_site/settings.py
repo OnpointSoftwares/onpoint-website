@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'core',
     'coding_challenges.apps.CodingChallengesConfig',
     'lms',
+    'website_templates',
 ]
 
 MIDDLEWARE = [

@@ -1,38 +1,341 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Instructor Dashboard - OnPoint LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 0;
+    margin-bottom: 30px;
+    border-radius: 15px;
+}
+.stats-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.stats-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+.course-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+.course-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.course-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.status-published {
+    background: #d4edda;
+    color: #155724;
+}
+.status-draft {
+    background: #fff3cd;
+    color: #856404;
+}
+.status-archived {
+    background: #f8d7da;
+    color: #721c24;
+}
+.progress-ring {
+    width: 60px;
+    height: 60px;
+}
+.progress-ring circle {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+.progress-ring .bg {
+    stroke: #e9ecef;
+}
+.progress-ring .progress {
+    stroke: #667eea;
+    stroke-dasharray: 0 100;
+    transition: stroke-dasharray 0.3s ease;
+}
+.instructor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.2);
+}
+.chart-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 25px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Instructor Dashboard</h1>
-    <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-primary">
-      <i class="bi bi-plus-circle me-1"></i> New Course
-    </a>
-  </div>
-  <div class="row g-3">
-    {% for course in courses %}
-    <div class="col-md-6">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title mb-1">{{ course.title }}</h5>
-          <p class="text-muted small mb-2">{{ course.category.name }} • {{ course.get_difficulty_display }}</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="btn-group">
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'lms:course_detail' course.slug %}">View</a>
-              <a class="btn btn-outline-secondary btn-sm" href="{% url 'lms:instructor_course_manage' course.slug %}">Manage</a>
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center">
+                    {% if instructor.avatar %}
+                        <img src="{{ instructor.avatar.url }}" alt="{{ instructor.user.get_full_name }}" class="instructor-avatar me-4">
+                    {% else %}
+                        <div class="instructor-avatar me-4 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.2);">
+                            <i class="bi bi-person-fill" style="font-size: 32px;"></i>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h1 class="h2 mb-1">Welcome back, {{ instructor.user.get_full_name|default:instructor.user.username }}!</h1>
+                        <p class="mb-0 opacity-75">Manage your courses and track your teaching progress</p>
+                        {% if instructor.is_verified %}
+                            <span class="badge bg-light text-dark mt-2">
+                                <i class="bi bi-patch-check-fill me-1"></i>Verified Instructor
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <span class="small text-muted">{{ course.enrollments.count }} students</span>
-          </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Course
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-    {% empty %}
-      <div class="col-12">
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
-          <div>You haven't created any courses yet.</div>
-          <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-sm btn-primary">Create your first course</a>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
 </div>
+
+<div class="container">
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon mx-auto mb-3" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <h3 class="h2 mb-1">{{ stats.total_courses }}</h3>
+                    <p class="text-muted mb-0">Total Courses</p>
+                    <small class="text-success">
+                        <i class="bi bi-check-circle me-1"></i>{{ stats.published_courses }} Published
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon mx-auto mb-3" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 class="h2 mb-1">{{ stats.total_students }}</h3>
+                    <p class="text-muted mb-0">Total Students</p>
+                    <small class="text-info">
+                        <i class="bi bi-arrow-up me-1"></i>{{ stats.recent_enrollments }} This Month
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon mx-auto mb-3" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <h3 class="h2 mb-1">{{ stats.average_rating|floatformat:1 }}</h3>
+                    <p class="text-muted mb-0">Average Rating</p>
+                    <div class="text-warning">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= stats.average_rating %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="stats-icon mx-auto mb-3" style="background: linear-gradient(135deg, #17a2b8, #6f42c1);">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h3 class="h2 mb-1">${{ stats.total_revenue|floatformat:0 }}</h3>
+                    <p class="text-muted mb-0">Total Revenue</p>
+                    <small class="text-muted">
+                        <i class="bi bi-graph-up me-1"></i>Lifetime Earnings
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Courses Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-collection me-2"></i>Your Courses
+                    <span class="badge bg-primary ms-2">{{ courses.count }}</span>
+                </h2>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="courseFilter" id="all" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="all">All</label>
+                    <input type="radio" class="btn-check" name="courseFilter" id="published" autocomplete="off">
+                    <label class="btn btn-outline-success" for="published">Published</label>
+                    <input type="radio" class="btn-check" name="courseFilter" id="draft" autocomplete="off">
+                    <label class="btn btn-outline-warning" for="draft">Draft</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for stat in course_stats %}
+        <div class="col-lg-6 course-item" data-status="{{ stat.course.status }}">
+            <div class="card course-card h-100">
+                <div class="position-relative">
+                    {% if stat.course.image %}
+                        <img src="{{ stat.course.image.url }}" class="card-img-top" alt="{{ stat.course.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                            <i class="bi bi-book" style="font-size: 48px;"></i>
+                        </div>
+                    {% endif %}
+                    <span class="course-status status-{{ stat.course.status }}">
+                        {{ stat.course.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-2">{{ stat.course.title }}</h5>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-tag me-1"></i>{{ stat.course.category.name|default:"Uncategorized" }} • 
+                        <i class="bi bi-signal me-1"></i>{{ stat.course.get_difficulty_display }}
+                        {% if stat.course.is_paid %}
+                            • <i class="bi bi-currency-dollar me-1"></i>${{ stat.course.price }}
+                        {% else %}
+                            • <i class="bi bi-gift me-1"></i>Free
+                        {% endif %}
+                    </p>
+                    
+                    <!-- Course Stats -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-4 text-center">
+                            <div class="h5 mb-0 text-primary">{{ stat.enrollments }}</div>
+                            <small class="text-muted">Students</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h5 mb-0 text-success">{{ stat.completion_rate }}%</div>
+                            <small class="text-muted">Completion</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="h5 mb-0 text-info">{{ stat.course.total_lessons }}</div>
+                            <small class="text-muted">Lessons</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Average Progress</small>
+                            <small class="text-muted">{{ stat.average_progress }}%</small>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-gradient" role="progressbar" 
+                                 style="width: {{ stat.average_progress }}%; background: linear-gradient(90deg, #667eea, #764ba2);" 
+                                 aria-valuenow="{{ stat.average_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'lms:course_detail' stat.course.slug %}" class="btn btn-outline-primary btn-sm flex-fill">
+                            <i class="bi bi-eye me-1"></i>View
+                        </a>
+                        <a href="{% url 'lms:instructor_course_manage' stat.course.slug %}" class="btn btn-primary btn-sm flex-fill">
+                            <i class="bi bi-gear me-1"></i>Manage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-book" style="font-size: 64px; color: #dee2e6;"></i>
+                </div>
+                <h3 class="h4 text-muted mb-3">No courses yet</h3>
+                <p class="text-muted mb-4">Start your teaching journey by creating your first course!</p>
+                <a href="{% url 'lms:instructor_course_create' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Course
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// Course filtering
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('input[name="courseFilter"]');
+    const courseItems = document.querySelectorAll('.course-item');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            const filter = this.id;
+            
+            courseItems.forEach(item => {
+                const status = item.getAttribute('data-status');
+                
+                if (filter === 'all' || status === filter) {
+                    item.style.display = 'block';
+                    item.style.animation = 'fadeIn 0.3s ease';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+
+// Add fade in animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

@@ -34,6 +34,9 @@ urlpatterns = [
     # LMS app
     path('lms/', include('lms.urls', namespace='lms')),
     
+    # Website Templates app
+    path('templates/', include('website_templates.urls', namespace='website_templates')),
+    
     # Django admin (enabled for model management)
     path('django-admin/', admin.site.urls),
 ]

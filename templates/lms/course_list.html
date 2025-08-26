@@ -1,58 +1,251 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Courses - OnPoint LMS{% endblock %}
-{% block content %}
-<div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0"><i class="bi bi-journal-text me-2"></i>Browse Courses</h1>
-    <div class="d-flex gap-2">
-      <a href="{% url 'lms:student_dashboard' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-collection-play me-1"></i> My Learning</a>
-      <button class="btn btn-outline-secondary btn-sm d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersCanvas" aria-controls="filtersCanvas">
-        <i class="bi bi-sliders me-1"></i> Filters
-      </button>
-    </div>
-  </div>
 
-  <form method="get" class="row g-2 mb-4 d-none d-md-flex">
-    <div class="col-md-4">
-      <div class="input-group">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search courses...">
-      </div>
+{% block extra_css %}
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+}
+.search-box {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+}
+.search-box:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+.filter-card {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-radius: 15px;
+    position: sticky;
+    top: 100px;
+}
+.course-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+.course-image {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+}
+.instructor-avatar {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+.rating-stars {
+    color: #ffc107;
+}
+.price-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.difficulty-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+.stats-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+.filter-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Learn New Skills</h1>
+                <p class="lead mb-4">Discover thousands of courses from expert instructors and advance your career</p>
+                
+                <!-- Search Bar -->
+                <form method="get" class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" value="{{ request.GET.q }}" class="form-control search-box" placeholder="What do you want to learn?">
+                        <button class="btn btn-light" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Quick Categories -->
+                <div class="d-flex flex-wrap gap-2">
+                    {% for category in categories|slice:":5" %}
+                        <a href="?category={{ category.slug }}" class="btn btn-outline-light btn-sm rounded-pill">
+                            {{ category.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="stats-card">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="h3 mb-1">{{ courses.count }}+</div>
+                            <small>Courses</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="h3 mb-1">50K+</div>
+                            <small>Students</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-2">
-      <select name="category" class="form-select">
-        <option value="">All Categories</option>
-        {% for c in categories %}
-          <option value="{{ c.slug }}" {% if request.GET.category == c.slug %}selected{% endif %}>{{ c.name }}</option>
-        {% endfor %}
-      </select>
+</section>
+
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="h4 mb-0">
+            {% if request.GET.q %}
+                Search results for "{{ request.GET.q }}"
+            {% elif request.GET.category %}
+                {{ request.GET.category|title }} Courses
+            {% else %}
+                All Courses
+            {% endif %}
+            <span class="text-muted">({{ courses.count }} courses)</span>
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'lms:student_dashboard' %}" class="btn btn-outline-primary">
+                <i class="bi bi-collection-play me-1"></i> My Learning
+            </a>
+            <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersCanvas">
+                <i class="bi bi-sliders me-1"></i> Filters
+            </button>
+        </div>
     </div>
-    <div class="col-md-2">
-      <select name="price" class="form-select">
-        <option value="">All</option>
-        <option value="free" {% if request.GET.price == 'free' %}selected{% endif %}>Free</option>
-        <option value="paid" {% if request.GET.price == 'paid' %}selected{% endif %}>Paid</option>
-      </select>
-    </div>
-    <div class="col-md-2">
-      <select name="difficulty" class="form-select">
-        <option value="">Any Level</option>
-        <option value="beginner" {% if request.GET.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
-        <option value="intermediate" {% if request.GET.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
-        <option value="advanced" {% if request.GET.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
-      </select>
-    </div>
-    <div class="col-md-2">
-      <select name="sort" class="form-select">
-        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
-        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
-        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
-        <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
-      </select>
-    </div>
-  </form>
+
+    <!-- Desktop Filters -->
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="filter-card card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-funnel me-2"></i>Filters
+                    </h5>
+                    
+                    <form method="get" id="filterForm">
+                        <!-- Category Filter -->
+                        <div class="filter-section">
+                            <h6 class="fw-bold mb-3">Category</h6>
+                            <div class="d-grid gap-2">
+                                <label class="btn btn-outline-primary text-start {% if not request.GET.category %}active{% endif %}">
+                                    <input type="radio" name="category" value="" class="btn-check" {% if not request.GET.category %}checked{% endif %}>
+                                    All Categories
+                                </label>
+                                {% for c in categories %}
+                                    <label class="btn btn-outline-primary text-start {% if request.GET.category == c.slug %}active{% endif %}">
+                                        <input type="radio" name="category" value="{{ c.slug }}" class="btn-check" {% if request.GET.category == c.slug %}checked{% endif %}>
+                                        {{ c.name }}
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Price Filter -->
+                        <div class="filter-section">
+                            <h6 class="fw-bold mb-3">Price</h6>
+                            <div class="d-grid gap-2">
+                                <label class="btn btn-outline-success text-start {% if not request.GET.price %}active{% endif %}">
+                                    <input type="radio" name="price" value="" class="btn-check" {% if not request.GET.price %}checked{% endif %}>
+                                    All Prices
+                                </label>
+                                <label class="btn btn-outline-success text-start {% if request.GET.price == 'free' %}active{% endif %}">
+                                    <input type="radio" name="price" value="free" class="btn-check" {% if request.GET.price == 'free' %}checked{% endif %}>
+                                    <i class="bi bi-gift me-2"></i>Free
+                                </label>
+                                <label class="btn btn-outline-success text-start {% if request.GET.price == 'paid' %}active{% endif %}">
+                                    <input type="radio" name="price" value="paid" class="btn-check" {% if request.GET.price == 'paid' %}checked{% endif %}>
+                                    <i class="bi bi-credit-card me-2"></i>Paid
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Difficulty Filter -->
+                        <div class="filter-section">
+                            <h6 class="fw-bold mb-3">Difficulty</h6>
+                            <div class="d-grid gap-2">
+                                <label class="btn btn-outline-warning text-start {% if not request.GET.difficulty %}active{% endif %}">
+                                    <input type="radio" name="difficulty" value="" class="btn-check" {% if not request.GET.difficulty %}checked{% endif %}>
+                                    Any Level
+                                </label>
+                                <label class="btn btn-outline-warning text-start {% if request.GET.difficulty == 'beginner' %}active{% endif %}">
+                                    <input type="radio" name="difficulty" value="beginner" class="btn-check" {% if request.GET.difficulty == 'beginner' %}checked{% endif %}>
+                                    <i class="bi bi-1-circle me-2"></i>Beginner
+                                </label>
+                                <label class="btn btn-outline-warning text-start {% if request.GET.difficulty == 'intermediate' %}active{% endif %}">
+                                    <input type="radio" name="difficulty" value="intermediate" class="btn-check" {% if request.GET.difficulty == 'intermediate' %}checked{% endif %}>
+                                    <i class="bi bi-2-circle me-2"></i>Intermediate
+                                </label>
+                                <label class="btn btn-outline-warning text-start {% if request.GET.difficulty == 'advanced' %}active{% endif %}">
+                                    <input type="radio" name="difficulty" value="advanced" class="btn-check" {% if request.GET.difficulty == 'advanced' %}checked{% endif %}>
+                                    <i class="bi bi-3-circle me-2"></i>Advanced
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Sort Filter -->
+                        <div class="filter-section">
+                            <h6 class="fw-bold mb-3">Sort By</h6>
+                            <select name="sort" class="form-select">
+                                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+                                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                                <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                                <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-2"></i>Apply Filters
+                            </button>
+                            <a href="{% url 'lms:course_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Clear All
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
 
   <!-- Offcanvas filters for mobile -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="filtersCanvas" aria-labelledby="filtersCanvasLabel">
@@ -107,43 +300,130 @@
     </div>
   </div>
 
-  <div class="row g-3">
-    {% for course in courses %}
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm border-0 course-card">
-        <div class="position-relative">
-          {% if course.image %}
-            <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
-          {% else %}
-            <img src="{% static 'img/course-placeholder.svg' %}" class="card-img-top bg-body-tertiary" alt="{{ course.title }}">
-          {% endif %}
-          <div class="position-absolute top-0 start-0 m-2 d-flex gap-1">
-            <span class="badge bg-dark-subtle text-dark border"><i class="bi bi-layers me-1"></i> {{ course.category.name }}</span>
-            <span class="badge bg-primary"><i class="bi bi-speedometer me-1"></i> {{ course.get_difficulty_display }}</span>
-          </div>
-          <div class="position-absolute top-0 end-0 m-2">
-            {% if course.is_paid %}
-              <span class="badge bg-success"><i class="bi bi-cash-coin me-1"></i>${{ course.price }}</span>
-            {% else %}
-              <span class="badge bg-info text-dark"><i class="bi bi-gift me-1"></i>Free</span>
-            {% endif %}
-          </div>
+            <!-- Course Grid -->
+            <div class="row g-4">
+                {% for course in courses %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="course-card card">
+                        <div class="position-relative">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" class="course-image" alt="{{ course.title }}">
+                            {% else %}
+                                <div class="course-image bg-gradient d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-play-circle display-1 text-white opacity-75"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Price Badge -->
+                            <div class="price-badge">
+                                {% if course.is_paid %}
+                                    ${{ course.price }}
+                                {% else %}
+                                    FREE
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Difficulty Badge -->
+                            <div class="position-absolute bottom-0 start-0 m-3">
+                                <span class="badge difficulty-badge 
+                                    {% if course.difficulty == 'beginner' %}bg-success
+                                    {% elif course.difficulty == 'intermediate' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ course.get_difficulty_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <!-- Category -->
+                            <div class="mb-2">
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-tag me-1"></i>{{ course.category.name }}
+                                </span>
+                            </div>
+                            
+                            <!-- Title -->
+                            <h5 class="card-title mb-3">
+                                <a href="{% url 'lms:course_detail' course.slug %}" class="text-decoration-none text-dark">
+                                    {{ course.title }}
+                                </a>
+                            </h5>
+                            
+                            <!-- Description -->
+                            <p class="card-text text-muted mb-3">{{ course.description|truncatewords:15 }}</p>
+                            
+                            <!-- Instructor -->
+                            <div class="d-flex align-items-center mb-3">
+                                {% if course.instructor.avatar %}
+                                    <img src="{{ course.instructor.avatar.url }}" class="instructor-avatar rounded-circle me-2" alt="Instructor">
+                                {% else %}
+                                    <div class="instructor-avatar rounded-circle bg-light d-flex align-items-center justify-content-center me-2">
+                                        <i class="bi bi-person-fill text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <small class="text-muted d-block">Instructor</small>
+                                    <small class="fw-semibold">{{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Stats Row -->
+                            <div class="row g-0 mb-3 text-center">
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Lessons</small>
+                                    <small class="fw-bold">{{ course.lessons.count }}</small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Duration</small>
+                                    <small class="fw-bold">12h</small>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Students</small>
+                                    <small class="fw-bold">{{ course.enrollments.count }}</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Rating and Action -->
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="rating-stars me-1">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= course.rating_avg|floatformat:0 %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">{{ course.rating_avg|floatformat:1 }} ({{ course.rating_count }})</small>
+                                </div>
+                                
+                                <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-primary btn-sm">
+                                    {% if user.is_authenticated and user in course.enrollments.all %}
+                                        <i class="bi bi-play-circle me-1"></i>Continue
+                                    {% else %}
+                                        <i class="bi bi-eye me-1"></i>View Course
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-search display-1 text-muted mb-3"></i>
+                        <h4 class="text-muted">No courses found</h4>
+                        <p class="text-muted">Try adjusting your filters or search terms.</p>
+                        <a href="{% url 'lms:course_list' %}" class="btn btn-primary">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Clear Filters
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ course.title }}</h5>
-          <p class="text-muted small mb-2"><i class="bi bi-person-video3 me-1"></i> {{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</p>
-          <p class="card-text flex-grow-1">{{ course.description|truncatewords:20 }}</p>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="text-warning"><i class="bi bi-star-fill me-1"></i>{{ course.rating_avg|default:0|floatformat:1 }} <span class="text-muted">({{ course.rating_count|default:0 }})</span></span>
-            <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-eye me-1"></i> View</a>
-          </div>
-        </div>
-      </div>
     </div>
-    {% empty %}
-      <div class="col-12"><div class="alert alert-info">No courses found.</div></div>
-    {% endfor %}
-  </div>
 
   {% if page_obj %}
   <nav class="mt-4" aria-label="Course pagination">

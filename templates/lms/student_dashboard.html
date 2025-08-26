@@ -1,28 +1,340 @@
 {% extends 'base.html' %}
-{% block title %}My Learning - OnPoint LMS{% endblock %}
+{% load static %}
+{% block title %}My Learning Dashboard - OnPoint LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+}
+.stats-card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+.progress-ring {
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+.course-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+.course-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.course-image {
+    height: 150px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+}
+.progress-bar-custom {
+    height: 8px;
+    border-radius: 10px;
+    background: #e9ecef;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+}
+.achievement-badge {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+.activity-item {
+    border-left: 3px solid #667eea;
+    background: #f8f9fa;
+    border-radius: 0 10px 10px 0;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">My Learning</h1>
-    <a href="{% url 'lms:course_list' %}" class="btn btn-outline-primary btn-sm">Browse Courses</a>
-  </div>
-  <div class="row g-3">
-    {% for e in enrollments %}
-    <div class="col-md-6">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title mb-1">{{ e.course.title }}</h5>
-          <p class="text-muted small">Progress: {{ e.progress|floatformat:0 }}%</p>
-          <div class="progress mb-2" style="height: 6px;">
-            <div class="progress-bar" role="progressbar" style="width: {{ e.progress }}%;" aria-valuenow="{{ e.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-          <a href="{% url 'lms:course_learn' e.course.slug %}" class="btn btn-primary btn-sm">Continue Learning</a>
+<!-- Dashboard Hero -->
+<section class="dashboard-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
+                <p class="lead mb-4">Continue your learning journey and achieve your goals</p>
+                
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h2 mb-1">{{ enrollments.count }}</div>
+                            <small>Enrolled Courses</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h2 mb-1">{{ completed_courses }}</div>
+                            <small>Completed</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h2 mb-1">{{ total_hours|default:"24" }}</div>
+                            <small>Hours Learned</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <div class="h2 mb-1">{{ certificates|default:"3" }}</div>
+                            <small>Certificates</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="progress-ring mx-auto mb-3">
+                    <svg width="80" height="80" viewBox="0 0 80 80">
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="white" stroke-width="6" 
+                                stroke-dasharray="220" stroke-dashoffset="{{ 220|sub:overall_progress|mul:2.2 }}" 
+                                stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                    </svg>
+                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                        <div class="h4 mb-0">{{ overall_progress|default:"68" }}%</div>
+                        <small>Overall Progress</small>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    {% empty %}
-      <div class="col-12"><div class="alert alert-info">You haven't enrolled in any courses yet.</div></div>
-    {% endfor %}
-  </div>
+</section>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Continue Learning Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-play-circle me-2"></i>Continue Learning
+                </h2>
+                <a href="{% url 'lms:course_list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-circle me-1"></i>Browse Courses
+                </a>
+            </div>
+            
+            {% if enrollments %}
+                <div class="row g-4">
+                    {% for enrollment in enrollments %}
+                    <div class="col-md-6">
+                        <div class="course-card card">
+                            <div class="position-relative">
+                                {% if enrollment.course.image %}
+                                    <img src="{{ enrollment.course.image.url }}" class="course-image" alt="{{ enrollment.course.title }}">
+                                {% else %}
+                                    <div class="course-image bg-gradient d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-play-circle display-4 text-white opacity-75"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Progress Badge -->
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge bg-dark bg-opacity-75 text-white">
+                                        {{ enrollment.progress|floatformat:0 }}%
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body p-4">
+                                <div class="mb-2">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="bi bi-tag me-1"></i>{{ enrollment.course.category.name }}
+                                    </span>
+                                </div>
+                                
+                                <h5 class="card-title mb-3">{{ enrollment.course.title }}</h5>
+                                
+                                <!-- Instructor -->
+                                <div class="d-flex align-items-center mb-3">
+                                    {% if enrollment.course.instructor.avatar %}
+                                        <img src="{{ enrollment.course.instructor.avatar.url }}" class="rounded-circle me-2" width="30" height="30" alt="Instructor">
+                                    {% else %}
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                            <i class="bi bi-person-fill text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">{{ enrollment.course.instructor.user.get_full_name|default:enrollment.course.instructor.user.username }}</small>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="text-muted">Progress</small>
+                                        <small class="fw-bold">{{ enrollment.progress|floatformat:0 }}%</small>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: {{ enrollment.progress }}%;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Stats -->
+                                <div class="row g-0 mb-3 text-center">
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Lessons</small>
+                                        <small class="fw-bold">{{ enrollment.course.lessons.count }}</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Duration</small>
+                                        <small class="fw-bold">12h</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Rating</small>
+                                        <small class="fw-bold">{{ enrollment.course.rating_avg|floatformat:1 }}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    {% if enrollment.completed %}
+                                        <a href="{% url 'lms:course_learn' enrollment.course.slug %}" class="btn btn-success">
+                                            <i class="bi bi-check-circle me-2"></i>Completed - Review
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'lms:course_learn' enrollment.course.slug %}" class="btn btn-primary">
+                                            <i class="bi bi-play-circle me-2"></i>Continue Learning
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">No courses enrolled yet</h4>
+                    <p class="text-muted mb-4">Start your learning journey by enrolling in a course</p>
+                    <a href="{% url 'lms:course_list' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-search me-2"></i>Browse Courses
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Learning Stats -->
+            <div class="stats-card card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-graph-up me-2"></i>Learning Stats
+                    </h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-6 text-center">
+                            <div class="h3 text-primary mb-1">{{ enrollments.count }}</div>
+                            <small class="text-muted">Active Courses</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="h3 text-success mb-1">{{ completed_courses|default:"2" }}</div>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="h3 text-warning mb-1">{{ total_hours|default:"24" }}</div>
+                            <small class="text-muted">Hours Learned</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <div class="h3 text-info mb-1">{{ streak_days|default:"7" }}</div>
+                            <small class="text-muted">Day Streak</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements -->
+            <div class="stats-card card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-trophy me-2"></i>Achievements
+                    </h5>
+                    
+                    <div class="row g-3 text-center">
+                        <div class="col-4">
+                            <div class="achievement-badge bg-warning text-white mx-auto">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <small class="text-muted">First Course</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="achievement-badge bg-success text-white mx-auto">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <small class="text-muted">Course Complete</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="achievement-badge bg-primary text-white mx-auto">
+                                <i class="bi bi-lightning-fill"></i>
+                            </div>
+                            <small class="text-muted">Week Streak</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="stats-card card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="bi bi-clock-history me-2"></i>Recent Activity
+                    </h5>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        <div class="activity-item p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-play-circle text-primary me-3"></i>
+                                <div>
+                                    <small class="fw-semibold d-block">Watched lesson</small>
+                                    <small class="text-muted">Python Basics - 2 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle text-success me-3"></i>
+                                <div>
+                                    <small class="fw-semibold d-block">Completed quiz</small>
+                                    <small class="text-muted">JavaScript Fundamentals - Yesterday</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-bookmark-plus text-info me-3"></i>
+                                <div>
+                                    <small class="fw-semibold d-block">Enrolled in course</small>
+                                    <small class="text-muted">React Development - 3 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

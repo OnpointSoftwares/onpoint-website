@@ -3,122 +3,802 @@
 
 {% block title %}{{ title }} - OnPoint LMS{% endblock %}
 
+{% block extra_css %}
+<style>
+.module-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #667eea;
+}
+.module-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+.lesson-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+.lesson-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+.lesson-type-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+.module-stats {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+.add-section {
+    background: #fff;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+.add-section:hover {
+    border-color: #667eea;
+    background: #f8f9fa;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="h4 mb-0">Manage: {{ course.title }}</h1>
-      <div class="text-muted small">{{ course.category.name }} • {{ course.get_difficulty_display }}</div>
+      <h1 class="h3 mb-1"><i class="bi bi-mortarboard me-2"></i>{{ course.title }}</h1>
+      <div class="text-muted">
+        <i class="bi bi-tag me-1"></i>{{ course.category.name }} • 
+        <i class="bi bi-speedometer2 me-1"></i>{{ course.get_difficulty_display }} •
+        <i class="bi bi-clock me-1"></i>{{ course.duration_hours }}h
+      </div>
     </div>
     <div class="d-flex gap-2">
-      <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-secondary">View Public Page</a>
-      <a href="{% url 'lms:instructor_dashboard' %}" class="btn btn-light">Back to Dashboard</a>
+      <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-primary">
+        <i class="bi bi-eye me-1"></i>View Public Page
+      </a>
+      <a href="{% url 'lms:instructor_dashboard' %}" class="btn btn-light">
+        <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Course Structure Overview -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="h4 text-primary mb-1">{{ modules.count }}</div>
+              <div class="text-muted small">Modules</div>
+            </div>
+            <div class="col-md-3">
+              <div class="h4 text-success mb-1">{{ lessons.count }}</div>
+              <div class="text-muted small">Total Lessons</div>
+            </div>
+            <div class="col-md-3">
+              <div class="h4 text-info mb-1">{{ course.duration_hours }}h</div>
+              <div class="text-muted small">Course Duration</div>
+            </div>
+            <div class="col-md-3">
+              <div class="h4 text-warning mb-1">{{ course.enrollment_count }}</div>
+              <div class="text-muted small">Enrolled Students</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="row g-4">
-    <div class="col-lg-7">
-      <div class="card h-100">
-        <div class="card-header bg-white"><strong>Lessons</strong></div>
-        <div class="card-body">
-          {% if lessons %}
-            <ol class="list-group list-group-numbered">
-              {% for lesson in lessons %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-semibold">{{ lesson.title }}</div>
-                  <div class="small text-muted">Order: {{ lesson.order }}</div>
+    <div class="col-lg-8">
+      <!-- Course Content Structure -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi bi-collection me-2"></i>Course Structure</h5>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+          <i class="bi bi-plus-circle me-1"></i>Add Module
+        </button>
+      </div>
+
+      {% if modules %}
+        {% for module in modules %}
+        <div class="module-section">
+          <div class="module-header d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-0">
+                <i class="bi bi-folder me-2"></i>{{ module.order }}. {{ module.title }}
+              </h6>
+              <div class="module-stats mt-1">
+                <i class="bi bi-play-circle me-1"></i>{{ module.total_lessons }} lessons • 
+                <i class="bi bi-clock me-1"></i>{{ module.total_duration_minutes }} min
+                {% if module.completion_rate > 0 %}
+                  • <i class="bi bi-check-circle me-1"></i>{{ module.completion_rate }}% completion
+                {% endif %}
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="editModule({{ module.id }})"><i class="bi bi-pencil me-2"></i>Edit Module</a></li>
+                <li><a class="dropdown-item" href="#" onclick="addLessonToModule({{ module.id }})"><i class="bi bi-plus me-2"></i>Add Lesson</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="deleteModule({{ module.id }})"><i class="bi bi-trash me-2"></i>Delete Module</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          {% if module.description %}
+          <div class="text-muted small mb-2">{{ module.description }}</div>
+          {% endif %}
+          
+          {% if module.lessons.all %}
+            {% for lesson in module.lessons.all %}
+            <div class="lesson-item d-flex justify-content-between align-items-center">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center">
+                  <span class="lesson-type-badge badge bg-secondary me-2">{{ lesson.get_lesson_type_display }}</span>
+                  <strong>{{ lesson.order }}. {{ lesson.title }}</strong>
+                  {% if lesson.is_preview %}
+                    <span class="badge bg-info ms-2">Preview</span>
+                  {% endif %}
+                  {% if not lesson.is_published %}
+                    <span class="badge bg-warning ms-2">Draft</span>
+                  {% endif %}
                 </div>
-                <div>
-                  <a href="{% url 'lms:instructor_lesson_edit' course.slug lesson.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                  <a href="{% url 'lms:instructor_lesson_delete' course.slug lesson.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                </div>
-              </li>
-              {% endfor %}
-            </ol>
+                {% if lesson.duration_minutes %}
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-clock me-1"></i>{{ lesson.duration_minutes }} minutes
+                  </div>
+                {% endif %}
+              </div>
+              <div class="btn-group btn-group-sm">
+                <a href="{% url 'lms:instructor_lesson_edit' course.slug lesson.pk %}" class="btn btn-outline-secondary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'lms:instructor_lesson_delete' course.slug lesson.pk %}" class="btn btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
           {% else %}
-            <div class="text-muted">No lessons yet.</div>
+            <div class="text-muted text-center py-3">
+              <i class="bi bi-plus-circle me-2"></i>No lessons in this module yet.
+              <button class="btn btn-sm btn-link" onclick="addLessonToModule({{ module.id }})">
+                Add the first lesson
+              </button>
+            </div>
           {% endif %}
         </div>
+        {% endfor %}
+      {% endif %}
+      
+      <!-- Lessons without modules -->
+      {% if unorganized_lessons %}
+      <div class="module-section">
+        <div class="module-header">
+          <h6 class="mb-0">
+            <i class="bi bi-file-earmark me-2"></i>Unorganized Lessons
+          </h6>
+          <div class="module-stats mt-1">
+            <i class="bi bi-info-circle me-1"></i>These lessons are not assigned to any module
+          </div>
+        </div>
+        
+        {% for lesson in unorganized_lessons %}
+        <div class="lesson-item d-flex justify-content-between align-items-center">
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center">
+              <span class="lesson-type-badge badge bg-secondary me-2">{{ lesson.get_lesson_type_display }}</span>
+              <strong>{{ lesson.order }}. {{ lesson.title }}</strong>
+              {% if lesson.is_preview %}
+                <span class="badge bg-info ms-2">Preview</span>
+              {% endif %}
+              {% if not lesson.is_published %}
+                <span class="badge bg-warning ms-2">Draft</span>
+              {% endif %}
+            </div>
+            {% if lesson.duration_minutes %}
+              <div class="text-muted small mt-1">
+                <i class="bi bi-clock me-1"></i>{{ lesson.duration_minutes }} minutes
+              </div>
+            {% endif %}
+          </div>
+          <div class="btn-group btn-group-sm">
+            <a href="{% url 'lms:instructor_lesson_edit' course.slug lesson.pk %}" class="btn btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <a href="{% url 'lms:instructor_lesson_delete' course.slug lesson.pk %}" class="btn btn-outline-danger">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
+        </div>
+        {% endfor %}
       </div>
+      {% endif %}
+      
+      <!-- Empty state -->
+      {% if not modules and not unorganized_lessons %}
+      <div class="add-section">
+        <i class="bi bi-collection display-4 text-muted mb-3"></i>
+        <h5 class="text-muted">No content yet</h5>
+        <p class="text-muted mb-3">Start building your course by adding modules and lessons</p>
+        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+          <i class="bi bi-plus-circle me-1"></i>Add First Module
+        </button>
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addLessonModal">
+          <i class="bi bi-plus me-1"></i>Add Lesson
+        </button>
+      </div>
+      {% endif %}
     </div>
 
-    <div class="col-lg-5">
+    <div class="col-lg-4">
+      <!-- Quick Actions -->
       <div class="card mb-4">
-        <div class="card-header bg-white"><strong>Add Lesson</strong></div>
+        <div class="card-header bg-primary text-white">
+          <h6 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
+        </div>
         <div class="card-body">
-          <form method="post" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="add_lesson" value="1" />
-            <div class="mb-3">
-              <label class="form-label" for="id_lesson-title">Title</label>
-              {{ lesson_form.title }}
-              {% if lesson_form.title.errors %}
-                <div class="invalid-feedback d-block">{{ lesson_form.title.errors.0 }}</div>
-              {% endif %}
-            </div>
-            <div class="mb-3">
-              <label class="form-label" for="id_lesson-order">Order</label>
-              {{ lesson_form.order }}
-            </div>
-            <div class="mb-3">
-              <label class="form-label" for="id_lesson-video_url">Video URL</label>
-              {{ lesson_form.video_url }}
-            </div>
-            <div class="mb-3">
-              <label class="form-label" for="id_lesson-content">Content</label>
-              {{ lesson_form.content }}
-            </div>
-            <div class="d-flex justify-content-end">
-              <button type="submit" class="btn btn-primary">Add Lesson</button>
-            </div>
-          </form>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addModuleModal">
+              <i class="bi bi-folder-plus me-2"></i>Add Module
+            </button>
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addLessonModal">
+              <i class="bi bi-plus-circle me-2"></i>Add Lesson
+            </button>
+            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+              <i class="bi bi-file-earmark-plus me-2"></i>Add Resource
+            </button>
+            <hr>
+            <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-secondary">
+              <i class="bi bi-eye me-2"></i>Preview Course
+            </a>
+          </div>
         </div>
       </div>
-
+      
+      <!-- Course Settings -->
+      <div class="card mb-4">
+        <div class="card-header bg-white">
+          <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Course Settings</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="text-muted small">Status</label>
+            <div>
+              {% if course.status == 'published' %}
+                <span class="badge bg-success">
+              {% elif course.status == 'draft' %}
+                <span class="badge bg-warning">
+              {% else %}
+                <span class="badge bg-secondary">
+              {% endif %}
+                {{ course.get_status_display }}
+              </span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="text-muted small">Pricing</label>
+            <div>
+              {% if course.is_paid %}
+                <span class="fw-bold text-success">${{ course.price }}</span>
+              {% else %}
+                <span class="text-muted">Free</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="text-muted small">Featured</label>
+            <div>
+              {% if course.featured %}
+                <span class="badge bg-warning"><i class="bi bi-star-fill"></i> Featured</span>
+              {% else %}
+                <span class="text-muted">Not featured</span>
+              {% endif %}
+            </div>
+          </div>
+          <hr>
+          <div class="d-grid">
+            <a href="#" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil me-1"></i>Edit Course Settings
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Course Statistics -->
       <div class="card">
-        <div class="card-header bg-white"><strong>Add Resource</strong></div>
+        <div class="card-header bg-white">
+          <h6 class="mb-0"><i class="bi bi-graph-up me-2"></i>Statistics</h6>
+        </div>
         <div class="card-body">
-          <form method="post" enctype="multipart/form-data" novalidate>
-            {% csrf_token %}
-            <input type="hidden" name="add_resource" value="1" />
-            <div class="mb-3">
-              <label class="form-label" for="id_resource-title">Title</label>
-              {{ resource_form.title }}
-              {% if resource_form.title.errors %}
-                <div class="invalid-feedback d-block">{{ resource_form.title.errors.0 }}</div>
-              {% endif %}
+          <div class="row text-center">
+            <div class="col-6 mb-3">
+              <div class="h5 text-primary mb-0">{{ course.enrollment_count }}</div>
+              <div class="small text-muted">Students</div>
             </div>
-            <div class="mb-3">
-              <label class="form-label" for="id_resource-file">File</label>
-              {{ resource_form.file }}
+            <div class="col-6 mb-3">
+              <div class="h5 text-success mb-0">{{ course.completion_rate }}%</div>
+              <div class="small text-muted">Completion</div>
             </div>
-            <div class="d-flex justify-content-end">
-              <button type="submit" class="btn btn-primary">Add Resource</button>
+            <div class="col-6">
+              <div class="h5 text-info mb-0">{{ course.rating_avg|floatformat:1 }}</div>
+              <div class="small text-muted">Rating</div>
             </div>
-          </form>
+            <div class="col-6">
+              <div class="h5 text-warning mb-0">{{ course.rating_count }}</div>
+              <div class="small text-muted">Reviews</div>
+            </div>
+          </div>
         </div>
       </div>
 
+    </div>
+  </div>
+  
+  <!-- Add Module Modal -->
+  <div class="modal fade" id="addModuleModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-folder-plus me-2"></i>Add New Module</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="post" id="moduleForm">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_module">
+            <div class="mb-3">
+              <label class="form-label">Module Title *</label>
+              <input type="text" name="title" class="form-control" placeholder="e.g., Introduction to Python" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" rows="3" placeholder="Brief description of what this module covers..."></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Order</label>
+                  <input type="number" name="order" class="form-control" min="1" value="{{ modules.count|add:1 }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Duration (minutes)</label>
+                  <input type="number" name="duration_minutes" class="form-control" min="0" placeholder="Estimated duration">
+                </div>
+              </div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" name="is_published" class="form-check-input" id="modulePublished" checked>
+              <label class="form-check-label" for="modulePublished">Published (visible to students)</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Module</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Lesson Modal -->
+  <div class="modal fade" id="addLessonModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Add New Lesson</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="post" id="lessonForm">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_lesson">
+            <input type="hidden" name="module_id" id="lessonModuleId">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">Lesson Title *</label>
+                  <input type="text" name="title" class="form-control" placeholder="Lesson title" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Order</label>
+                  <input type="number" name="order" class="form-control" min="1" value="1">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Module</label>
+                  <select name="module" class="form-select">
+                    <option value="">No Module (Direct to Course)</option>
+                    {% for module in modules %}
+                      <option value="{{ module.id }}">{{ module.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Lesson Type</label>
+                  <select name="lesson_type" class="form-select">
+                    <option value="video">Video</option>
+                    <option value="text">Text/Reading</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="assignment">Assignment</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Video URL</label>
+              <input type="url" name="video_url" class="form-control" placeholder="YouTube, Vimeo, or direct video URL">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Content</label>
+              <textarea name="content" class="form-control richtext" rows="6" placeholder="Lesson content and description..."></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Duration (minutes)</label>
+                  <input type="number" name="duration_minutes" class="form-control" min="0" placeholder="Duration">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mt-4">
+                  <div class="form-check">
+                    <input type="checkbox" name="is_preview" class="form-check-input" id="lessonPreview">
+                    <label class="form-check-label" for="lessonPreview">Allow preview</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" name="is_published" class="form-check-input" id="lessonPublished" checked>
+                    <label class="form-check-label" for="lessonPublished">Published</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Create Lesson</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Resource Modal -->
+  <div class="modal fade" id="addResourceModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-file-earmark-plus me-2"></i>Add Resource</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="post" enctype="multipart/form-data" id="resourceForm">
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_resource">
+            <div class="mb-3">
+              <label class="form-label">Resource Title *</label>
+              <input type="text" name="title" class="form-control" placeholder="Resource title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">File *</label>
+              <input type="file" name="file" class="form-control" required>
+              <div class="form-text">Upload PDF, documents, images, or other learning materials</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-info">Upload Resource</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
-  <script src="https://cdn.tiny.cloud/1/i0obrbdlevvwd9xusxkir7hr14ad77rzz73k5th67zwpz8z2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <!-- TinyMCE from CDN without API key -->
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      if (window.tinymce) {
+      // Initialize TinyMCE for rich text areas
+      console.log('Initializing TinyMCE...');
+      
+      // Check if TinyMCE is loaded
+      if (typeof tinymce !== 'undefined') {
+        console.log('TinyMCE is available, initializing...');
+        
         tinymce.init({
           selector: 'textarea.richtext',
-          plugins: 'link lists image code table autoresize',
-          toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+          plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+          toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
           menubar: false,
-          skin: 'oxide-dark',
-          content_css: 'dark',
-          min_height: 250,
-          convert_urls: false
+          height: 300,
+          branding: false,
+          convert_urls: false,
+          relative_urls: false,
+          setup: function(editor) {
+            editor.on('init', function() {
+              console.log('TinyMCE editor initialized successfully');
+            });
+            editor.on('change', function() {
+              editor.save(); // Save content back to textarea
+            });
+          },
+          init_instance_callback: function(editor) {
+            console.log('TinyMCE instance created for:', editor.id);
+          }
+        }).then(function(editors) {
+          console.log('TinyMCE initialization complete. Editors:', editors.length);
+        }).catch(function(error) {
+          console.error('TinyMCE initialization failed:', error);
+        });
+      } else {
+        console.error('TinyMCE not loaded from CDN');
+        // Fallback: make textareas larger if TinyMCE fails
+        document.querySelectorAll('textarea.richtext').forEach(function(textarea) {
+          textarea.style.height = '200px';
+          textarea.style.fontFamily = 'monospace';
+        });
+      }
+      
+      // Modal handling functions
+      const addModuleModal = document.getElementById('addModuleModal');
+      const addLessonModal = document.getElementById('addLessonModal');
+      const addResourceModal = document.getElementById('addResourceModal');
+      
+      // Function to add lesson to specific module
+      window.addLessonToModule = function(moduleId, moduleTitle) {
+        const lessonModuleSelect = document.querySelector('#addLessonModal select[name="module"]');
+        const lessonModuleIdInput = document.getElementById('lessonModuleId');
+        const modalTitle = document.querySelector('#addLessonModal .modal-title');
+        
+        if (moduleId) {
+          lessonModuleSelect.value = moduleId;
+          lessonModuleIdInput.value = moduleId;
+          modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Add Lesson to "' + moduleTitle + '"';
+        } else {
+          lessonModuleSelect.value = '';
+          lessonModuleIdInput.value = '';
+          modalTitle.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Add New Lesson';
+        }
+        
+        const modal = new bootstrap.Modal(addLessonModal);
+        modal.show();
+        
+        // Initialize TinyMCE for the modal textarea after modal is shown
+        setTimeout(function() {
+          initializeTinyMCEForModal();
+        }, 500);
+      };
+      
+      // Function to initialize TinyMCE for modal textareas
+      function initializeTinyMCEForModal() {
+        const modalTextarea = document.querySelector('#addLessonModal textarea.richtext');
+        if (modalTextarea && typeof tinymce !== 'undefined') {
+          // Remove existing TinyMCE instance if it exists
+          if (tinymce.get(modalTextarea.id)) {
+            tinymce.get(modalTextarea.id).remove();
+          }
+          
+          // Initialize TinyMCE for this specific textarea
+          tinymce.init({
+            target: modalTextarea,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            menubar: false,
+            height: 250,
+            branding: false,
+            convert_urls: false,
+            relative_urls: false,
+            setup: function(editor) {
+              editor.on('init', function() {
+                console.log('TinyMCE initialized for modal textarea');
+              });
+              editor.on('change', function() {
+                editor.save();
+              });
+            }
+          });
+        }
+      }
+      
+      // Function to edit module
+      window.editModule = function(moduleId) {
+        // This would typically load module data via AJAX
+        console.log('Edit module:', moduleId);
+        // For now, we'll just show a placeholder
+        alert('Module editing will be implemented in the next phase');
+      };
+      
+      // Function to delete module
+      window.deleteModule = function(moduleId, moduleTitle) {
+        if (confirm('Are you sure you want to delete the module "' + moduleTitle + '"? This will also delete all lessons in this module.')) {
+          // Create a form to submit the delete request
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = window.location.href;
+          
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrfmiddlewaretoken';
+          csrfInput.value = csrfToken;
+          
+          const actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          actionInput.value = 'delete_module';
+          
+          const moduleIdInput = document.createElement('input');
+          moduleIdInput.type = 'hidden';
+          moduleIdInput.name = 'module_id';
+          moduleIdInput.value = moduleId;
+          
+          form.appendChild(csrfInput);
+          form.appendChild(actionInput);
+          form.appendChild(moduleIdInput);
+          
+          document.body.appendChild(form);
+          form.submit();
+        }
+      };
+      
+      // Function to edit lesson
+      window.editLesson = function(lessonId) {
+        console.log('Edit lesson:', lessonId);
+        alert('Lesson editing will be implemented in the next phase');
+      };
+      
+      // Function to delete lesson
+      window.deleteLesson = function(lessonId, lessonTitle) {
+        if (confirm('Are you sure you want to delete the lesson "' + lessonTitle + '"?')) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = window.location.href;
+          
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrfmiddlewaretoken';
+          csrfInput.value = csrfToken;
+          
+          const actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          actionInput.value = 'delete_lesson';
+          
+          const lessonIdInput = document.createElement('input');
+          lessonIdInput.type = 'hidden';
+          lessonIdInput.name = 'lesson_id';
+          lessonIdInput.value = lessonId;
+          
+          form.appendChild(csrfInput);
+          form.appendChild(actionInput);
+          form.appendChild(lessonIdInput);
+          
+          document.body.appendChild(form);
+          form.submit();
+        }
+      };
+      
+      // Form submission handlers
+      const moduleForm = document.getElementById('moduleForm');
+      const lessonForm = document.getElementById('lessonForm');
+      const resourceForm = document.getElementById('resourceForm');
+      
+      if (moduleForm) {
+        moduleForm.addEventListener('submit', function(e) {
+          const title = this.querySelector('[name="title"]').value.trim();
+          if (!title) {
+            e.preventDefault();
+            alert('Please enter a module title');
+            return false;
+          }
+        });
+      }
+      
+      if (lessonForm) {
+        lessonForm.addEventListener('submit', function(e) {
+          const title = this.querySelector('[name="title"]').value.trim();
+          if (!title) {
+            e.preventDefault();
+            alert('Please enter a lesson title');
+            return false;
+          }
+          
+          // Update TinyMCE content before submission
+          if (window.tinymce) {
+            tinymce.triggerSave();
+          }
+        });
+      }
+      
+      if (resourceForm) {
+        resourceForm.addEventListener('submit', function(e) {
+          const title = this.querySelector('[name="title"]').value.trim();
+          const file = this.querySelector('[name="file"]').files[0];
+          
+          if (!title) {
+            e.preventDefault();
+            alert('Please enter a resource title');
+            return false;
+          }
+          
+          if (!file) {
+            e.preventDefault();
+            alert('Please select a file to upload');
+            return false;
+          }
+        });
+      }
+      
+      // Auto-update lesson order when module is selected
+      const moduleSelect = document.querySelector('#addLessonModal select[name="module"]');
+      const orderInput = document.querySelector('#addLessonModal input[name="order"]');
+      
+      if (moduleSelect && orderInput) {
+        moduleSelect.addEventListener('change', function() {
+          const moduleId = this.value;
+          if (moduleId) {
+            // Count lessons in selected module and set next order
+            const moduleCard = document.querySelector('[data-module-id="' + moduleId + '"]');
+            if (moduleCard) {
+              const lessonCount = moduleCard.querySelectorAll('.lesson-item').length;
+              orderInput.value = lessonCount + 1;
+            }
+          } else {
+            // Count unorganized lessons
+            const unorganizedLessons = document.querySelectorAll('.unorganized-lessons .lesson-item');
+            orderInput.value = unorganizedLessons.length + 1;
+          }
+        });
+      }
+      
+      // Add Bootstrap modal event listeners for TinyMCE initialization
+      if (addLessonModal) {
+        addLessonModal.addEventListener('shown.bs.modal', function() {
+          console.log('Lesson modal shown, initializing TinyMCE...');
+          setTimeout(function() {
+            initializeTinyMCEForModal();
+          }, 300);
+        });
+        
+        addLessonModal.addEventListener('hidden.bs.modal', function() {
+          // Clean up TinyMCE when modal is hidden
+          const modalTextarea = document.querySelector('#addLessonModal textarea.richtext');
+          if (modalTextarea && typeof tinymce !== 'undefined' && tinymce.get(modalTextarea.id)) {
+            tinymce.get(modalTextarea.id).remove();
+            console.log('TinyMCE instance removed from modal');
+          }
         });
       }
     });

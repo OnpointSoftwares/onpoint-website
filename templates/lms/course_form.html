@@ -3,53 +3,169 @@
 
 {% block title %}{{ title }} - OnPoint LMS{% endblock %}
 
+{% block extra_css %}
+<style>
+.form-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #667eea;
+}
+.form-section h5 {
+    color: #667eea;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+.form-section .form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+.course-form-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+.form-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: none;
+}
+.form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    padding: 2rem;
+    text-align: center;
+}
+.form-header h1 {
+    margin: 0;
+    font-weight: 700;
+}
+.form-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+}
+.form-body {
+    padding: 2rem;
+}
+.field-icon {
+    color: #667eea;
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-9">
-      <div class="card shadow-sm">
-        <div class="card-body p-4">
-          <h1 class="h4 mb-3">{{ title }}</h1>
-          <p class="text-muted mb-4">Fill in the details below to publish your course. You can edit it later.</p>
-
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-
-          <form method="post" enctype="multipart/form-data" novalidate>
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger" role="alert">
-                {% for error in form.non_field_errors %}
-                  <div>{{ error }}</div>
-                {% endfor %}
-              </div>
+<div class="course-form-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+        <div class="card form-card">
+          <div class="form-header">
+            <h1><i class="bi bi-mortarboard me-2"></i>{{ title }}</h1>
+            <p>Create an engaging learning experience for your students</p>
+          </div>
+          
+          <div class="form-body">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
             {% endif %}
 
-            <div class="row g-3">
-              <div class="col-md-8">
-                <div class="mb-3">
-                  <label class="form-label" for="id_title">Title</label>
-                  {{ form.title }}
-                  {% if form.title.errors %}
-                    <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
-                  {% endif %}
-                </div>
+            <form method="post" enctype="multipart/form-data" novalidate>
+              {% csrf_token %}
 
-                <div class="mb-3">
-                  <label class="form-label" for="id_slug">Slug</label>
-                  {{ form.slug }}
-                  <div class="form-text">Unique URL identifier, e.g., python-for-beginners</div>
-                  {% if form.slug.errors %}
-                    <div class="invalid-feedback d-block">{{ form.slug.errors.0 }}</div>
-                  {% endif %}
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                  {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
                 </div>
+              {% endif %}
 
+              <!-- Basic Information Section -->
+              <div class="form-section">
+                <h5><i class="bi bi-info-circle field-icon"></i>Basic Information</h5>
+                <div class="row g-3">
+                  <div class="col-md-8">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_title">
+                        <i class="bi bi-type field-icon"></i>Course Title *
+                      </label>
+                      {{ form.title }}
+                      {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_slug">
+                        <i class="bi bi-link-45deg field-icon"></i>URL Slug
+                      </label>
+                      {{ form.slug }}
+                      <div class="form-text">{{ form.slug.help_text }}</div>
+                      {% if form.slug.errors %}
+                        <div class="invalid-feedback d-block">{{ form.slug.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_short_description">
+                        <i class="bi bi-card-text field-icon"></i>Short Description *
+                      </label>
+                      {{ form.short_description }}
+                      <div class="form-text">{{ form.short_description.help_text }}</div>
+                      {% if form.short_description.errors %}
+                        <div class="invalid-feedback d-block">{{ form.short_description.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_category">
+                        <i class="bi bi-tags field-icon"></i>Category *
+                      </label>
+                      {{ form.category }}
+                      {% if form.category.errors %}
+                        <div class="invalid-feedback d-block">{{ form.category.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_difficulty">
+                        <i class="bi bi-speedometer2 field-icon"></i>Difficulty Level
+                      </label>
+                      {{ form.difficulty }}
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_duration_hours">
+                        <i class="bi bi-clock field-icon"></i>Duration (Hours)
+                      </label>
+                      {{ form.duration_hours }}
+                      <div class="form-text">{{ form.duration_hours.help_text }}</div>
+                      {% if form.duration_hours.errors %}
+                        <div class="invalid-feedback d-block">{{ form.duration_hours.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Content Section -->
+              <div class="form-section">
+                <h5><i class="bi bi-journal-text field-icon"></i>Course Content</h5>
                 <div class="mb-3">
-                  <label class="form-label" for="id_description">Description</label>
+                  <label class="form-label fw-semibold" for="id_description">
+                    <i class="bi bi-file-text field-icon"></i>Detailed Description *
+                  </label>
                   {{ form.description }}
                   {% if form.description.errors %}
                     <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
@@ -57,62 +173,134 @@
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label" for="id_curriculum">Curriculum</label>
+                  <label class="form-label fw-semibold" for="id_curriculum">
+                    <i class="bi bi-list-ol field-icon"></i>Curriculum Outline
+                  </label>
                   {{ form.curriculum }}
                   <div class="form-text">Provide a structured outline of modules and lessons. You can use headings, lists, and links.</div>
                   {% if form.curriculum.errors %}
                     <div class="invalid-feedback d-block">{{ form.curriculum.errors.0 }}</div>
                   {% endif %}
                 </div>
-              </div>
 
-              <div class="col-md-4">
-                <div class="mb-3">
-                  <label class="form-label" for="id_category">Category</label>
-                  {{ form.category }}
-                  {% if form.category.errors %}
-                    <div class="invalid-feedback d-block">{{ form.category.errors.0 }}</div>
-                  {% endif %}
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label" for="id_image">Cover Image</label>
-                  {{ form.image }}
-                  {% if form.image.errors %}
-                    <div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>
-                  {% endif %}
-                </div>
-
-                <div class="mb-3 form-check form-switch">
-                  {{ form.published }}
-                  <label class="form-check-label ms-2" for="id_published">Published</label>
-                </div>
-
-                <div class="mb-3 form-check form-switch">
-                  {{ form.is_paid }}
-                  <label class="form-check-label ms-2" for="id_is_paid">Paid Course</label>
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label" for="id_price">Price</label>
-                  {{ form.price }}
-                  {% if form.price.errors %}
-                    <div class="invalid-feedback d-block">{{ form.price.errors.0 }}</div>
-                  {% endif %}
-                </div>
-
-                <div class="mb-3">
-                  <label class="form-label" for="id_difficulty">Difficulty</label>
-                  {{ form.difficulty }}
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_prerequisites">
+                        <i class="bi bi-check2-square field-icon"></i>Prerequisites
+                      </label>
+                      {{ form.prerequisites }}
+                      <div class="form-text">{{ form.prerequisites.help_text }}</div>
+                      {% if form.prerequisites.errors %}
+                        <div class="invalid-feedback d-block">{{ form.prerequisites.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_learning_outcomes">
+                        <i class="bi bi-trophy field-icon"></i>Learning Outcomes
+                      </label>
+                      {{ form.learning_outcomes }}
+                      <div class="form-text">{{ form.learning_outcomes.help_text }}</div>
+                      {% if form.learning_outcomes.errors %}
+                        <div class="invalid-feedback d-block">{{ form.learning_outcomes.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-4">
-              <a href="{% url 'lms:instructor_dashboard' %}" class="btn btn-light">Cancel</a>
-              <button type="submit" class="btn btn-primary">Save Course</button>
-            </div>
-          </form>
+              <!-- Media & Pricing Section -->
+              <div class="form-section">
+                <h5><i class="bi bi-image field-icon"></i>Media & Pricing</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_image">
+                        <i class="bi bi-card-image field-icon"></i>Course Cover Image
+                      </label>
+                      {{ form.image }}
+                      <div class="form-text">Upload an attractive cover image for your course</div>
+                      {% if form.image.errors %}
+                        <div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_instructor">
+                        <i class="bi bi-person-badge field-icon"></i>Instructor
+                      </label>
+                      {{ form.instructor }}
+                      {% if form.instructor.errors %}
+                        <div class="invalid-feedback d-block">{{ form.instructor.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="mb-3 form-check form-switch">
+                      {{ form.is_paid }}
+                      <label class="form-check-label ms-2 fw-semibold" for="id_is_paid">
+                        <i class="bi bi-currency-dollar field-icon"></i>Paid Course
+                      </label>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_price">
+                        <i class="bi bi-tag field-icon"></i>Price (USD)
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        {{ form.price }}
+                      </div>
+                      {% if form.price.errors %}
+                        <div class="invalid-feedback d-block">{{ form.price.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Publication Settings Section -->
+              <div class="form-section">
+                <h5><i class="bi bi-gear field-icon"></i>Publication Settings</h5>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold" for="id_status">
+                        <i class="bi bi-circle-fill field-icon"></i>Status
+                      </label>
+                      {{ form.status }}
+                      <div class="form-text">{{ form.status.help_text }}</div>
+                      {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mb-3 form-check form-switch">
+                      {{ form.featured }}
+                      <label class="form-check-label ms-2 fw-semibold" for="id_featured">
+                        <i class="bi bi-star field-icon"></i>Featured Course
+                      </label>
+                      <div class="form-text">{{ form.featured.help_text }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                <a href="{% url 'lms:instructor_dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                  <i class="bi bi-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-check-circle me-2"></i>Create Course
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -121,21 +309,121 @@
 {% endblock %}
 
 {% block extra_scripts %}
-  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.tinymce) {
+<!-- TinyMCE from reliable CDN -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize TinyMCE for rich text fields
+    console.log('Initializing TinyMCE for course form...');
+    
+    // Check if TinyMCE is loaded
+    if (typeof tinymce !== 'undefined') {
+        console.log('TinyMCE is available, initializing...');
+        
         tinymce.init({
-          selector: 'textarea.richtext',
-          plugins: 'link lists image code table autoresize',
-          toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
-          menubar: false,
-          skin: 'oxide-dark',
-          content_css: 'dark',
-          min_height: 300,
-          convert_urls: false
+            selector: '.richtext',
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            menubar: false,
+            height: 300,
+            branding: false,
+            convert_urls: false,
+            relative_urls: false,
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+            setup: function(editor) {
+                editor.on('init', function() {
+                    console.log('TinyMCE editor initialized successfully for:', editor.id);
+                });
+                editor.on('change', function() {
+                    editor.save(); // Save content back to textarea
+                });
+            },
+            init_instance_callback: function(editor) {
+                console.log('TinyMCE instance created for:', editor.id);
+            }
+        }).then(function(editors) {
+            console.log('TinyMCE initialization complete. Editors:', editors.length);
+        }).catch(function(error) {
+            console.error('TinyMCE initialization failed:', error);
         });
-      }
-    });
-  </script>
+    } else {
+        console.error('TinyMCE not loaded from CDN');
+        // Fallback: make textareas larger if TinyMCE fails
+        document.querySelectorAll('.richtext').forEach(function(textarea) {
+            textarea.style.height = '200px';
+            textarea.style.fontFamily = 'monospace';
+        });
+    }
+
+    // Auto-generate slug from title
+    const titleField = document.getElementById('id_title');
+    const slugField = document.getElementById('id_slug');
+    
+    if (titleField && slugField) {
+        titleField.addEventListener('input', function() {
+            if (!slugField.value || slugField.dataset.autoGenerated === 'true') {
+                const slug = this.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                slugField.value = slug;
+                slugField.dataset.autoGenerated = 'true';
+            }
+        });
+        
+        slugField.addEventListener('input', function() {
+            this.dataset.autoGenerated = 'false';
+        });
+    }
+
+    // Toggle price field based on paid course checkbox
+    const isPaidField = document.getElementById('id_is_paid');
+    const priceField = document.getElementById('id_price');
+    const priceContainer = priceField?.closest('.mb-3');
+    
+    if (isPaidField && priceContainer) {
+        function togglePriceField() {
+            if (isPaidField.checked) {
+                priceContainer.style.display = 'block';
+                priceField.required = true;
+            } else {
+                priceContainer.style.display = 'none';
+                priceField.required = false;
+                priceField.value = '0.00';
+            }
+        }
+        
+        isPaidField.addEventListener('change', togglePriceField);
+        togglePriceField(); // Initialize on page load
+    }
+
+    // Form validation feedback
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll to first invalid field
+                const firstInvalid = form.querySelector('.is-invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Avg, Q
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponseBadRequest
-from .models import Course, Enrollment, InstructorProfile, Category, LessonProgress, Lesson
-from .forms import CourseForm, LessonForm, ResourceForm
+from .models import Course, Enrollment, InstructorProfile, Category, LessonProgress, Lesson, Module
+from .forms import CourseForm, LessonForm, ResourceForm, ModuleForm
 
 
 def is_instructor(user):
@@ -76,8 +76,52 @@ def course_detail(request, slug):
 @login_required
 @user_passes_test(is_instructor)
 def instructor_dashboard(request):
-    courses = Course.objects.filter(instructor=request.user.instructor_profile)
-    return render(request, 'lms/instructor_dashboard.html', {'courses': courses, 'title': 'Instructor Dashboard'})
+    instructor = request.user.instructor_profile
+    courses = Course.objects.filter(instructor=instructor).select_related('category').prefetch_related('enrollments')
+    
+    # Calculate dashboard statistics
+    total_courses = courses.count()
+    published_courses = courses.filter(status='published').count()
+    draft_courses = courses.filter(status='draft').count()
+    total_students = instructor.total_students
+    total_revenue = sum(course.price * course.enrollment_count for course in courses if course.is_paid)
+    
+    # Recent enrollments (last 30 days)
+    from datetime import datetime, timedelta
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    recent_enrollments = Enrollment.objects.filter(
+        course__instructor=instructor,
+        created_at__gte=thirty_days_ago
+    ).count()
+    
+    # Course performance data
+    course_stats = []
+    for course in courses:
+        course_stats.append({
+            'course': course,
+            'enrollments': course.enrollment_count,
+            'completion_rate': course.completion_rate,
+            'average_progress': course.get_average_progress(),
+            'revenue': course.price * course.enrollment_count if course.is_paid else 0,
+        })
+    
+    context = {
+        'courses': courses,
+        'course_stats': course_stats,
+        'instructor': instructor,
+        'stats': {
+            'total_courses': total_courses,
+            'published_courses': published_courses,
+            'draft_courses': draft_courses,
+            'total_students': total_students,
+            'total_revenue': total_revenue,
+            'recent_enrollments': recent_enrollments,
+            'average_rating': instructor.average_rating,
+        },
+        'title': 'Instructor Dashboard'
+    }
+    
+    return render(request, 'lms/instructor_dashboard.html', context)
 
 
 @login_required
@@ -109,46 +153,150 @@ def instructor_course_create(request):
 @login_required
 @user_passes_test(is_instructor)
 def instructor_course_manage(request, slug):
-    """Instructor-only management page for a course: add lessons and resources."""
+    """Instructor-only management page for a course: add lessons, modules, and resources."""
     course = get_object_or_404(Course, slug=slug)
     if course.instructor != request.user.instructor_profile:
         messages.error(request, 'You do not have permission to manage this course.')
         return redirect('lms:instructor_dashboard')
 
-    lesson_form = LessonForm(prefix='lesson')
-    resource_form = ResourceForm(prefix='resource')
-
     if request.method == 'POST':
-        if 'add_lesson' in request.POST:
-            lesson_form = LessonForm(request.POST, prefix='lesson')
-            if lesson_form.is_valid():
-                lesson = lesson_form.save(commit=False)
-                lesson.course = course
-                lesson.save()
-                messages.success(request, 'Lesson added.')
-                return redirect('lms:instructor_course_manage', slug=course.slug)
+        action = request.POST.get('action')
+        
+        if action == 'add_module':
+            # Handle module creation
+            title = request.POST.get('title', '').strip()
+            description = request.POST.get('description', '').strip()
+            order = request.POST.get('order', 1)
+            duration_minutes = request.POST.get('duration_minutes', 0)
+            is_published = request.POST.get('is_published') == 'on'
+            
+            if title:
+                try:
+                    module = Module.objects.create(
+                        course=course,
+                        title=title,
+                        description=description,
+                        order=int(order) if order else 1,
+                        duration_minutes=int(duration_minutes) if duration_minutes else 0,
+                        is_published=is_published
+                    )
+                    messages.success(request, f'Module "{title}" created successfully!')
+                except Exception as e:
+                    messages.error(request, f'Error creating module: {str(e)}')
             else:
-                messages.error(request, 'Please correct the lesson form errors.')
-        elif 'add_resource' in request.POST:
-            resource_form = ResourceForm(request.POST, request.FILES, prefix='resource')
-            if resource_form.is_valid():
-                res = resource_form.save(commit=False)
-                res.course = course
-                res.save()
-                messages.success(request, 'Resource added.')
-                return redirect('lms:instructor_course_manage', slug=course.slug)
+                messages.error(request, 'Module title is required.')
+            return redirect('lms:instructor_course_manage', slug=course.slug)
+            
+        elif action == 'add_lesson':
+            # Handle lesson creation
+            title = request.POST.get('title', '').strip()
+            content = request.POST.get('content', '').strip()
+            video_url = request.POST.get('video_url', '').strip()
+            lesson_type = request.POST.get('lesson_type', 'video')
+            module_id = request.POST.get('module')
+            order = request.POST.get('order', 1)
+            duration_minutes = request.POST.get('duration_minutes', 0)
+            is_preview = request.POST.get('is_preview') == 'on'
+            is_published = request.POST.get('is_published') == 'on'
+            
+            if title:
+                try:
+                    lesson_data = {
+                        'course': course,
+                        'title': title,
+                        'content': content,
+                        'video_url': video_url,
+                        'lesson_type': lesson_type,
+                        'order': int(order) if order else 1,
+                        'duration_minutes': int(duration_minutes) if duration_minutes else 0,
+                        'is_preview': is_preview,
+                        'is_published': is_published
+                    }
+                    
+                    # Add module if specified
+                    if module_id:
+                        try:
+                            module = Module.objects.get(id=module_id, course=course)
+                            lesson_data['module'] = module
+                        except Module.DoesNotExist:
+                            pass
+                    
+                    lesson = Lesson.objects.create(**lesson_data)
+                    messages.success(request, f'Lesson "{title}" created successfully!')
+                except Exception as e:
+                    messages.error(request, f'Error creating lesson: {str(e)}')
             else:
-                messages.error(request, 'Please correct the resource form errors.')
+                messages.error(request, 'Lesson title is required.')
+            return redirect('lms:instructor_course_manage', slug=course.slug)
+            
+        elif action == 'add_resource':
+            # Handle resource creation
+            title = request.POST.get('title', '').strip()
+            file = request.FILES.get('file')
+            
+            if title and file:
+                try:
+                    from .models import Resource
+                    resource = Resource.objects.create(
+                        course=course,
+                        title=title,
+                        file=file
+                    )
+                    messages.success(request, f'Resource "{title}" uploaded successfully!')
+                except Exception as e:
+                    messages.error(request, f'Error uploading resource: {str(e)}')
+            else:
+                messages.error(request, 'Resource title and file are required.')
+            return redirect('lms:instructor_course_manage', slug=course.slug)
+            
+        elif action == 'delete_module':
+            # Handle module deletion
+            module_id = request.POST.get('module_id')
+            if module_id:
+                try:
+                    module = Module.objects.get(id=module_id, course=course)
+                    module_title = module.title
+                    module.delete()
+                    messages.success(request, f'Module "{module_title}" deleted successfully!')
+                except Module.DoesNotExist:
+                    messages.error(request, 'Module not found.')
+                except Exception as e:
+                    messages.error(request, f'Error deleting module: {str(e)}')
+            return redirect('lms:instructor_course_manage', slug=course.slug)
+            
+        elif action == 'delete_lesson':
+            # Handle lesson deletion
+            lesson_id = request.POST.get('lesson_id')
+            if lesson_id:
+                try:
+                    lesson = Lesson.objects.get(id=lesson_id, course=course)
+                    lesson_title = lesson.title
+                    lesson.delete()
+                    messages.success(request, f'Lesson "{lesson_title}" deleted successfully!')
+                except Lesson.DoesNotExist:
+                    messages.error(request, 'Lesson not found.')
+                except Exception as e:
+                    messages.error(request, f'Error deleting lesson: {str(e)}')
+            return redirect('lms:instructor_course_manage', slug=course.slug)
 
-    lessons = course.lessons.all()  # ordered by model Meta
-    resources = course.resources.all()
-
+    # Get course data for template
+    modules = course.modules.all().prefetch_related('lessons')
+    unorganized_lessons = course.lessons.filter(module__isnull=True)
+    resources = course.resources.all() if hasattr(course, 'resources') else []
+    
+    # Calculate course statistics
+    total_lessons = course.lessons.count()
+    total_modules = modules.count()
+    total_duration = sum(lesson.duration_minutes for lesson in course.lessons.all())
+    
     return render(request, 'lms/instructor_course_manage.html', {
         'course': course,
-        'lesson_form': lesson_form,
-        'resource_form': resource_form,
-        'lessons': lessons,
+        'modules': modules,
+        'unorganized_lessons': unorganized_lessons,
         'resources': resources,
+        'total_lessons': total_lessons,
+        'total_modules': total_modules,
+        'total_duration': total_duration,
         'title': f"Manage: {course.title}"
     })
 

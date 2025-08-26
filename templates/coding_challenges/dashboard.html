@@ -1,6 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Coding Challenges{% endblock %}
+
+{% block title %}Coding Challenges - Practice Programming | OnPoint Software{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Practice coding challenges with various difficulty levels. Improve your programming skills with our curated collection of problems.">
+<meta name="keywords" content="coding challenges, programming practice, algorithms, data structures, coding interview">
+<meta property="og:title" content="Coding Challenges - Practice Programming">
+<meta property="og:description" content="Practice coding challenges with various difficulty levels. Improve your programming skills.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .challenge-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.125);
+  }
+  .challenge-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #0d6efd;
+  }
+  .difficulty-easy { border-left: 4px solid #198754; }
+  .difficulty-medium { border-left: 4px solid #ffc107; }
+  .difficulty-hard { border-left: 4px solid #dc3545; }
+  .search-input:focus {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  }
+  .filter-badge {
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
+{% endblock %}
 {% block content %}
 <div class="container py-4">
   <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
@@ -27,10 +73,20 @@
     <div class="card-body">
       <form method="get" class="row g-2 align-items-end">
         <div class="col-12 col-md-4">
-          <label class="form-label small text-muted">Search</label>
+          <label for="search-input" class="form-label small text-muted">Search Challenges</label>
           <div class="input-group">
-            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
-            <input type="text" name="q" value="{{ search|default:'' }}" class="form-control" placeholder="Search problems...">
+            <span class="input-group-text bg-light" aria-hidden="true"><i class="bi bi-search"></i></span>
+            <input type="text" id="search-input" name="q" value="{{ search|default:'' }}" 
+                   class="form-control search-input" 
+                   placeholder="Search by title, description, or tags..." 
+                   aria-label="Search challenges" 
+                   autocomplete="off" 
+                   data-debounce="300">
+            {% if search %}
+              <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('search-input').value=''; this.form.submit();" aria-label="Clear search">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            {% endif %}
           </div>
         </div>
         <div class="col-6 col-md-3">
@@ -76,28 +132,48 @@
     </div>
   </div>
 
-  <div class="row g-3">
+  <div class="row g-3" id="challenges-grid">
     {% for c in challenges %}
       <div class="col-12 col-sm-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
+        <article class="card h-100 shadow-sm challenge-card difficulty-{{ c.difficulty }}" role="article">
           <div class="card-body d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge bg-{% if c.difficulty == 'easy' %}success{% elif c.difficulty == 'medium' %}warning text-dark{% else %}danger{% endif %}">{{ c.get_difficulty_display }}</span>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-{% if c.difficulty == 'easy' %}success{% elif c.difficulty == 'medium' %}warning text-dark{% else %}danger{% endif %}" 
+                    aria-label="Difficulty: {{ c.get_difficulty_display }}">{{ c.get_difficulty_display }}</span>
               {% if c.id in solved_ids %}
-                <span class="badge bg-primary"><i class="bi bi-check2-circle me-1"></i>Solved</span>
+                <span class="badge bg-success" aria-label="Challenge completed">
+                  <i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Solved
+                </span>
               {% endif %}
             </div>
-            <h5 class="card-title mb-2"><a href="{% url 'coding_challenges:challenge_detail' c.slug %}" class="text-decoration-none">{{ c.title }}</a></h5>
-            <p class="card-text text-muted small flex-grow-1">{{ c.problem_statement|truncatewords:24 }}</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="small text-muted">
-                <i class="bi bi-clock me-1"></i>{{ c.time_limit_ms }} ms
-                <span class="ms-2"><i class="bi bi-hdd me-1"></i>{{ c.memory_limit_kb|floatformat:0 }} KB</span>
+            <h3 class="card-title h5 mb-2">
+              <a href="{% url 'coding_challenges:challenge_detail' c.slug %}" 
+                 class="text-decoration-none stretched-link" 
+                 aria-describedby="challenge-{{ c.id }}-desc">{{ c.title }}</a>
+            </h3>
+            <p class="card-text text-muted small flex-grow-1" id="challenge-{{ c.id }}-desc">
+              {{ c.problem_statement|striptags|truncatewords:20 }}
+            </p>
+            <div class="mt-auto">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <div class="small text-muted d-flex align-items-center gap-2">
+                  <span title="Time limit"><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ c.time_limit_ms }}ms</span>
+                  <span title="Memory limit"><i class="bi bi-hdd me-1" aria-hidden="true"></i>{{ c.memory_limit_kb|floatformat:0 }}KB</span>
+                </div>
+                <div class="small text-muted">
+                  {% if c.tags.all %}
+                    {% for tag in c.tags.all|slice:":2" %}
+                      <span class="badge bg-light text-dark border me-1">#{{ tag.name }}</span>
+                    {% endfor %}
+                    {% if c.tags.all|length > 2 %}
+                      <span class="text-muted">+{{ c.tags.all|length|add:"-2" }}</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
               </div>
-              <a href="{% url 'coding_challenges:challenge_detail' c.slug %}" class="btn btn-outline-primary btn-sm">Solve</a>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     {% empty %}
       <div class="col-12">

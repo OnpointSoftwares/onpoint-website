@@ -1,44 +1,243 @@
 {% extends 'base.html' %}
-{% block title %}Leaderboard{% endblock %}
+{% load static %}
+{% block title %}Leaderboard - Top Performers | OnPoint Software{% endblock %}
+
+{% block meta %}
+<meta name="description" content="View the top performers in our coding challenges. See rankings, points, and achievements of our programming community.">
+<meta name="keywords" content="leaderboard, coding challenges, programming rankings, top performers">
+<meta property="og:title" content="Coding Challenges Leaderboard">
+<meta property="og:description" content="View the top performers in our coding challenges.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .leaderboard-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  .rank-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #333; }
+  .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); color: #333; }
+  .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa520); color: white; }
+  .rank-other { background: #6c757d; color: white; }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0d6efd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 0.75rem;
+  }
+  .points-progress {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .points-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    transition: width 0.3s ease;
+  }
+  .table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,0.025);
+  }
+  @media (max-width: 768px) {
+    .mobile-stack {
+      display: block !important;
+    }
+    .mobile-stack .col {
+      margin-bottom: 0.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h4 mb-0"><i class="bi bi-trophy me-2 text-warning"></i>Leaderboard</h1>
-    <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Challenges</a>
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="leaderboard-card p-4 rounded-3 text-center">
+        <h1 class="h2 mb-2">
+          <i class="bi bi-trophy me-2" aria-hidden="true"></i>
+          Coding Champions Leaderboard
+        </h1>
+        <p class="mb-3 opacity-75">Compete with fellow developers and climb the ranks!</p>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+          <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-light">
+            <i class="bi bi-arrow-left me-1"></i> Back to Challenges
+          </a>
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'coding_challenges:profile' %}" class="btn btn-outline-light">
+              <i class="bi bi-person-circle me-1"></i> My Profile
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="h4 mb-1 text-primary">{{ profiles|length }}</div>
+          <div class="small text-muted">Total Players</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="h4 mb-1 text-success">{{ profiles.0.points|default:0 }}</div>
+          <div class="small text-muted">Top Score</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="h4 mb-1 text-warning">{{ profiles.0.solved_count|default:0 }}</div>
+          <div class="small text-muted">Most Solved</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="h4 mb-1 text-info">{{ profiles|length }}</div>
+          <div class="small text-muted">Active Users</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Table -->
   <div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom">
+      <h2 class="h5 mb-0">Rankings</h2>
+    </div>
     <div class="table-responsive">
-      <table class="table align-middle mb-0">
+      <table class="table table-hover align-middle mb-0" role="table">
         <thead class="table-light">
           <tr>
-            <th style="width:60px;">Rank</th>
-            <th>User</th>
-            <th>Points</th>
-            <th>Solved</th>
-            <th>Badges</th>
-            <th>Last Activity</th>
+            <th scope="col" style="width:80px;" class="text-center">Rank</th>
+            <th scope="col">Player</th>
+            <th scope="col" class="text-center">Points</th>
+            <th scope="col" class="text-center">Solved</th>
+            <th scope="col" class="d-none d-md-table-cell">Achievements</th>
+            <th scope="col" class="d-none d-lg-table-cell">Last Active</th>
           </tr>
         </thead>
         <tbody>
           {% for p in profiles %}
-            <tr>
-              <td class="fw-bold">#{{ forloop.counter }}</td>
-              <td>{{ p.user.username }}</td>
-              <td><span class="badge bg-primary">{{ p.points }}</span></td>
-              <td>{{ p.solved_count }}</td>
-              <td>
-                {% for b in p.badges.all %}
-                  <span class="badge bg-light text-dark border me-1"><i class="bi bi-award me-1 text-warning"></i>{{ b.name }}</span>
-                {% empty %}<span class="text-muted small">None</span>{% endfor %}
+            <tr {% if request.user == p.user %}class="table-warning"{% endif %}>
+              <td class="text-center">
+                <div class="rank-badge rank-{% if forloop.counter <= 3 %}{{ forloop.counter }}{% else %}other{% endif %}">
+                  {% if forloop.counter == 1 %}
+                    <i class="bi bi-trophy" aria-label="First place"></i>
+                  {% elif forloop.counter == 2 %}
+                    <i class="bi bi-award" aria-label="Second place"></i>
+                  {% elif forloop.counter == 3 %}
+                    <i class="bi bi-medal" aria-label="Third place"></i>
+                  {% else %}
+                    {{ forloop.counter }}
+                  {% endif %}
+                </div>
               </td>
-              <td class="text-muted small">{{ p.last_activity|timesince }} ago</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar">
+                    {{ p.user.username|first|upper }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ p.user.username }}</div>
+                    <div class="small text-muted">Member since {{ p.user.date_joined|date:"M Y" }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="fw-bold text-primary">{{ p.points }}</div>
+                <div class="points-progress mt-1">
+                  <div class="points-bar" data-width="{% if profiles.0.points > 0 %}{% widthratio p.points profiles.0.points 100 %}{% else %}0{% endif %}"></div>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-success">{{ p.solved_count }}</span>
+              </td>
+              <td class="d-none d-md-table-cell">
+                {% for b in p.badges.all|slice:":3" %}
+                  <span class="badge bg-light text-dark border me-1" title="{{ b.description|default:b.name }}">
+                    <i class="bi bi-award me-1 text-warning" aria-hidden="true"></i>{{ b.name }}
+                  </span>
+                {% empty %}
+                  <span class="text-muted small">No badges yet</span>
+                {% endfor %}
+                {% if p.badges.all|length > 3 %}
+                  <span class="text-muted small">+{{ p.badges.all|length|add:"-3" }} more</span>
+                {% endif %}
+              </td>
+              <td class="d-none d-lg-table-cell text-muted small">
+                {% if p.last_activity %}
+                  {{ p.last_activity|timesince }} ago
+                {% else %}
+                  Never
+                {% endif %}
+              </td>
             </tr>
           {% empty %}
-            <tr><td colspan="6" class="text-center text-muted">No data yet.</td></tr>
+            <tr>
+              <td colspan="6" class="text-center py-5">
+                <div class="text-muted">
+                  <i class="bi bi-trophy display-4 mb-3 d-block"></i>
+                  <h3>No rankings yet</h3>
+                  <p>Be the first to solve challenges and claim the top spot!</p>
+                  <a href="{% url 'coding_challenges:dashboard' %}" class="btn btn-primary">
+                    Start Solving Challenges
+                  </a>
+                </div>
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- Footer Info -->
+  <div class="text-center mt-4">
+    <small class="text-muted">
+      Rankings are updated in real-time based on challenge completions and points earned.
+    </small>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Set progress bar widths from data attributes
+  document.querySelectorAll('.points-bar[data-width]').forEach(function(bar) {
+    const width = bar.getAttribute('data-width');
+    bar.style.width = width + '%';
+  });
+});
+</script>
 {% endblock %}

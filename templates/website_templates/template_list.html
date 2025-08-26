@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - OnPoint Software Solutions{% endblock %}
+
+{% block extra_css %}
+<style>
+.template-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.template-thumbnail {
+    height: 200px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tech-badge {
+    font-size: 0.75rem;
+    margin: 2px;
+}
+
+.filter-sidebar {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    margin-bottom: 40px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Website Templates</h1>
+                <p class="lead mb-4">Discover professional, responsive website templates with GitHub Pages integration. Perfect for developers, designers, and businesses.</p>
+                
+                <!-- Search Bar -->
+                <form method="GET" class="d-flex mb-4">
+                    <input type="search" name="q" class="form-control form-control-lg me-2" 
+                           placeholder="Search templates..." value="{{ search_query }}">
+                    <button type="submit" class="btn btn-light btn-lg">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="bi bi-code-slash" style="font-size: 8rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="filter-sidebar">
+                <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filters</h5>
+                
+                <!-- Categories -->
+                <div class="mb-4">
+                    <h6 class="fw-bold">Categories</h6>
+                    <div class="list-group list-group-flush">
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_type %}type={{ current_type }}&{% endif %}{% if current_difficulty %}difficulty={{ current_difficulty }}&{% endif %}{% if sort_by %}sort={{ sort_by }}{% endif %}" 
+                           class="list-group-item list-group-item-action border-0 {% if not current_category %}active{% endif %}">
+                            All Categories
+                        </a>
+                        {% for category in categories %}
+                        <a href="?category={{ category.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                           class="list-group-item list-group-item-action border-0 {% if current_category == category.slug %}active{% endif %}">
+                            <i class="{{ category.icon }} me-2"></i>{{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Template Types -->
+                <div class="mb-4">
+                    <h6 class="fw-bold">Template Type</h6>
+                    <select class="form-select" onchange="filterByType(this.value)">
+                        <option value="">All Types</option>
+                        {% for type_key, type_name in template_types %}
+                        <option value="{{ type_key }}" {% if current_type == type_key %}selected{% endif %}>{{ type_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Difficulty Level -->
+                <div class="mb-4">
+                    <h6 class="fw-bold">Difficulty</h6>
+                    <select class="form-select" onchange="filterByDifficulty(this.value)">
+                        <option value="">All Levels</option>
+                        {% for diff_key, diff_name in difficulty_levels %}
+                        <option value="{{ diff_key }}" {% if current_difficulty == diff_key %}selected{% endif %}>{{ diff_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Templates Grid -->
+        <div class="col-lg-9">
+            <!-- Sort and Results Info -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="mb-0">{{ templates.paginator.count }} Templates Found</h5>
+                    {% if search_query %}
+                    <small class="text-muted">Results for "{{ search_query }}"</small>
+                    {% endif %}
+                </div>
+                
+                <!-- Admin Controls -->
+                {% if user.is_staff %}
+                <div class="admin-controls">
+                    <a href="/django-admin/website_templates/websitetemplate/add/" class="btn btn-success btn-sm me-2">
+                        <i class="bi bi-plus-circle me-1"></i>Add Template
+                    </a>
+                    <a href="/django-admin/website_templates/websitetemplate/" class="btn btn-outline-primary btn-sm me-2">
+                        <i class="bi bi-gear me-1"></i>Manage Templates
+                    </a>
+                    <a href="/django-admin/website_templates/templatecategory/" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-tags me-1"></i>Manage Categories
+                    </a>
+                </div>
+                {% endif %}
+                <div class="d-flex align-items-center">
+                    <label class="me-2">Sort by:</label>
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="sortTemplates(this.value)">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+                        <option value="downloads" {% if sort_by == 'downloads' %}selected{% endif %}>Most Downloaded</option>
+                        <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Featured Templates -->
+            {% if featured_templates and not search_query %}
+            <div class="mb-5">
+                <h4 class="mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Featured Templates</h4>
+                <div class="row">
+                    {% for template in featured_templates %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card template-card h-100">
+                            {% if template.thumbnail %}
+                            <img src="{{ template.thumbnail.url }}" class="card-img-top template-thumbnail" alt="{{ template.title }}">
+                            {% else %}
+                            <div class="template-thumbnail d-flex align-items-center justify-content-center">
+                                <i class="bi bi-code-slash text-white" style="font-size: 3rem;"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">{{ template.title }}</h6>
+                                    <span class="badge bg-warning">Featured</span>
+                                </div>
+                                <p class="card-text small text-muted">{{ template.description|truncatewords:15 }}</p>
+                                <div class="mb-2">
+                                    {% for tech in template.get_technologies_list|slice:":3" %}
+                                    <span class="badge bg-secondary tech-badge">{{ tech }}</span>
+                                    {% endfor %}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-eye me-1"></i>{{ template.view_count }}
+                                        <i class="bi bi-download ms-2 me-1"></i>{{ template.download_count }}
+                                    </small>
+                                    <a href="{{ template.get_absolute_url }}" class="btn btn-primary btn-sm">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <hr class="my-5">
+            </div>
+            {% endif %}
+            
+            <!-- All Templates -->
+            <div class="row">
+                {% for template in templates %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card template-card h-100">
+                        {% if template.thumbnail %}
+                        <img src="{{ template.thumbnail.url }}" class="card-img-top template-thumbnail" alt="{{ template.title }}">
+                        {% else %}
+                        <div class="template-thumbnail d-flex align-items-center justify-content-center">
+                            <i class="bi bi-code-slash text-white" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">{{ template.title }}</h6>
+                                {% if template.is_featured %}
+                                <span class="badge bg-warning">Featured</span>
+                                {% endif %}
+                            </div>
+                            <p class="card-text small text-muted">{{ template.description|truncatewords:15 }}</p>
+                            <div class="mb-2">
+                                {% for tech in template.get_technologies_list|slice:":3" %}
+                                <span class="badge bg-secondary tech-badge">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="bi bi-eye me-1"></i>{{ template.view_count }}
+                                    <i class="bi bi-download ms-2 me-1"></i>{{ template.download_count }}
+                                </small>
+                                <a href="{{ template.get_absolute_url }}" class="btn btn-primary btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3">No templates found</h4>
+                    <p class="text-muted">Try adjusting your search criteria or browse all templates.</p>
+                    <a href="{% url 'website_templates:template_list' %}" class="btn btn-primary">Browse All Templates</a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if templates.has_other_pages %}
+            <nav aria-label="Template pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if templates.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ templates.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in templates.paginator.page_range %}
+                    {% if templates.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > templates.number|add:'-3' and num < templates.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if templates.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ templates.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_difficulty %}&difficulty={{ current_difficulty }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterByType(type) {
+    const url = new URL(window.location);
+    if (type) {
+        url.searchParams.set('type', type);
+    } else {
+        url.searchParams.delete('type');
+    }
+    url.searchParams.delete('page');
+    window.location = url;
+}
+
+function filterByDifficulty(difficulty) {
+    const url = new URL(window.location);
+    if (difficulty) {
+        url.searchParams.set('difficulty', difficulty);
+    } else {
+        url.searchParams.delete('difficulty');
+    }
+    url.searchParams.delete('page');
+    window.location = url;
+}
+
+function sortTemplates(sort) {
+    const url = new URL(window.location);
+    if (sort) {
+        url.searchParams.set('sort', sort);
+    } else {
+        url.searchParams.delete('sort');
+    }
+    url.searchParams.delete('page');
+    window.location = url;
+}
+</script>
+{% endblock %}

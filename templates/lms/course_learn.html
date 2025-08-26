@@ -1,52 +1,566 @@
 {% extends 'base.html' %}
 {% load lms_filters %}
+{% load static %}
 {% block title %}Learn: {{ course.title }} - OnPoint LMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.learning-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px 0;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+.lesson-sidebar {
+    background: #f8f9fa;
+    border-radius: 15px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    position: sticky;
+    top: 100px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+.lesson-item {
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    background: white;
+    border: 1px solid #e9ecef;
+}
+.lesson-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.lesson-item.active {
+    background: #667eea;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+.lesson-item.completed {
+    background: #28a745;
+    color: white;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+.lesson-item.completed::after {
+    content: '✓';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 16px;
+}
+.lesson-progress {
+    height: 3px;
+    background: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+.lesson-progress-bar {
+    height: 100%;
+    background: #667eea;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+.lesson-item.completed .lesson-progress-bar {
+    background: #28a745;
+    width: 100%;
+}
+.video-container {
+    background: #000;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+}
+.video-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 18px;
+    z-index: 10;
+}
+.lesson-content {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+.lesson-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 20px 0;
+}
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.progress-indicator {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+}
+.resource-card {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+.resource-card:hover {
+    transform: translateY(-3px);
+}
+.lesson-navigation {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: sticky;
+    bottom: 20px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <div class="row g-4">
-    <div class="col-md-8">
-      <h1 class="h4 mb-3">{{ course.title }}</h1>
-      {% if course.lessons.all %}
-        {% for lesson in course.lessons.all %}
-          <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Lesson {{ forloop.counter }}: {{ lesson.title }}</h5>
-              {% if lesson.video_url %}
-                <div class="ratio ratio-16x9 mb-3">
-                  {# Prefer HTML5 video if the URL ends with .mp4; else fallback to embedded iframe #}
-                  {% if lesson.video_url|is_mp4 %}
-                    <video class="w-100 tracked-video" controls preload="metadata"
-                           data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}">
-                      <source src="{{ lesson.video_url }}" type="video/mp4">
-                    </video>
-                  {% else %}
-                    <iframe class="tracked-iframe" src="{{ lesson.video_url|to_embed }}" title="{{ lesson.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen
-                            data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}"></iframe>
-                  {% endif %}
+<!-- Learning Header -->
+<section class="learning-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="{% url 'lms:student_dashboard' %}" class="text-white-50">My Learning</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ course.title }}</li>
+                    </ol>
+                </nav>
+                
+                <h1 class="h3 mb-3">{{ course.title }}</h1>
+                <p class="mb-3">{{ course.description|truncatewords:20 }}</p>
+                
+                <!-- Course Progress -->
+                <div class="progress-indicator mb-3">
+                    <div class="progress-fill" style="width: {{ enrollment.progress|default:0 }}%;"></div>
                 </div>
-              {% endif %}
-              <div>{{ lesson.content|default_if_none:''|safe }}</div>
+                <small>{{ enrollment.progress|default:0|floatformat:0 }}% Complete • {{ course.lessons.count }} Lessons</small>
             </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="alert alert-info">No lessons yet.</div>
-      {% endif %}
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-header">Resources</div>
-        <div class="list-group list-group-flush">
-          {% for r in course.resources.all %}
-            <a class="list-group-item list-group-item-action" href="{{ r.file.url }}" download>{{ r.title }}</a>
-          {% empty %}
-            <div class="list-group-item">No resources</div>
-          {% endfor %}
+            
+            <div class="col-lg-4 text-end">
+                <div class="d-flex align-items-center justify-content-end gap-3">
+                    <div class="text-center">
+                        <div class="h4 mb-1">{{ current_lesson_number|default:1 }}</div>
+                        <small>Current Lesson</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="h4 mb-1">{{ course.lessons.count }}</div>
+                        <small>Total Lessons</small>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</section>
+
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Main Learning Content -->
+        <div class="col-lg-8">
+            {% if course.lessons.all %}
+                {% for lesson in course.lessons.all %}
+                    <div class="lesson-content mb-4" id="lesson-{{ lesson.id }}" {% if not forloop.first %}style="display: none;"{% endif %}>
+                        <!-- Video Section -->
+                        {% if lesson.video_url %}
+                            <div class="video-container mb-4">
+                                <div class="ratio ratio-16x9">
+                                    {% if lesson.video_url|is_mp4 %}
+                                        <video class="w-100 tracked-video" controls preload="metadata"
+                                               data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}">
+                                            <source src="{{ lesson.video_url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    {% else %}
+                                        <iframe class="tracked-iframe" src="{{ lesson.video_url|to_embed }}" 
+                                                title="{{ lesson.title }}" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                                allowfullscreen
+                                                data-course-slug="{{ course.slug }}" data-lesson-id="{{ lesson.id }}">
+                                        </iframe>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Lesson Content -->
+                        <div class="p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div>
+                                    <h2 class="h4 mb-1">Lesson {{ forloop.counter }}: {{ lesson.title }}</h2>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>15 min • 
+                                        <i class="bi bi-eye me-1"></i>{{ lesson.views|default:0 }} views
+                                    </small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline-primary btn-sm me-2" onclick="markAsComplete({{ lesson.id }})">
+                                        <i class="bi bi-check-circle me-1"></i>Mark Complete
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="toggleNotes({{ lesson.id }})">
+                                        <i class="bi bi-journal-text me-1"></i>Notes
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% if lesson.content %}
+                                <div class="lesson-text">
+                                    {{ lesson.content|safe }}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Notes Section -->
+                            <div class="notes-section mt-4" id="notes-{{ lesson.id }}" style="display: none;">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-journal-text me-2"></i>My Notes
+                                        </h6>
+                                        <textarea class="form-control" rows="4" placeholder="Add your notes for this lesson..."></textarea>
+                                        <div class="mt-2">
+                                            <button class="btn btn-primary btn-sm">Save Notes</button>
+                                            <button class="btn btn-outline-secondary btn-sm" onclick="toggleNotes({{ lesson.id }})">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <!-- Lesson Navigation -->
+                <div class="lesson-navigation">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <button class="btn btn-outline-primary" id="prevBtn" onclick="previousLesson()">
+                            <i class="bi bi-chevron-left me-1"></i>Previous Lesson
+                        </button>
+                        
+                        <div class="text-center">
+                            <small class="text-muted">Lesson <span id="currentLessonNum">1</span> of {{ course.lessons.count }}</small>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextLesson()">
+                            Next Lesson<i class="bi bi-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">No lessons available</h4>
+                    <p class="text-muted">The instructor is still working on adding course content.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Lesson List -->
+            <div class="lesson-sidebar p-4 mb-4">
+                <h5 class="mb-3">
+                    <i class="bi bi-list-ul me-2"></i>Course Content
+                    <span class="badge bg-primary ms-2">{{ course.lessons.count }} lessons</span>
+                </h5>
+                
+                {% for lesson in course.lessons.all %}
+                    <div class="lesson-item p-3 {% if forloop.first %}active{% endif %}" 
+                         onclick="showLesson({{ lesson.id }}, {{ forloop.counter }})"
+                         data-lesson-id="{{ lesson.id }}"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Lesson {{ forloop.counter }}: {{ lesson.title }}"
+                         onkeypress="if(event.key==='Enter'||event.key===' ') showLesson({{ lesson.id }}, {{ forloop.counter }})">
+                        <div class="d-flex align-items-center">
+                            <span class="lesson-number me-2 d-flex align-items-center justify-content-center" 
+                                  style="width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; font-weight: bold;">
+                                {{ forloop.counter }}
+                            </span>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ lesson.title }}</h6>
+                                <small class="opacity-75">
+                                    {% if lesson.video_url %}
+                                        <i class="bi bi-play-circle me-1"></i>Video • 15 min
+                                    {% else %}
+                                        <i class="bi bi-file-text me-1"></i>Reading • 5 min
+                                    {% endif %}
+                                </small>
+                                <div class="lesson-progress mt-2">
+                                    <div class="lesson-progress-bar" data-lesson-id="{{ lesson.id }}"></div>
+                                </div>
+                            </div>
+                            <div class="ms-2">
+                                <i class="bi bi-check-circle-fill text-success" style="display: none;" data-lesson-complete="{{ lesson.id }}"></i>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Course Resources -->
+            <div class="resource-card card mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-download me-2"></i>Resources
+                    </h5>
+                    
+                    {% if course.resources.all %}
+                        <div class="d-grid gap-2">
+                            {% for resource in course.resources.all %}
+                                <a href="{{ resource.file.url }}" class="btn btn-outline-primary text-start" download>
+                                    <i class="bi bi-file-earmark-arrow-down me-2"></i>{{ resource.title }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-folder-x display-6 text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No resources available</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Course Info -->
+            <div class="resource-card card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Course Info
+                    </h5>
+                    
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-person text-muted me-3"></i>
+                            <span>{{ course.instructor.user.get_full_name|default:course.instructor.user.username }}</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-tag text-muted me-3"></i>
+                            <span>{{ course.category.name }}</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-signal text-muted me-3"></i>
+                            <span>{{ course.get_difficulty_display }}</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-play-circle text-muted me-3"></i>
+                            <span>{{ course.lessons.count }} Lessons</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-clock text-muted me-3"></i>
+                            <span>12 hours total</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- JavaScript for Lesson Navigation -->
+<script>
+let currentLesson = 1;
+const totalLessons = {{ course.lessons.count }};
+let lessonProgress = {};
+
+// Enhanced lesson navigation with error handling
+function showLesson(lessonId, lessonNumber) {
+    try {
+        // Show loading state
+        showLoadingState();
+        
+        // Hide all lessons
+        document.querySelectorAll('.lesson-content').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Show selected lesson
+        const lessonElement = document.getElementById(`lesson-${lessonId}`);
+        if (!lessonElement) {
+            throw new Error(`Lesson ${lessonId} not found`);
+        }
+        lessonElement.style.display = 'block';
+        
+        // Update lesson items
+        document.querySelectorAll('.lesson-item').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        const activeItem = document.querySelector(`[data-lesson-id="${lessonId}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+            // Update ARIA attributes
+            activeItem.setAttribute('aria-current', 'true');
+        }
+        
+        // Update navigation
+        currentLesson = lessonNumber;
+        const currentLessonElement = document.getElementById('currentLessonNum');
+        if (currentLessonElement) {
+            currentLessonElement.textContent = currentLesson;
+        }
+        
+        // Update navigation buttons
+        updateNavigationButtons();
+        
+        // Update progress
+        updateLessonProgress(lessonId);
+        
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Hide loading state
+        hideLoadingState();
+        
+    } catch (error) {
+        console.error('Error showing lesson:', error);
+        showErrorState(`Failed to load lesson: ${error.message}`);
+    }
+}
+
+// Show loading indicator
+function showLoadingState() {
+    const loadingEl = document.createElement('div');
+    loadingEl.id = 'lesson-loading';
+    loadingEl.className = 'text-center py-4';
+    loadingEl.innerHTML = '<div class="loading-spinner me-2"></div>Loading lesson...';
+    
+    const container = document.querySelector('.col-lg-8');
+    if (container) {
+        container.prepend(loadingEl);
+    }
+}
+
+// Hide loading indicator
+function hideLoadingState() {
+    const loadingEl = document.getElementById('lesson-loading');
+    if (loadingEl) {
+        loadingEl.remove();
+    }
+}
+
+// Show error state
+function showErrorState(message) {
+    hideLoadingState();
+    const errorEl = document.createElement('div');
+    errorEl.className = 'lesson-error';
+    errorEl.innerHTML = `
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Error:</strong> ${message}
+        <br><small>Please try refreshing the page or contact support if the issue persists.</small>
+    `;
+    
+    const container = document.querySelector('.col-lg-8');
+    if (container) {
+        container.prepend(errorEl);
+        setTimeout(() => errorEl.remove(), 5000); // Auto-remove after 5 seconds
+    }
+}
+
+// Update navigation buttons state
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    if (prevBtn) {
+        prevBtn.disabled = currentLesson === 1;
+        prevBtn.setAttribute('aria-disabled', currentLesson === 1);
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentLesson === totalLessons;
+        nextBtn.setAttribute('aria-disabled', currentLesson === totalLessons);
+    }
+}
+
+// Update lesson progress visually
+function updateLessonProgress(lessonId, progress = 0) {
+    const progressBar = document.querySelector(`[data-lesson-id="${lessonId}"] .lesson-progress-bar`);
+    if (progressBar) {
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+    }
+    
+    // Store progress
+    lessonProgress[lessonId] = progress;
+}
+
+function nextLesson() {
+    if (currentLesson < totalLessons) {
+        const nextLessonElement = document.querySelector(`[data-lesson-id]:nth-child(${currentLesson + 1})`);
+        if (nextLessonElement) {
+            const lessonId = nextLessonElement.getAttribute('data-lesson-id');
+            showLesson(lessonId, currentLesson + 1);
+        }
+    }
+}
+
+function previousLesson() {
+    if (currentLesson > 1) {
+        const prevLessonElement = document.querySelector(`[data-lesson-id]:nth-child(${currentLesson - 1})`);
+        if (prevLessonElement) {
+            const lessonId = prevLessonElement.getAttribute('data-lesson-id');
+            showLesson(lessonId, currentLesson - 1);
+        }
+    }
+}
+
+function markAsComplete(lessonId) {
+    // Add completion logic here
+    const lessonElement = document.querySelector(`[data-lesson-id="${lessonId}"]`);
+    lessonElement.classList.add('completed');
+    lessonElement.querySelector('.bi-lock').style.display = 'none';
+    lessonElement.querySelector('.bi-check-circle-fill').style.display = 'block';
+    
+    // Show success message
+    alert('Lesson marked as complete!');
+}
+
+function toggleNotes(lessonId) {
+    const notesSection = document.getElementById(`notes-${lessonId}`);
+    notesSection.style.display = notesSection.style.display === 'none' ? 'block' : 'none';
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial navigation state
+    document.getElementById('prevBtn').disabled = true;
+    if (totalLessons === 1) {
+        document.getElementById('nextBtn').disabled = true;
+    }
+});
+</script>
 {% endblock %}
 
 {% block extra_scripts %}

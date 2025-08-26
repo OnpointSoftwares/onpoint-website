@@ -48,16 +48,31 @@
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Products</a>
             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="productsDropdown">
-              <li><a class="dropdown-item" href="{% url 'bizflow_pos_docs' %}">BizFlow POS</a></li>
+              <li><a class="dropdown-item" href="{% url 'bizflow_pos_docs' %}">
+                <i class="bi bi-shop me-2"></i>BizFlow POS
+              </a></li>
+              <li><a class="dropdown-item" href="{% url 'website_templates:template_list' %}">
+                <i class="bi bi-file-code me-2"></i>Website Templates
+              </a></li>
             </ul>
           </li>
           <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
           <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
-          <li class="nav-item"><a class="nav-link" href="/#testimonials">Testimonials</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contact-us/">Contact</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="learningDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-mortarboard me-1"></i>Learning
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="learningDropdown">
+              <li><a class="dropdown-item" href="{% url 'coding_challenges:dashboard' %}">
+                <i class="bi bi-code-square me-2"></i>Coding Challenges
+              </a></li>
+              <li><a class="dropdown-item" href="/lms/">
+                <i class="bi bi-book me-2"></i>Learning Management
+              </a></li>
+            </ul>
+          </li>
           <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'coding_challenges:dashboard' %}">Challenges</a></li>
-          <li class="nav-item"><a class="nav-link" href="/lms/">LMS</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contact-us/">Contact</a></li>
           {% if user.is_authenticated %}
           <li class="nav-item dropdown ms-lg-3">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">

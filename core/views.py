@@ -96,7 +96,7 @@ def home(request):
         return redirect('home')
     
     # Get featured projects for portfolio section
-    featured_projects = Project.objects.filter(featured=True, status__in=['completed', 'launched']).order_by('-created_at')[:6]
+    featured_projects = Project.objects.filter(status__in=['completed', 'launched']).order_by('-created_at')[:6]
     
     # Get all completed/launched projects for stats
     all_projects = Project.objects.filter(status__in=['completed', 'launched'])

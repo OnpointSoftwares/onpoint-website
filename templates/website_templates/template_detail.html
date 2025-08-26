@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ template.title }} - Website Templates - OnPoint Software Solutions{% endblock %}
+
+{% block extra_css %}
+<style>
+.template-preview {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.template-preview iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+}
+
+.tech-badge {
+    font-size: 0.85rem;
+    margin: 3px;
+    padding: 5px 10px;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.action-buttons .btn {
+    margin: 5px;
+}
+
+.related-template {
+    transition: transform 0.3s ease;
+}
+
+.related-template:hover {
+    transform: translateY(-3px);
+}
+
+.template-info {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.breadcrumb {
+    background: none;
+    padding: 0;
+}
+
+.preview-controls {
+    background: #343a40;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px 10px 0 0;
+}
+
+.device-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.device-btn {
+    background: none;
+    border: 1px solid #6c757d;
+    color: #adb5bd;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.device-btn.active,
+.device-btn:hover {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .template-preview iframe {
+        height: 400px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'website_templates:template_list' %}">Templates</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'website_templates:category_detail' template.category.slug %}">{{ template.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ template.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8 mb-4">
+            <!-- Template Header -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="h2 mb-2">{{ template.title }}</h1>
+                    <div class="d-flex align-items-center text-muted mb-3">
+                        <span class="badge bg-primary me-2">{{ template.get_template_type_display }}</span>
+                        <span class="badge bg-secondary me-2">{{ template.get_difficulty_level_display }}</span>
+                        {% if template.is_featured %}
+                        <span class="badge bg-warning me-2">Featured</span>
+                        {% endif %}
+                        <small class="ms-2">
+                            <i class="bi bi-eye me-1"></i>{{ template.view_count }} views
+                            <i class="bi bi-download ms-3 me-1"></i>{{ template.download_count }} downloads
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Preview -->
+            {% if template.github_pages_url %}
+            <div class="template-preview mb-4">
+                <div class="preview-controls d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-display me-2"></i>
+                        <span>Live Preview</span>
+                    </div>
+                    <div class="device-buttons">
+                        <button class="device-btn active" onclick="setPreviewSize('100%', '600px')" data-device="desktop">
+                            <i class="bi bi-laptop me-1"></i>Desktop
+                        </button>
+                        <button class="device-btn" onclick="setPreviewSize('768px', '600px')" data-device="tablet">
+                            <i class="bi bi-tablet me-1"></i>Tablet
+                        </button>
+                        <button class="device-btn" onclick="setPreviewSize('375px', '600px')" data-device="mobile">
+                            <i class="bi bi-phone me-1"></i>Mobile
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-container" style="background: #f8f9fa; padding: 20px; text-align: center;">
+                    <iframe id="templatePreview" 
+                            src="{{ template.github_pages_url }}" 
+                            style="width: 100%; height: 600px; border: 1px solid #dee2e6; border-radius: 5px; background: white;"
+                            loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                Live preview not available. You can view the source code on GitHub.
+            </div>
+            {% endif %}
+
+            <!-- Description -->
+            <div class="template-info mb-4">
+                <h4 class="mb-3">About This Template</h4>
+                <p>{{ template.description|linebreaks }}</p>
+                
+                <!-- Technologies -->
+                <div class="mb-3">
+                    <h6 class="fw-bold">Technologies Used:</h6>
+                    {% for tech in template.get_technologies_list %}
+                    <span class="badge bg-secondary tech-badge">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+                
+                <!-- Tags -->
+                {% if template.tags %}
+                <div class="mb-3">
+                    <h6 class="fw-bold">Tags:</h6>
+                    {% for tag in template.get_tags_list %}
+                    <span class="badge bg-outline-primary tech-badge">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Author & License -->
+                <div class="row">
+                    {% if template.author %}
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Author:</h6>
+                        <p class="mb-0">{{ template.author }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">License:</h6>
+                        <p class="mb-0">{{ template.license_type }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Stats Card -->
+            <div class="stats-card mb-4">
+                <h5 class="mb-3"><i class="bi bi-graph-up me-2"></i>Template Stats</h5>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="h4 mb-0">{{ template.view_count }}</div>
+                        <small>Views</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 mb-0">{{ template.download_count }}</div>
+                        <small>Downloads</small>
+                    </div>
+                </div>
+                <hr class="my-3" style="border-color: rgba(255,255,255,0.2);">
+                <div class="text-center">
+                    <small>Category: {{ template.category.name }}</small><br>
+                    <small>Added: {{ template.created_at|date:"M d, Y" }}</small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card mb-4">
+                <div class="card-body text-center action-buttons">
+                    <h6 class="card-title">Get This Template</h6>
+                    
+                    {% if template.github_pages_url %}
+                    <a href="{{ template.github_pages_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-eye me-1"></i>Live Demo
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ template.github_url }}" target="_blank" class="btn btn-dark btn-sm">
+                        <i class="bi bi-github me-1"></i>View on GitHub
+                    </a>
+                    
+                    <button onclick="downloadTemplate('{{ template.slug }}')" class="btn btn-success btn-sm">
+                        <i class="bi bi-download me-1"></i>Download
+                    </button>
+                    
+                    <button onclick="shareTemplate()" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Controls -->
+            {% if user.is_staff %}
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-danger"><i class="bi bi-shield-check me-2"></i>Admin Controls</h6>
+                    <div class="d-grid gap-2">
+                        <a href="/django-admin/website_templates/websitetemplate/{{ template.id }}/change/" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil me-1"></i>Edit Template
+                        </a>
+                        <a href="/django-admin/website_templates/websitetemplate/add/" class="btn btn-success btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Add New Template
+                        </a>
+                        <a href="/django-admin/website_templates/websitetemplate/" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-list me-1"></i>All Templates
+                        </a>
+                        {% if template.is_featured %}
+                        <button onclick="toggleFeatured('{{ template.slug }}', false)" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-star-fill me-1"></i>Remove Featured
+                        </button>
+                        {% else %}
+                        <button onclick="toggleFeatured('{{ template.slug }}', true)" class="btn btn-warning btn-sm">
+                            <i class="bi bi-star me-1"></i>Mark Featured
+                        </button>
+                        {% endif %}
+                        {% if template.is_active %}
+                        <button onclick="toggleActive('{{ template.slug }}', false)" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-eye-slash me-1"></i>Deactivate
+                        </button>
+                        {% else %}
+                        <button onclick="toggleActive('{{ template.slug }}', true)" class="btn btn-success btn-sm">
+                            <i class="bi bi-eye me-1"></i>Activate
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Template Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Template Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <strong>Type:</strong> {{ template.get_template_type_display }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Difficulty:</strong> {{ template.get_difficulty_level_display }}
+                    </div>
+                    <div class="mb-2">
+                        <strong>Category:</strong> 
+                        <a href="{% url 'website_templates:category_detail' template.category.slug %}">{{ template.category.name }}</a>
+                    </div>
+                    {% if template.author %}
+                    <div class="mb-2">
+                        <strong>Author:</strong> {{ template.author }}
+                    </div>
+                    {% endif %}
+                    <div class="mb-2">
+                        <strong>License:</strong> {{ template.license_type }}
+                    </div>
+                    <div class="mb-0">
+                        <strong>Last Updated:</strong> {{ template.updated_at|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Templates -->
+    {% if related_templates %}
+    <div class="mt-5">
+        <h4 class="mb-4">Related Templates</h4>
+        <div class="row">
+            {% for related in related_templates %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card related-template h-100">
+                    {% if related.thumbnail %}
+                    <img src="{{ related.thumbnail.url }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ related.title }}">
+                    {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="bi bi-code-slash text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ related.title }}</h6>
+                        <p class="card-text small text-muted">{{ related.description|truncatewords:10 }}</p>
+                        <a href="{{ related.get_absolute_url }}" class="btn btn-primary btn-sm">View Template</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function setPreviewSize(width, height) {
+    const iframe = document.getElementById('templatePreview');
+    const container = iframe.parentElement;
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+    
+    // Set iframe size
+    iframe.style.width = width;
+    iframe.style.height = height;
+    
+    // Center the iframe if it's smaller than container
+    if (width !== '100%') {
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+    } else {
+        container.style.display = 'block';
+    }
+}
+
+function downloadTemplate(slug) {
+    // Increment download count
+    fetch(`/templates/${slug}/download/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update download count in UI
+            const downloadElements = document.querySelectorAll('.download-count');
+            downloadElements.forEach(el => {
+                el.textContent = data.download_count;
+            });
+        }
+    })
+    .catch(error => console.error('Error:', error));
+    
+    // Open GitHub repository
+    window.open('{{ template.github_url }}', '_blank');
+}
+
+function shareTemplate() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ template.title }}',
+            text: '{{ template.description|truncatewords:20 }}',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Template URL copied to clipboard!');
+        });
+    }
+}
+
+function toggleFeatured(slug, featured) {
+    if (!confirm(featured ? 'Mark this template as featured?' : 'Remove featured status from this template?')) {
+        return;
+    }
+    
+    fetch(`/templates/${slug}/toggle-featured/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ featured: featured })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Reload to update the UI
+        } else {
+            alert('Error updating template status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating template status');
+    });
+}
+
+function toggleActive(slug, active) {
+    if (!confirm(active ? 'Activate this template?' : 'Deactivate this template?')) {
+        return;
+    }
+    
+    fetch(`/templates/${slug}/toggle-active/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ active: active })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Reload to update the UI
+        } else {
+            alert('Error updating template status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating template status');
+    });
+}
+
+// Add CSRF token to page
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+        const csrfToken = '{{ csrf_token }}';
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'csrfmiddlewaretoken';
+        input.value = csrfToken;
+        document.body.appendChild(input);
+    }
+});
+</script>
+{% endblock %}
