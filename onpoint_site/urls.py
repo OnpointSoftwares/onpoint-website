@@ -19,6 +19,9 @@ admin.site.site_title = 'OnPoint Administration'
 admin.site.index_title = 'Welcome to OnPoint Admin'
 
 urlpatterns = [
+    # Favicon redirect
+    path('favicon.ico', RedirectView.as_view(url='/static/images/logo.png', permanent=True)),
+    
     # Core app URLs (includes our custom admin)
     path('', include('core.urls')),
     
