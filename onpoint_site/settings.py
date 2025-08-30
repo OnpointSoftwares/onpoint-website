@@ -94,6 +94,10 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'onpointinfo635@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'onpointinfo635@gmail.com')
 
+# Fallback to console backend if no password is set (for development)
+if not EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Gemini AI Settings
 GEMINI_API_KEY = 'AIzaSyD4IVtZuOp8k2wwN7O5Ao5-0FGS7CaU0dA'
 
