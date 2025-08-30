@@ -39,7 +39,7 @@ def get_gemini_chat():
             print("GEMINI_API_KEY not found in settings")
             return None
             
-        genai.configure(api_key="AIzaSyD4IVtZuOp8k2wwN7O5Ao5-0FGS7CaU0dA")
+        genai.configure(api_key=settings.GEMINI_API_KEY)
         model = genai.GenerativeModel('gemini-1.5-flash')
         chat = model.start_chat(history=[])
         
@@ -163,7 +163,6 @@ def contact_us(request):
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 @require_http_methods(["POST"])
-@csrf_exempt  # Temporarily exempt CSRF for testing
 @ensure_csrf_cookie
 def chat_api(request):
     if not request.body:
@@ -200,7 +199,7 @@ def chat_api(request):
         
         # Get new CSRF token if this is a new session
         from django.middleware.csrf import get_token
-        response_data['csrf_token'] = get_token(request) if request.user.is_anonymous() else ''
+        response_data['csrf_token'] = get_token(request) if request.user.is_anonymous else ''
         
         return JsonResponse(response_data)
         
