@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Article, Comment
+from .models import Project, Article, Comment, Contact
 from django.core.exceptions import ValidationError
 import re
 class ProjectForm(forms.ModelForm):
@@ -87,14 +87,9 @@ class ProjectForm(forms.ModelForm):
             'live_url': 'Live Project URL',
         }
         help_texts = {
-            'slug': 'URL-friendly version of the title (auto-generated if left empty)',
-            'short_description': 'Brief summary displayed on project cards (max 200 characters)',
-            'description': 'Detailed project information, features, and technical details',
-            'client': 'Name of the client or organization (optional)',
-            'website': 'Client\'s official website URL (optional)',
-            'technologies': 'Comma-separated list of technologies, frameworks, and tools used',
-            'start_date': 'When the project development started',
-            'end_date': 'When the project was completed (leave empty if ongoing)',
+            'slug': 'URL-friendly version of the title. Leave blank to auto-generate.',
+            'technologies': 'Comma-separated list of technologies used',
+            'featured': 'Featured projects appear on the homepage portfolio section',
             'featured': 'Check to display this project on the home page portfolio section',
             'image': 'Main project image (recommended: 1200x800px)',
             'thumbnail': 'Smaller version for listings (auto-generated if not provided)',
@@ -292,3 +287,66 @@ class ProjectQuickForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter project title'}),
             'short_description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Brief description for SEO and previews'}),
         }
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'phone', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name',
+                'required': True
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'your.email@example.com',
+                'required': True
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+254 700 000 000',
+                'pattern': r'^\+?[1-9]\d{1,14}$'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'Tell us about your project requirements, timeline, and budget...',
+                'maxlength': 1000,
+                'required': True
+            }),
+        }
+        
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name and len(name.strip()) < 2:
+            raise ValidationError('Name must be at least 2 characters long.')
+        return name.strip()
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Basic email validation beyond Django's default
+            if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+                raise ValidationError('Please enter a valid email address.')
+        return email.lower()
+    
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if phone:
+            # Remove all non-digit characters except +
+            cleaned_phone = re.sub(r'[^\d+]', '', phone)
+            if cleaned_phone and not re.match(r'^\+?[1-9]\d{1,14}$', cleaned_phone):
+                raise ValidationError('Please enter a valid phone number.')
+            return cleaned_phone
+        return phone
+    
+    def clean_message(self):
+        message = self.cleaned_data.get('message')
+        if message:
+            message = message.strip()
+            if len(message) < 10:
+                raise ValidationError('Message must be at least 10 characters long.')
+            if len(message) > 1000:
+                raise ValidationError('Message must be less than 1000 characters.')
+        return message

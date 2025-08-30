@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -17,6 +18,7 @@ from django.utils import timezone
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, View, TemplateView
 )
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.urls import reverse
 import google.generativeai as genai
@@ -26,7 +28,7 @@ from datetime import timedelta
 from .models import Contact, Project, Article, LearningResource, Comment
 from coding_challenges.models import Challenge as CodeChallenge
 from lms.models import Course
-from .forms import ProjectForm, ProjectFilterForm, ArticleForm, CommentForm, ArticleQuickForm, ProjectQuickForm
+from .forms import ProjectForm, ProjectFilterForm, ArticleForm, CommentForm, ArticleQuickForm, ProjectQuickForm, ContactForm
 from django.core.mail import mail_admins
 import logging
 
@@ -56,7 +58,11 @@ def get_gemini_chat():
         Company Information:
         - Email: onpointinfo635@gmail.com
         - Phone: +254 702 502 952
-        
+        Products:
+          -we came up with point of sale system called biz flow 
+          refer to this link to get more details https://onpointsoft.pythonanywhere.com/bizflow_pos/docs/
+          -templates for websites
+          refer to this link to get more details https://onpointsoft.pythonanywhere.com/templates/
         Be helpful, professional, and concise in your responses.
         If you don't know an answer, say you'll have someone from the team contact them.
         """
@@ -159,7 +165,73 @@ def web_development(request):
 def github_readme(request):
     return render(request, 'core/github-readme.html')
 def contact_us(request):
-    return render(request, 'core/contact-us.html')
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            try:
+                # Save to database
+                contact = form.save()
+                
+                # Send notification email to admin
+                subject = f'New Contact Form Submission from {contact.name}'
+                admin_message = f"""
+New contact form submission received:
+
+Name: {contact.name}
+Email: {contact.email}
+Phone: {contact.phone or 'Not provided'}
+Message: {contact.message}
+
+Please respond promptly.
+                """
+                
+                send_mail(
+                    subject,
+                    admin_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.DEFAULT_FROM_EMAIL],
+                    fail_silently=False,
+                )
+                
+                # Send confirmation email to user
+                user_subject = 'Thank you for contacting OnPoint Software Solutions'
+                user_message = f"""
+Dear {contact.name},
+
+Thank you for reaching out to OnPoint Software Solutions. We have received your message and will get back to you within 24 hours.
+
+Your message:
+{contact.message}
+
+Best regards,
+OnPoint Software Solutions Team
+Email: onpointinfo635@gmail.com
+Phone: +254 702 502 952
+                """
+                
+                send_mail(
+                    user_subject,
+                    user_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [contact.email],
+                    fail_silently=True,  # Don't fail if user email fails
+                )
+                
+                messages.success(request, 'Thank you for your message! We\'ll get back to you within 24 hours.')
+                return redirect('contact_us')
+                
+            except Exception as e:
+                logger.error(f"Contact form error: {str(e)}")
+                messages.error(request, 'Sorry, there was an error sending your message. Please try again or contact us directly.')
+        else:
+            # Form validation errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.title()}: {error}")
+    else:
+        form = ContactForm()
+    
+    return render(request, 'core/contact-us.html', {'form': form})
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 @require_http_methods(["POST"])
