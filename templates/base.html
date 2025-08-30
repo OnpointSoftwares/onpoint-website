@@ -2,17 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <title>OnPoint Software Solutions</title>
   <meta name="description" content="Innovating Your Digital Future - Custom software, web, mobile, and technical content services."/>
-  {% csrf_token %}
   <meta name="author" content="OnPoint Software Solutions">
   <meta name="keywords" content="OnPoint Software Solutions, Custom software, web, mobile, technical content services">
-  <script>
-    // Make CSRF token available to JavaScript
-    window.csrfToken = '{{ csrf_token }}';
-  </script>
   <!-- Favicon -->
   <link rel="icon" href="{% static 'images/logo.png' %}" type="image/png">
   <link rel="shortcut icon" href="{% static 'images/logo.png' %}" type="image/png">
@@ -218,12 +214,15 @@
   
   <!-- Load configuration first -->
   <script>
-    // Pass Django URLs to JavaScript
+    // Pass Django URLs and CSRF token to JavaScript
     window.djangoUrls = {
       chatApi: "{% url 'chat_api' %}",  // This will resolve to '/chat/'
       // Add other URLs here if needed
     };
-    console.log('Django URLs initialized:', window.djangoUrls);
+    
+    // Make CSRF token available to JavaScript
+    window.csrfToken = "{{ csrf_token }}";
+    console.log('Django URLs and CSRF token initialized');
   </script>
   
   <!-- Load JavaScript files -->
@@ -324,13 +323,16 @@
           
           <!-- Message Input -->
           <div class="p-3 border-top border-secondary">
-            <div class="input-group">
-              <input type="text" id="userInput" class="form-control bg-dark text-white border-secondary" 
-                     placeholder="Type your message..." autocomplete="off">
-              <button class="btn btn-primary" type="button" id="sendButton">
-                <i class="bi bi-send"></i>
-              </button>
-            </div>
+            <form id="chatForm">
+              {% csrf_token %}
+              <div class="input-group">
+                <input type="text" id="userInput" class="form-control bg-dark text-white border-secondary" 
+                       placeholder="Type your message..." autocomplete="off">
+                <button class="btn btn-primary" type="button" id="sendButton">
+                  <i class="bi bi-send"></i>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
