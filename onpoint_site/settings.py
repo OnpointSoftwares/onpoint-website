@@ -95,7 +95,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'onpointinfo635@gmail.com')
 
 # Gemini AI Settings
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+GEMINI_API_KEY = 'AIzaSyD4IVtZuOp8k2wwN7O5Ao5-0FGS7CaU0dA'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
