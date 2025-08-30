@@ -1,12 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}BizFlow POS v2.1.0 - Documentation{% endblock %}
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Comprehensive documentation for BizFlow POS - A modern point of sale system for small to medium businesses">
-    <meta name="keywords" content="POS, point of sale, inventory management, sales, business software">
-    <meta name="author" content="BizFlow POS Team">
-    <title>BizFlow POS - Documentation</title>
+    <meta name="description" content="Comprehensive documentation for BizFlow POS v2.1.0 - Advanced multi-business point of sale system with purchase orders and enterprise integration">
+    <meta name="keywords" content="POS, point of sale, inventory management, sales, business software, purchase orders, multi-business, enterprise">
+    <meta name="author" content="OnPoint Software Solutions">
+    <title>BizFlow POS v2.1.0 - Documentation</title>
     
     <!-- Preload critical resources -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
@@ -17,14 +21,29 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    
     <style>
         :root {
-            --bs-primary: #2563eb;
-            --bs-primary-rgb: 37, 99, 235;
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
             --sidebar-width: 280px;
             --sidebar-collapsed-width: 70px;
             --navbar-height: 70px;
             --animation-speed: 0.3s;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -32,13 +51,13 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f1f5f9;
             color: #334155;
             line-height: 1.6;
         }
 
-        /* Enhanced Sidebar */
+        /* Enhanced Sidebar - Matching Admin Base */
         .sidebar {
             position: fixed;
             top: 0;
@@ -50,7 +69,7 @@
             transform: translateX(0);
             transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1030;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--box-shadow-lg);
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #64748b #475569;
@@ -76,37 +95,41 @@
         .sidebar-header {
             padding: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
             transition: all var(--animation-speed) ease;
         }
 
         .sidebar.collapsed .sidebar-header {
             padding: 1rem 0.5rem;
+            text-align: center;
+        }
+
+        .sidebar-brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .sidebar-header h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 600;
             margin: 0;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
         }
 
         .sidebar.collapsed .sidebar-header h3 {
-            font-size: 1.2rem;
+            display: none;
         }
 
-        .sidebar-header p {
+        .sidebar-header p, .sidebar-header small {
             margin: 0.25rem 0 0 0;
-            font-size: 0.875rem;
-            opacity: 0.7;
+            font-size: 0.75rem;
+            color: #94a3b8;
             transition: opacity var(--animation-speed) ease;
         }
 
-        .sidebar.collapsed .sidebar-header p {
-            opacity: 0;
+        .sidebar.collapsed .sidebar-header p,
+        .sidebar.collapsed .sidebar-header small {
+            display: none;
         }
 
         .nav-menu {
@@ -115,19 +138,38 @@
             margin: 0;
         }
 
+        .nav-section {
+            padding: 1rem 1.5rem 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .nav-section:first-child {
+            margin-top: 0;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         .nav-menu li {
-            margin: 0.25rem 0;
+            margin: 0.125rem 0;
         }
 
         .nav-menu a {
             display: flex;
             align-items: center;
-            padding: 0.875rem 1.5rem;
-            color: #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
             text-decoration: none;
             transition: all var(--animation-speed) ease;
             position: relative;
             font-weight: 500;
+            border-radius: 0 25px 25px 0;
+            margin-right: 1rem;
         }
 
         .sidebar.collapsed .nav-menu a {
@@ -136,19 +178,21 @@
         }
 
         .nav-menu a:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             color: white;
-            transform: translateX(5px);
+            transform: translateX(3px);
         }
 
         .sidebar.collapsed .nav-menu a:hover {
             transform: none;
+            border-radius: 8px;
+            margin-right: 0.5rem;
         }
 
         .nav-menu a.active {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
         .nav-menu a.active::before {
@@ -157,8 +201,9 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 4px;
+            width: 3px;
             background: #60a5fa;
+            border-radius: 0 3px 3px 0;
         }
 
         .nav-menu a i {
@@ -590,14 +635,27 @@
     <!-- Enhanced Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h3>BizFlow POS</h3>
-            <p>v1.0.0</p>
+            <div class="d-flex align-items-center">
+                <div class="sidebar-brand-icon">
+                    <i class="bi bi-shop text-primary fs-2"></i>
+                </div>
+                <div class="ms-3">
+                    <h3>BizFlow POS</h3>
+                    <p>v2.1.0</p>
+                    <small>Multi-Business Edition</small>
+                </div>
+            </div>
         </div>
         <ul class="nav-menu">
+            <li class="nav-section">
+                <span class="nav-section-title">DOCUMENTATION</span>
+            </li>
             <li><a href="#overview" class="nav-link active"><i class="fas fa-home"></i><span>Overview</span></a></li>
             <li><a href="#installation" class="nav-link"><i class="fas fa-download"></i><span>Installation</span></a></li>
             <li><a href="#getting-started" class="nav-link"><i class="fas fa-rocket"></i><span>Getting Started</span></a></li>
             <li><a href="#features" class="nav-link"><i class="fas fa-star"></i><span>Features</span></a></li>
+            <li><a href="#purchase-orders" class="nav-link"><i class="fas fa-shopping-cart"></i><span>Purchase Orders</span></a></li>
+            <li><a href="#multi-business" class="nav-link"><i class="fas fa-store"></i><span>Industry Support</span></a></li>
             <li><a href="#user-guide" class="nav-link"><i class="fas fa-book"></i><span>User Guide</span></a></li>
             <li><a href="#troubleshooting" class="nav-link"><i class="fas fa-tools"></i><span>Troubleshooting</span></a></li>
             <li><a href="#faq" class="nav-link"><i class="fas fa-question-circle"></i><span>FAQ</span></a></li>
@@ -621,18 +679,26 @@
     <main class="main-content">
         <!-- Content Header -->
         <div class="content-header">
-            <h1>BizFlow POS Documentation</h1>
-            <p class="lead">A comprehensive guide to installing, configuring, and using the BizFlow Point of Sale system.</p>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h1>BizFlow POS Documentation</h1>
+                    <p class="lead">Advanced multi-business point of sale system with enterprise features and purchase order management.</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary fs-6 px-3 py-2">v2.1.0</span>
+                    <div class="small text-muted mt-1">Multi-Business Edition</div>
+                </div>
+            </div>
             
             <div class="alert alert-info alert-enhanced" role="alert">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Latest Version:</strong> v1.0.0 | Last Updated: August 25, 2025
+                <i class="fas fa-rocket me-2"></i>
+                <strong>What's New in v2.1.0:</strong> Purchase Orders, Multi-Business Integration, Enhanced UI, Enterprise Features | Last Updated: August 30, 2025
             </div>
         </div>
 
         <section id="overview" class="section">
             <h2><i class="fas fa-home me-2"></i>About BizFlow POS</h2>
-            <p class="fs-5">BizFlow POS is a modern, user-friendly point of sale system designed for small to medium-sized businesses. It provides a complete solution for managing sales, inventory, and customer data in one integrated platform.</p>
+            <p class="fs-5">BizFlow POS is a versatile, industry-adaptive point of sale system designed for various business types including general merchants, water refilling stations, electronics stores, pharmacies, and more. It provides a complete solution tailored to your specific industry needs.</p>
             
             <h3>Key Benefits</h3>
             <div class="row g-4">
@@ -726,16 +792,13 @@
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2 mb-3">
-                                    <a class="btn btn-primary btn-enhanced" href="https://github.com/OnpointSoftwares/BizFlow/blob/main/BizFlow-POS-Windows-Installer.zip?raw=1" target="_blank" rel="noopener">
-                                        <i class="fas fa-download me-2"></i>Download Windows Installer (ZIP)
-                                    </a>
-                                    <a class="btn btn-outline-primary btn-enhanced" href="https://github.com/OnpointSoftwares/BizFlow/blob/main/BizFlow-POS-Portable.zip?raw=1" target="_blank" rel="noopener">
-                                        <i class="fas fa-box me-2"></i>Download Windows Portable (ZIP)
+                                    <a class="btn btn-primary btn-enhanced" href="https://github.com/OnpointSoftwares/BizFlow/raw/refs/heads/main/BizFlow-POS-Setup.exe" download>
+                                        <i class="fas fa-download me-2"></i>Download BizFlow POS Setup (EXE)
                                     </a>
                                 </div>
                                 <div class="small text-body-secondary">
-                                    <div class="mb-1"><i class="fas fa-file-archive me-2"></i><code>BizFlow-POS-Windows-Installer.zip</code> (PowerShell installer)</div>
-                                    <div><i class="fas fa-file-archive me-2"></i><code>BizFlow-POS-Portable.zip</code> (no install, run <code>run-windows.bat</code>)</div>
+                                    <div class="mb-1"><i class="fas fa-file me-2"></i><code>BizFlow-POS-Setup.exe</code> (Windows installer)</div>
+                                    <div class="text-muted">Simply download and run the installer - no additional setup required</div>
                                 </div>
                             </div>
                         </div>
@@ -755,9 +818,9 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <div class="small text-body-secondary">
-                                        <div class="mb-2"><i class="fas fa-box me-2"></i><code>bizflow-pos_1.0.0_all.deb</code> (Debian/Ubuntu package)</div>
-                                        <div><i class="fas fa-file-archive me-2"></i><code>BizFlow-POS-Linux-1.0.0.tar.gz</code> (portable + <code>install-linux.sh</code>)</div>
+                                    <div class="alert alert-warning alert-enhanced" role="alert">
+                                        <i class="fas fa-clock me-2"></i>
+                                        <strong>Coming Soon:</strong> Linux version is currently in development and will be available in the next release.
                                     </div>
                                 </div>
                             </div>
@@ -842,22 +905,16 @@
                             <h3 class="h5 mb-0"><i class="fab fa-windows me-2 text-primary"></i>Windows Installation</h3>
                         </div>
                         <div class="card-body">
-                            <h4 class="h6 text-success">Option A: Windows Installer (Recommended)</h4>
+                            <h4 class="h6 text-success">Simple Installation Process</h4>
                             <ol class="mb-3">
-                                <li>Download and extract <code>BizFlow-POS-Windows-Installer.zip</code></li>
-                                <li>Right-click PowerShell → Run as Administrator</li>
-                                <li>Navigate to extracted folder: <code>./install-windows.ps1</code></li>
-                                <li>Launch from Start Menu: <strong>BizFlow POS</strong></li>
+                                <li>Download <code>BizFlow-POS-Setup.exe</code> from the link above</li>
+                                <li>Run the installer as Administrator (right-click → "Run as administrator")</li>
+                                <li>Follow the installation wizard prompts</li>
+                                <li>Launch from Start Menu or Desktop shortcut: <strong>BizFlow POS</strong></li>
                             </ol>
                             
-                            <h4 class="h6 text-info">Option B: Portable (No Install)</h4>
-                            <ol class="mb-3">
-                                <li>Download and extract <code>BizFlow-POS-Portable.zip</code></li>
-                                <li>Double-click <code>run-windows.bat</code> to start</li>
-                            </ol>
-                            
-                            <div class="alert alert-warning alert-enhanced" role="alert">
-                                <small><i class="fas fa-exclamation-triangle me-1"></i>Installer copies to <code>C:\Program Files\BizFlow POS</code> and requires Java 11+ on PATH.</small>
+                            <div class="alert alert-info alert-enhanced" role="alert">
+                                <small><i class="fas fa-info-circle me-1"></i>The installer includes all required dependencies. No additional Java installation needed.</small>
                             </div>
                         </div>
                     </div>
@@ -870,20 +927,19 @@
                             <h3 class="h5 mb-0"><i class="fab fa-linux me-2 text-dark"></i>Linux Installation</h3>
                         </div>
                         <div class="card-body">
-                            <h4 class="h6 text-success">Option A: Debian/Ubuntu (.deb)</h4>
-                            <ol class="mb-3">
-                                <li>Install the <code>.deb</code> package:</li>
-                            </ol>
-                            <pre><code>sudo apt install ./bizflow-pos_1.0.0_amd64.deb</code></pre>
-                            <p class="small">Launch from Applications or run <code>bizflow-pos</code></p>
+                            <div class="alert alert-warning alert-enhanced" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock fs-4 me-3"></i>
+                                    <div>
+                                        <h4 class="h6 mb-1">Linux Version Coming Soon</h4>
+                                        <p class="mb-0 small">We're currently working on the Linux version of BizFlow POS v2.1.0. It will include all the latest features including purchase orders and multi-business support.</p>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <h4 class="h6 text-info">Option B: Portable TAR.GZ</h4>
-                            <pre><code>tar -xzf BizFlow-POS-Linux.tar.gz
-cd BizFlow-POS-Linux
-sudo ./install-linux.sh</code></pre>
-                            
-                            <div class="alert alert-info alert-enhanced" role="alert">
-                                <small><i class="fas fa-info-circle me-1"></i>Installs to <code>/opt/bizflow-pos</code> and creates desktop launcher.</small>
+                            <div class="text-center py-3">
+                                <i class="fab fa-linux text-muted" style="font-size: 4rem;"></i>
+                                <p class="text-muted mt-2">Stay tuned for updates!</p>
                             </div>
                         </div>
                     </div>
@@ -1096,6 +1152,225 @@ sudo ./install-linux.sh</code></pre>
                             <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Role-based access control</li>
                             <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Modern navigation with icons</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="purchase-orders" class="section">
+            <h2><i class="fas fa-shopping-cart me-2"></i>Purchase Orders</h2>
+            <p class="fs-5">BizFlow POS v2.1.0 introduces comprehensive purchase order management to streamline your procurement process and maintain optimal inventory levels.</p>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-plus-circle text-success fs-3"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5 mb-1">Create Purchase Orders</h3>
+                                    <p class="text-muted small mb-0">Generate orders from low stock alerts</p>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Auto-generate from reorder points</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Multi-supplier order management</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Bulk product selection</li>
+                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Custom order templates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-truck text-primary fs-3"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 class="h5 mb-1">Order Tracking</h3>
+                                    <p class="text-muted small mb-0">Monitor order status and deliveries</p>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Real-time status updates</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Delivery scheduling</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Partial receipt handling</li>
+                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Automated stock updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning bg-opacity-10 border-0">
+                    <h3 class="h5 mb-0"><i class="fas fa-clipboard-list me-2"></i>Purchase Order Workflow</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h4 class="h6 text-warning">Creating a Purchase Order</h4>
+                            <ol class="mb-3">
+                                <li>Navigate to <strong>Inventory</strong> > <strong>Purchase Orders</strong></li>
+                                <li>Click <strong>New Purchase Order</strong></li>
+                                <li>Select supplier from dropdown</li>
+                                <li>Add products manually or from low stock alerts</li>
+                                <li>Set quantities and expected delivery dates</li>
+                                <li>Review totals and submit order</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="h6 text-info">Receiving Orders</h4>
+                            <ol class="mb-3">
+                                <li>Go to <strong>Purchase Orders</strong> > <strong>Pending</strong></li>
+                                <li>Select order to receive</li>
+                                <li>Scan or manually enter received quantities</li>
+                                <li>Handle discrepancies if any</li>
+                                <li>Update costs if different from ordered</li>
+                                <li>Complete receipt to update inventory</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-success alert-enhanced mt-3" role="alert">
+                        <i class="fas fa-magic me-2"></i>
+                        <strong>Smart Features:</strong> Auto-reorder points, supplier performance tracking, and cost analysis help optimize your procurement process.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar text-primary fs-1 mb-3"></i>
+                            <h4 class="h6">Order Analytics</h4>
+                            <p class="text-muted small">Track supplier performance, delivery times, and cost trends</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-bell text-warning fs-1 mb-3"></i>
+                            <h4 class="h6">Smart Alerts</h4>
+                            <p class="text-muted small">Automated notifications for low stock, overdue orders, and price changes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-export text-success fs-1 mb-3"></i>
+                            <h4 class="h6">Export & Reports</h4>
+                            <p class="text-muted small">Generate purchase reports, export to Excel, and integrate with accounting</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="multi-business" class="section">
+            <h2><i class="fas fa-store me-2"></i>Multi-Industry Support</h2>
+            <p class="fs-5">BizFlow POS v2.1.0 adapts to various business industries, providing specialized features and workflows for different types of businesses from a single, flexible platform.</p>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h3 class="h5 mb-3"><i class="fas fa-cogs me-2 text-primary"></i>Industry-Specific Features</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>General Merchants:</strong> Full inventory, sales, and customer management</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Water Refilling:</strong> Volume-based pricing, container tracking</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Electronics:</strong> Serial number tracking, warranty management</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Pharmacy:</strong> Expiry date tracking, prescription management</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Restaurants:</strong> Table management, kitchen orders</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i><strong>Retail Stores:</strong> Size/color variants, seasonal pricing</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100 bg-primary bg-opacity-10">
+                        <div class="card-body p-4 text-center">
+                            <i class="fas fa-industry text-primary fs-1 mb-3"></i>
+                            <h4 class="h5">Industry Adaptive</h4>
+                            <p class="text-muted">Automatically adapts to your business type with specialized features and workflows</p>
+                            <div class="badge bg-primary px-3 py-2">New in v2.1.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-shopping-basket text-primary fs-1 mb-3"></i>
+                            <h4 class="h6">General Merchants</h4>
+                            <p class="text-muted small">Complete inventory management, customer loyalty programs, and multi-payment support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-tint text-info fs-1 mb-3"></i>
+                            <h4 class="h6">Water Refilling</h4>
+                            <p class="text-muted small">Volume-based pricing, container tracking, delivery scheduling, and quality monitoring</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-mobile-alt text-warning fs-1 mb-3"></i>
+                            <h4 class="h6">Electronics</h4>
+                            <p class="text-muted small">Serial number tracking, warranty management, repair services, and technical specifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-4 mt-2">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-pills text-success fs-1 mb-3"></i>
+                            <h4 class="h6">Pharmacy</h4>
+                            <p class="text-muted small">Prescription management, expiry date tracking, drug interactions, and regulatory compliance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-utensils text-danger fs-1 mb-3"></i>
+                            <h4 class="h6">Restaurants</h4>
+                            <p class="text-muted small">Table management, kitchen orders, menu customization, and staff scheduling</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-tshirt text-secondary fs-1 mb-3"></i>
+                            <h4 class="h6">Retail Stores</h4>
+                            <p class="text-muted small">Size/color variants, seasonal pricing, fashion trends, and customer preferences</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1752,3 +2027,4 @@ sudo ./install-linux.sh</code></pre>
     </script>
 </body>
 </html>
+{% endblock %}
