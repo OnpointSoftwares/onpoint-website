@@ -1,31 +1,165 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Admin Dashboard - OnPoint Software Solutions{% endblock %}</title>
+
+{% block title %}Admin Dashboard - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+  <style>
+    /* Admin-specific overrides */
+    body {
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --transition-base: all 0.2s ease-in-out;
+    }
     
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    /* Layout */
+    .admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg);
+    }
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    /* Sidebar */
+    #sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: var(--panel);
+      border-right: 1px solid var(--border-color);
+      transition: var(--transition-base);
+      z-index: var(--zindex-fixed);
+      overflow-y: auto;
+    }
     
-    <!-- Bootstrap 5.3 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    /* Content Area */
+    #content {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+      min-height: 100vh;
+      background: var(--bg);
+      transition: var(--transition-base);
+    }
     
-    {% block extra_css %}{% endblock %}
+    /* Header */
+    .admin-header {
+      height: var(--header-height);
+      background: var(--panel);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: var(--zindex-sticky);
+    }
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-</head>
-<body class="admin-dashboard">
+    /* Navigation */
+    .nav-link {
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      margin: 0.25rem 0.5rem;
+      transition: var(--transition-base);
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 107, 53, 0.1);
+      color: var(--primary);
+    }
+    
+    .nav-link i {
+      width: 24px;
+      text-align: center;
+      margin-right: 0.75rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: var(--transition-base);
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Tables */
+    .table {
+      color: var(--text);
+      --bs-table-bg: transparent;
+      --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+      --bs-table-hover-bg: rgba(255, 107, 53, 0.05);
+    }
+    
+    .table th {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      border-bottom-width: 1px;
+    }
+    
+    /* Forms */
+    .form-control, .form-select {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text);
+    }
+    
+    .form-control:focus, .form-select:focus {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+      color: var(--text);
+    }
+    
+    /* Buttons */
+    .btn-primary {
+      background: var(--grad);
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background: var(--grad-hover);
+      transform: translateY(-1px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 991.98px) {
+      #sidebar {
+        transform: translateX(-100%);
+      }
+      
+      #sidebar.show {
+        transform: translateX(0);
+      }
+      
+      #content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      body.sidebar-open #content::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: var(--zindex-modal-backdrop);
+      }
+    }
+  </style>
+  {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
     <div class="d-flex">
         <!-- Sidebar -->
         <nav id="sidebar" class="bg-dark text-white">
@@ -209,15 +343,6 @@
 
             <!-- Main Content -->
             <div class="container-fluid py-4">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
                 {% block content %}{% endblock %}
             </div>
         </div>

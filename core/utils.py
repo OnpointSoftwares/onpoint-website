@@ -4,14 +4,14 @@ import mimetypes
 from io import BytesIO
 from urllib.parse import urlparse
 
-import PyPDF2
+from pypdf import PdfReader
 from django.core.files import File
 from django.core.exceptions import ValidationError
 
 def extract_text_from_pdf(file):
     """Extract text content from a PDF file."""
     try:
-        pdf_reader = PyPDF2.PdfReader(file)
+        pdf_reader = PdfReader(file)
         text = ""
         for page in pdf_reader.pages:
             text += page.extract_text() + "\n"

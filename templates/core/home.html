@@ -6,8 +6,8 @@
   <div class="container py-5">
     <div class="row align-items-center py-5">
       <div class="col-lg-6" data-aos="fade-up">
-        <h1 class="display-4 fw-extrabold mb-3">Design. Build. Ship.</h1>
-        <p class="lead text-secondary mb-4">Innovating Your Digital Future — Custom Software, Websites, Mobile Apps, and Expert GitHub README craft.</p>
+        <h1 class="display-4 fw-extrabold mb-3">Innovating the Future of Technology</h1>
+        <p class="lead text-secondary mb-4">We build cutting-edge software solutions that drive growth and efficiency. From sleek mobile apps to powerful web platforms, we bring your vision to life.</p>
         <div class="d-flex gap-3">
           <a href="/contact-us/" class="btn btn-gradient btn-lg">Get Started</a>
           <a href="#services" class="btn btn-outline-light btn-lg">Our Services</a>
@@ -23,12 +23,6 @@
     <div class="row text-center mt-4" data-aos="fade-up">
       <div class="col-6 col-md-3">
         <div class="stat">
-          <div class="h2 fw-bold" data-counter data-target="{{ stats.years_experience }}">{{ stats.years_experience }}</div>
-          <div class="text-secondary small">Years Experience</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="stat">
           <div class="h2 fw-bold" data-counter data-target="{{ stats.projects_delivered }}">{{ stats.projects_delivered }}</div>
           <div class="text-secondary small">Projects Delivered</div>
         </div>
@@ -40,10 +34,7 @@
         </div>
       </div>
       <div class="col-6 col-md-3">
-        <div class="stat">
-          <div class="h2 fw-bold" data-counter data-target="{{ stats.team_members }}">{{ stats.team_members }}</div>
-          <div class="text-secondary small">Team Members</div>
-        </div>
+        
       </div>
     </div>
   </div>
@@ -58,10 +49,6 @@
             <div class="about-image rounded-4 overflow-hidden">
               <img src="{% static 'images/about-us.jpg' %}" 
                    alt="Our Team" class="img-fluid w-100">
-            </div>
-            <div class="experience-badge bg-primary text-white rounded-pill py-2 px-4 position-absolute bottom-0 start-0 m-4">
-              <span class="h4 mb-0">7+</span>
-              <div class="small">Years Experience</div>
             </div>
           </div>
         </div>
@@ -105,6 +92,29 @@
       </div>
     </div>
   </section>
+
+<!-- Featured Product -->
+<section id="featured-product" class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6" data-aos="fade-right">
+        <h6 class="text-uppercase text-primary mb-3">Featured Product</h6>
+        <h2 class="display-5 fw-bold text-white mb-4">BizFlow POS</h2>
+        <p class="text-secondary mb-4">A powerful, intuitive Point of Sale system designed to streamline your business operations. Manage sales, inventory, and customers with ease.</p>
+        <ul class="list-unstyled text-light mb-4">
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Real-time Sales Tracking</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Inventory Management</li>
+          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Customer Relationship Management</li>
+        </ul>
+        <a href="{% url 'bizflow_pos_docs' %}" class="btn btn-gradient btn-lg">Learn More</a>
+      </div>
+      <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
+        <img src="{% static 'images/bizflow-mockup.png' %}" alt="BizFlow POS Mockup" class="img-fluid rounded-4 shadow-lg">
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Services -->
 <section id="services" class="py-5">
   <div class="container">
@@ -174,100 +184,73 @@
   </div>
 </section>
 
-<!-- Price Calculator -->
+<!-- Pricing Section -->
 <section id="pricing" class="py-5 bg-black-50">
-      <div class="container">
+  <div class="container">
     <div class="text-center mb-5" data-aos="fade-up">
       <h6 class="text-uppercase text-primary mb-3">Pricing</h6>
-      <h2 class="text-white mb-4">Estimate Your Project Cost</h2>
-      <p class="text-light mb-4">Use our calculator to get an instant quote for your project</p>
+      <h2 class="text-white mb-4">Flexible Plans for Every Need</h2>
+      <p class="text-light mb-4">Choose a plan that works for you. All prices are estimates.</p>
     </div>
-    
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card glass p-4">
-          <div class="row g-4">
-            <div class="col-md-6">
-              <div class="mb-4">
-                <label class="form-label text-light">Project Type</label>
-                <select class="form-select" id="projectType">
-                  <option value="website">Website Development</option>
-                  <option value="webapp">Web Application</option>
-                  <option value="mobile">Mobile App</option>
-                  <option value="ecommerce">E-commerce</option>
-                  <option value="custom">Custom Software</option>
-                </select>
-              </div>
-              
-              <div class="mb-4">
-                <label class="form-label text-light">Number of Pages</label>
-                <input type="range" class="form-range" min="1" max="50" value="5" id="pageCount">
-                <div class="d-flex justify-content-between">
-                  <span class="text-light small">1-5</span>
-                  <span class="text-light small">50+</span>
-                </div>
-                <div class="text-center mt-2">
-                  <span class="badge bg-primary"><span id="pageCountValue">5</span> Pages</span>
-                </div>
-              </div>
-              
-              <div class="mb-4">
-                <label class="form-label text-light">Design Complexity</label>
-                <select class="form-select" id="designComplexity">
-                  <option value="basic">Basic (Template-based)</option>
-                  <option value="standard" selected>Standard (Semi-custom)</option>
-                  <option value="premium">Premium (Fully Custom)</option>
-                </select>
-              </div>
+    <div class="row g-4 justify-content-center">
+      <!-- Basic Plan -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up">
+        <div class="card pricing-card h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-white">Basic Website</h5>
+            <p class="text-secondary">For personal sites or small businesses.</p>
+            <div class="price-tag mb-3">
+              <span class="fs-2 fw-bold">KES 5,000</span>
             </div>
-            
-            <div class="col-md-6">
-              <div class="mb-4">
-                <label class="form-label text-light">Features</label>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" value="" id="featureSeo">
-                  <label class="form-check-label text-light" for="featureSeo">
-                    SEO Optimization
-                  </label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" value="" id="featureResponsive">
-                  <label class="form-check-label text-light" for="featureResponsive">
-                    Responsive Design
-                  </label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" value="" id="featureCms">
-                  <label class="form-check-label text-light" for="featureCms">
-                    Content Management
-                  </label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" value="" id="featureEcommerce">
-                  <label class="form-check-label text-light" for="featureEcommerce">
-                    E-commerce Functionality
-                  </label>
-                </div>
-              </div>
-              
-              <div class="p-4 bg-dark-soft rounded-3">
-                <h5 class="text-white mb-3">Estimated Cost</h5>
-                <div class="d-flex align-items-center mb-2">
-                  <span class="me-2 text-light">Total:</span>
-                  <h3 class="text-gradient mb-0">
-                    <span id="totalCost">
-                      KES 12,750
-                      <small class="text-success d-block mt-1">
-                        <i class="bi bi-stars me-1"></i> 15% startup discount applied
-                      </small>
-                    </span>
-                  </h3>
-                </div>
-                <p class="small text-muted mb-0">This is an estimate. Contact us for a detailed quote.</p>
-              </div>
-              
-              <button class="btn btn-gradient w-100 mt-4" id="getQuoteBtn">Get Detailed Quote</button>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>1-5 Pages</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Template-Based Design</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Responsive Layout</li>
+            </ul>
+          </div>
+          <div class="card-footer bg-transparent border-0 p-4 pt-0">
+            <a href="/contact-us/" class="btn btn-outline-light w-100">Get Started</a>
+          </div>
+        </div>
+      </div>
+      <!-- Pro Plan -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="card pricing-card h-100 popular">
+          <div class="card-body p-4">
+            <div class="popular-badge">Most Popular</div>
+            <h5 class="card-title text-white">Web Application</h5>
+            <p class="text-secondary">For dynamic sites and business applications.</p>
+            <div class="price-tag mb-3">
+              <span class="fs-2 fw-bold">from KES 25,000</span>
             </div>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Custom Features</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Database Integration</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>User Authentication</li>
+            </ul>
+          </div>
+          <div class="card-footer bg-transparent border-0 p-4 pt-0">
+            <a href="/contact-us/" class="btn btn-gradient w-100">Get a Quote</a>
+          </div>
+        </div>
+      </div>
+      <!-- Enterprise Plan -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="card pricing-card h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title text-white">Custom Solution</h5>
+            <p class="text-secondary">For large-scale or unique projects.</p>
+            <div class="price-tag mb-3">
+              <span class="fs-2 fw-bold">from KES 75,000</span>
+            </div>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Full Custom Development</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated Support</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Scalable Architecture</li>
+            </ul>
+          </div>
+          <div class="card-footer bg-transparent border-0 p-4 pt-0">
+            <a href="/contact-us/" class="btn btn-outline-light w-100">Contact Us</a>
           </div>
         </div>
       </div>
@@ -275,96 +258,8 @@
   </div>
 </section>
 
-<!-- Sample Coding Challenges -->
-<section id="coding-challenges" class="py-5">
-  <div class="container">
-    <div class="text-center mb-4" data-aos="fade-up">
-      <h6 class="text-uppercase text-primary mb-2">Practice</h6>
-      <h2 class="text-white mb-0">Sample Coding Challenges</h2>
-    </div>
-    <div class="row g-4 mt-1">
-      {% for ch in sample_challenges %}
-      <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}0">
-        <div class="card h-100 border-0 bg-dark-100 hover-shadow transition-all">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <h5 class="card-title text-muted mb-0">{{ ch.title }}</h5>
-              <span class="badge {% if ch.difficulty == 'easy' %}bg-success{% elif ch.difficulty == 'medium' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                {{ ch.get_difficulty_display }}
-              </span>
-            </div>
-            <p class="card-text text-muted mb-3">{{ ch.problem_statement|truncatewords:28 }}</p>
-            {% if ch.tags.all %}
-            <div class="mb-3">
-              {% for tag in ch.tags.all|slice:':3' %}
-                <span class="badge bg-primary me-1">{{ tag.name }}</span>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-          <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="{% url 'coding_challenges:challenge_detail' ch.slug %}" class="btn btn-outline-dark">
-              Try Challenge
-              <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center py-5">
-        <i class="bi bi-code-square display-1 text-muted mb-3"></i>
-        <h4>No challenges yet</h4>
-        <p class="text-muted">We’ll add sample coding challenges soon.</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-  
-</section>
 
-<!-- Featured Courses -->
-<section id="featured-courses" class="py-5 bg-black-50">
-  <div class="container">
-    <div class="text-center mb-4" data-aos="fade-up">
-      <h6 class="text-uppercase text-primary mb-2">Learn</h6>
-      <h2 class="text-white mb-0">Featured LMS Courses</h2>
-    </div>
-    <div class="row g-4 mt-1">
-      {% for course in sample_courses %}
-      <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}0">
-        <div class="card h-100 border-0 bg-dark-100 hover-shadow transition-all">
-          {% if course.image %}
-          <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
-          {% else %}
-          <div class="ratio ratio-16x9 bg-dark d-flex align-items-center justify-content-center">
-            <img src="/static/img/course-placeholder.svg" alt="No image available" class="img-fluid p-4 opacity-75" style="object-fit: contain;">
-          </div>
-          {% endif %}
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <h5 class="card-title text-muted mb-0">{{ course.title }}</h5>
-              <span class="badge bg-info text-dark">{{ course.get_difficulty_display }}</span>
-            </div>
-            <p class="card-text text-muted">{{ course.description|truncatewords:24 }}</p>
-          </div>
-          <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="{% url 'lms:course_detail' course.slug %}" class="btn btn-outline-dark">
-              View Course
-              <i class="bi bi-arrow-right ms-2"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center py-5">
-        <i class="bi bi-mortarboard display-1 text-muted mb-3"></i>
-        <h4>No courses yet</h4>
-        <p class="text-muted">We’ll add sample LMS courses soon.</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+
 
 <!-- Portfolio -->
 <section id="portfolio" class="py-5 bg-black-50">
@@ -475,54 +370,6 @@
   </div>
 </section>
 
-<!-- Latest Articles -->
-<section id="articles" class="py-5">
-  <div class="container">
-    <div class="text-center mb-5" data-aos="fade-up">
-      <h6 class="text-uppercase text-primary mb-3">Our Blog</h6>
-      <h2 class="text-white mb-4">Latest Articles</h2>
-      <p class="lead text-muted mx-auto" style="max-width: 700px;">Stay updated with our latest insights, tutorials, and industry news.</p>
-    </div>
-    
-    <div class="row g-4">
-      {% for article in latest_articles %}
-      <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}">
-        <div class="card h-100 border-0 bg-dark-100 hover-shadow transition-all">
-          <div class="position-relative">
-            <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}">
-            <div class="position-absolute top-0 end-0 m-3">
-              <span class="badge bg-primary">{{ article.created_at|date:"M d" }}</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title text-white">{{ article.title }}</h5>
-            <p class="card-text text-muted">{{ article.short_description|truncatewords:20 }}</p>
-          </div>
-          <div class="card-footer bg-transparent border-0 pt-0">
-            <a href="{% url 'article_detail_by_slug' article.slug %}" class="btn btn-link px-0">
-              Read More <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col-12 text-center py-5">
-        <i class="bi bi-newspaper display-1 text-muted mb-3"></i>
-        <h4>No articles yet</h4>
-        <p class="text-muted">Check back soon for our latest articles and updates.</p>
-      </div>
-      {% endfor %}
-    </div>
-    
-    {% if latest_articles %}
-    <div class="text-center mt-5" data-aos="fade-up">
-      <a href="{% url 'article_list' %}" class="btn btn-outline-light">
-        View All Articles <i class="bi bi-arrow-right ms-2"></i>
-      </a>
-    </div>
-    {% endif %}
-  </div>
-</section>
 {% endblock %}
 
 {% block extra_js %}

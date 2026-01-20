@@ -21,7 +21,7 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.urls import reverse
-import google.generativeai as genai
+import google.genai as genai
 import os
 import json
 from datetime import timedelta
@@ -42,7 +42,7 @@ def get_gemini_chat():
             return None
             
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
         chat = model.start_chat(history=[])
         
         CHAT_INSTRUCTIONS = """
@@ -295,55 +295,6 @@ def chat_api(request):
             'status': 'error'
         }, status=500)
 
-# Configure Gemini API
-try:
-    genai.configure(api_key="AIzaSyBXVv3tklwuNRpH82WbP-bLyNAVQA-kvYo")
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    chat = model.start_chat(history=[])
-    CHAT_INSTRUCTIONS = """
-    You are OnPoint Software's AI assistant. You help users with information about OnPoint Software's services and pricing.
-    
-    About OnPoint Software:
-    - Custom software development
-    - Website design & development
-    - Mobile app development
-    - GitHub README writing & editing
-    - 7+ years of experience
-    
-    Service Pricing (in Kenyan Shillings):
-    
-    Base Project Prices:
-    - Basic Website: KES 5,000 (1-5 pages)
-    - Web Application: Starting from KES 25,000
-    - Mobile App: Starting from KES 40,000
-    - E-commerce: Starting from KES 60,000
-    - Custom Software: Starting from KES 75,000
-    
-    Design Complexity Multipliers:
-    - Basic (Template-based): 1x base price
-    - Standard (Semi-custom): 1.5x base price
-    - Premium (Fully Custom): 2.5x base price
-    
-    Additional Features (Add-ons):
-    - SEO Optimization: +KES 5,000
-    - Responsive Design: +KES 3,000
-    - Content Management System: +KES 10,000
-    - E-commerce Functionality: +KES 15,000
-    
-    Note: All prices are in Kenyan Shillings (KES) and include a 15% startup discount.
-    
-    Be helpful, professional, and concise in your responses.
-    If you don't know an answer, say you'll have someone from the team contact them.
-    When discussing pricing, always mention that final quotes may vary based on specific project requirements.
-    """
-    
-    # Initialize chat with instructions
-    chat.send_message(CHAT_INSTRUCTIONS)
-    
-except Exception as e:
-    print(f"Error initializing Gemini: {e}")
-    model = None
-    chat = None
 
 # Duplicate home function removed - using the first home function with projects
 

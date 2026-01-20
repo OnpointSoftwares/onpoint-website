@@ -1,14 +1,59 @@
-:root{
-    --primary: #FF6B35;
-    --secondary: #FF4444;
-    --accent: #FF4444;
-    --success: #2E7D32;
-    --bg: #0A0F1E;
-    --panel: #121C36;
-    --muted: #94A3B8;
-    --grad: linear-gradient(135deg, var(--secondary), var(--primary));
-    --text: #E2E8F0;
-  }
+:root {
+  /* Color System */
+  --primary: #007BFF;
+  --primary-hover: #0056b3;
+  --secondary: #4DD0E1;
+  --accent: #4DD0E1;
+  --success: #2E7D32;
+  --info: #0288D1;
+  --warning: #ED6C02;
+  --danger: #D32F2F;
+  --light: #f8f9fa;
+  --dark: #212529;
+  
+  /* Theme Colors */
+  --bg: #0A0F1E;
+  --panel: #121C36;
+  --card-bg: rgba(18, 28, 54, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --muted: #94A3B8;
+  --text: #E2E8F0;
+  --text-muted: #6c757d;
+  
+  /* Gradients */
+  --grad: linear-gradient(135deg, var(--secondary), var(--primary));
+  --grad-hover: linear-gradient(135deg, #26c6da, #0056b3);
+  
+  /* Spacing */
+  --spacer: 1rem;
+  --border-radius: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-sm: 0.25rem;
+  
+  /* Typography */
+  --font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  
+  /* Shadows */
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --shadow-primary: 0 0 15px rgba(255, 107, 53, 0.3);
+  
+  /* Transitions */
+  --transition-base: all 0.2s ease-in-out;
+  --transition-fade: opacity 0.15s linear;
+  --transition-collapse: height 0.35s ease;
+  
+  /* Z-index */
+  --zindex-dropdown: 1000;
+  --zindex-sticky: 1020;
+  --zindex-fixed: 1030;
+  --zindex-modal-backdrop: 1040;
+  --zindex-modal: 1050;
+  --zindex-popover: 1060;
+  --zindex-tooltip: 1070;
+}
   
 body {
   background: var(--bg);

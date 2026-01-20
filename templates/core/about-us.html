@@ -1,95 +1,70 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %}About Us - OnPoint Software Solutions{% endblock %}
+
 {% block content %}
-<section id="about" class="py-5 bg-black-50">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-                <div class="position-relative">
-                    <div class="about-image rounded-4 overflow-hidden">
-                        <img src="{% static 'images/about-us.jpg' %}" 
-                             alt="Our Team" class="img-fluid w-100">
-                    </div>
-                    <div class="experience-badge bg-primary text-white rounded-pill py-2 px-4 position-absolute bottom-0 start-0 m-4">
-                        <span class="h4 mb-0">7+</span>
-                        <div class="small">Years Experience</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
-                <h6 class="text-uppercase text-primary mb-3">About Us</h6>
-                <h2 class="mb-4 text-white">Innovating the Future of Technology Solutions</h2>
-                <p class="text-light mb-4">
-                    At OnPoint Software Solutions, we're passionate about delivering cutting-edge technology solutions that drive business growth. 
-                    Our team of experts combines creativity with technical excellence to build software that makes a difference.
-                </p>
-                <p class="text-light mb-4">
-                    With over 7 years of industry experience, we've helped numerous businesses transform their digital presence and achieve their goals. 
-                    Our approach combines innovative thinking with practical solutions to deliver exceptional results.
-                </p>
-                
-                <div class="row g-4 mb-4">
-                    <div class="col-sm-6">
-                        <div class="d-flex">
-                            <div class="me-3">
-                                <div class="icon-wrap">
-                                    <i class="bi bi-lightbulb"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <h5 class="h6 mb-2">Our Mission</h5>
-                                <p class="small text-light mb-0">To empower businesses through innovative and reliable technology solutions.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="d-flex">
-                            <div class="me-3">
-                                <div class="icon-wrap">
-                                    <i class="bi bi-eye"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <h5 class="h6 mb-2">Our Vision</h5>
-                                <p class="small text-light mb-0">To be the most trusted technology partner for businesses worldwide.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="mt-4">
-                    <a href="#contact" class="btn btn-gradient me-3">Get in Touch</a>
-                    <a href="#" class="btn btn-outline-light">Learn More</a>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- About Us Hero -->
+<section class="hero-section position-relative overflow-hidden text-center py-5">
+  <div class="container py-5">
+    <h1 class="display-4 fw-extrabold mb-3" data-aos="fade-up">About OnPoint</h1>
+    <p class="lead text-secondary mb-4 mx-auto" style="max-width: 800px;" data-aos="fade-up" data-aos-delay="100">We are a passionate team of developers, designers, and strategists dedicated to innovating the future of technology.</p>
+  </div>
+  <div class="hero-bg-gradient"></div>
 </section>
-<section class="founder-section py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-                <div class="founder-image rounded-4 overflow-hidden">
-                    <img src="{% static 'images/founder.png' %}" alt="Founder" class="img-fluid">
-                </div>
-            </div>
-            <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
-                <h6 class="text-uppercase text-primary mb-3">Founder</h6>
-                <h2 class="mb-4 text-white">Meet Our Founder</h2>
-                <p class="text-light mb-4">
-                    Our founder, Vincent Bett, has over 5 years of experience in the technology industry. 
-                    He is a passionate advocate for innovation and is dedicated to helping businesses succeed.
-                </p>
-                <p class="text-light mb-4">
-                    With a deep understanding of the latest trends and technologies, Vincent Bett brings a unique perspective to our team. 
-                    His expertise and leadership have been instrumental in driving our company's growth and success.
-                </p>
-                <div class="mt-4">
-                    <a href="#contact" class="btn btn-gradient me-3">Get in Touch</a>
-                    <a href="#" class="btn btn-outline-light">Learn More</a>
-                </div>
-            </div>
+
+<!-- Our Story & Values -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6" data-aos="fade-right">
+        <h2 class="section-title mb-4">Our Story</h2>
+        <p class="text-secondary">Founded by Vincent Bett, OnPoint Software Solutions started with a simple mission: to empower businesses with technology that is both powerful and easy to use. From a small team of passionate developers, we have grown into a full-service digital agency serving clients worldwide. Our journey is one of continuous learning, innovation, and a relentless commitment to our clients' success.</p>
+        <h3 class="h4 text-white mt-5 mb-4">Our Core Values</h3>
+        <div class="d-flex flex-column gap-3">
+          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-lightbulb"></i></div><div><h6 class="text-white mb-1">Innovation</h6><p class="text-secondary small mb-0">We constantly explore new technologies and ideas to deliver cutting-edge solutions.</p></div></div>
+          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-people"></i></div><div><h6 class="text-white mb-1">Customer-Centric</h6><p class="text-secondary small mb-0">Our clients are at the heart of everything we do. We build partnerships based on trust and transparency.</p></div></div>
+          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-gem"></i></div><div><h6 class="text-white mb-1">Quality</h6><p class="text-secondary small mb-0">We are committed to the highest standards of quality in our code, design, and service.</p></div></div>
         </div>
+      </div>
+      <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
+        <img src="{% static 'images/about-us.jpg' %}" alt="Our Team in a meeting" class="img-fluid rounded-4 shadow-lg">
+      </div>
     </div>
+  </div>
 </section>
+
+
+<!-- Company Timeline -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title text-center mb-5" data-aos="fade-up">Our Journey</h2>
+    <div class="timeline">
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-content">
+          <h5 class="text-white">2018 - The Beginning</h5>
+          <p class="text-secondary small">OnPointsoft Solutions is founded with the goal of making high-quality software accessible to businesses of all sizes.</p>
+        </div>
+      </div>
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-content">
+          <h5 class="text-white">2020 - First Major Product</h5>
+          <p class="text-secondary small">We launch BizFlow POS, our flagship Point of Sale system, helping retail businesses streamline their operations.</p>
+        </div>
+      </div>
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-content">
+          <h5 class="text-white">2022 - Expanding Services</h5>
+          <p class="text-secondary small">Our services grow to include mobile app development and professional GitHub README writing.</p>
+        </div>
+      </div>
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-content">
+          <h5 class="text-white">Today - Innovating the Future</h5>
+          <p class="text-secondary small">We continue to push the boundaries of technology, helping our clients navigate the digital landscape with confidence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
