@@ -20,19 +20,6 @@
       </div>
     </div>
 
-    <div class="row text-center mt-4" data-aos="fade-up">
-      <div class="col-6 col-md-3">
-        <div class="stat">
-          <div class="h2 fw-bold" data-counter data-target="{{ stats.projects_delivered }}">{{ stats.projects_delivered }}</div>
-          <div class="text-secondary small">Projects Delivered</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="stat">
-          <div class="h2 fw-bold" data-counter data-target="{{ stats.client_satisfaction }}">{{ stats.client_satisfaction }}</div>
-          <div class="text-secondary small">Client Satisfaction (%)</div>
-        </div>
-      </div>
       <div class="col-6 col-md-3">
         
       </div>
@@ -41,7 +28,7 @@
   <div class="hero-bg-gradient"></div>
 </section>
 <!-- About Us -->
-<section id="about" class="py-5 bg-black-50">
+<section id="about" class="py-5 bg-dark">
     <div class="container">
       <div class="row align-items-center">
         <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
@@ -116,7 +103,7 @@
 </section>
 
 <!-- Services -->
-<section id="services" class="py-5">
+<section id="services" class="py-5 bg-dark">
   <div class="container">
     <h2 class="section-title" data-aos="fade-up">Our Services</h2>
     <div class="row g-4 mt-1">
@@ -185,15 +172,14 @@
 </section>
 
 <!-- Pricing Section -->
-<section id="pricing" class="py-5 bg-black-50">
+<!--<section id="pricing" class="py-5 bg-primary">
   <div class="container">
     <div class="text-center mb-5" data-aos="fade-up">
       <h6 class="text-uppercase text-primary mb-3">Pricing</h6>
-      <h2 class="text-white mb-4">Flexible Plans for Every Need</h2>
+      <h2 class="text-dark mb-4">Flexible Plans for Every Need</h2>
       <p class="text-light mb-4">Choose a plan that works for you. All prices are estimates.</p>
     </div>
     <div class="row g-4 justify-content-center">
-      <!-- Basic Plan -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up">
         <div class="card pricing-card h-100">
           <div class="card-body p-4">
@@ -213,7 +199,7 @@
           </div>
         </div>
       </div>
-      <!-- Pro Plan -->
+   
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
         <div class="card pricing-card h-100 popular">
           <div class="card-body p-4">
@@ -234,7 +220,6 @@
           </div>
         </div>
       </div>
-      <!-- Enterprise Plan -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
         <div class="card pricing-card h-100">
           <div class="card-body p-4">
@@ -257,11 +242,7 @@
     </div>
   </div>
 </section>
-
-
-
-
-<!-- Portfolio -->
+-->
 <section id="portfolio" class="py-5 bg-black-50">
   <div class="container">
     <h2 class="section-title" data-aos="fade-up">Portfolio</h2>
@@ -322,54 +303,7 @@
   </div>
 </section>
 
-<!-- Testimonials -->
-<section id="testimonials" class="py-5">
-  <div class="container">
-    <h2 class="section-title" data-aos="fade-up">What Clients Say</h2>
-    <div class="swiper mt-3" data-aos="fade-up">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide">
-          <div class="testimonial-card">
-            <p class="mb-3">“OnPoint delivered beyond expectations. The app is fast and beautifully designed.”</p>
-            <div class="d-flex align-items-center gap-2">
-              <div class="avatar"></div>
-              <div>
-                <div class="fw-semibold">Jane Kimani</div>
-                <div class="small text-secondary">Product Manager, FinTech Co.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="swiper-slide">
-          <div class="testimonial-card">
-            <p class="mb-3">“Great communication and superb code quality. Highly recommended.”</p>
-            <div class="d-flex align-items-center gap-2">
-              <div class="avatar"></div>
-              <div>
-                <div class="fw-semibold">Jakes Kipkemoi</div>
-                <div class="small text-secondary">CTO, HealthTech</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="swiper-slide">
-          <div class="testimonial-card">
-            <p class="mb-3">“Our website conversions increased by 40% after the redesign.”</p>
-            <div class="d-flex align-items-center gap-2">
-              <div class="avatar"></div>
-              <div>
-                <div class="fw-semibold">Mary Kamau</div>
-                <div class="small text-secondary">Founder, EduStart</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="swiper-pagination"></div>
-    </div>
-  </div>
-</section>
-
+        
 {% endblock %}
 
 {% block extra_js %}

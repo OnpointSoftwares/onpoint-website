@@ -12,8 +12,8 @@
   --dark: #212529;
   
   /* Theme Colors */
-  --bg: #0A0F1E;
-  --panel: #121C36;
+  --bg: var(--light);
+  --panel: var(--primary);
   --card-bg: rgba(18, 28, 54, 0.6);
   --border-color: rgba(255, 255, 255, 0.1);
   --muted: #94A3B8;
