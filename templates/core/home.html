@@ -1,124 +1,435 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
-<!-- Hero -->
-<section class="hero-section position-relative overflow-hidden" id="hero">
-  <div class="container py-5">
-    <div class="row align-items-center py-5">
-      <div class="col-lg-6" data-aos="fade-up">
-        <h1 class="display-4 fw-extrabold mb-3">Innovating the Future of Technology</h1>
-        <p class="lead text-secondary mb-4">We build cutting-edge software solutions that drive growth and efficiency. From sleek mobile apps to powerful web platforms, we bring your vision to life.</p>
-        <div class="d-flex gap-3">
-          <a href="/contact-us/" class="btn btn-gradient btn-lg">Get Started</a>
-          <a href="#services" class="btn btn-outline-light btn-lg">Our Services</a>
-        </div>
-      </div>
-      <div class="col-lg-6" data-aos="fade-left">
-        <div class="hero-graphic rounded-4">
-            <img src="{% static 'images/hero-image.jpg' %}" alt="Hero Graphic" class="img-fluid">
-        </div>
-      </div>
-    </div>
+<!-- Hero Section - Conversion Focused -->
+<section class="hero-section position-relative overflow-hidden bg-gradient-primary" id="hero">
+  <div class="container py-4 py-md-5 px-3 px-md-4">
+    <div class="row align-items-center py-3 py-md-5 my-lg-5">
+      <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-up">
+        <!-- Trust Badge -->
 
-      <div class="col-6 col-md-3">
         
+        <!-- Compelling Headline -->
+        <h1 class="display-4 display-md-3 display-lg-2 fw-extrabold mb-3 mb-md-4 text-white lh-1">
+          Custom Software That Drives Real Business Results
+        </h1>
+        
+        <!-- Clear Value Proposition -->
+        <p class="lead mb-3 mb-md-4 text-white fs-5 fs-md-4" style="opacity: 0.95;">
+          We build scalable, high-performance software solutions that help businesses automate processes, increase revenue, and stay ahead of the competition.
+        </p>
+        
+        <!-- Strong CTAs -->
+        <div class="d-flex gap-2 gap-md-3 flex-column flex-sm-row mb-4 mb-md-5">
+          <a href="/contact-us/" class="btn btn-light btn-lg px-4 px-md-5 py-2 py-md-3 shadow-lg fw-bold w-100 w-sm-auto">
+            <i class="bi bi-calendar-check me-2"></i>Book a Free Consultation
+          </a>
+          <a href="#portfolio" class="btn btn-outline-light btn-lg px-4 px-md-5 py-2 py-md-3 fw-semibold w-100 w-sm-auto">
+            View Our Work <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="d-flex gap-3 gap-md-4 flex-column flex-sm-row flex-wrap">
+          <div class="text-white">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+              <span class="fw-semibold">No upfront payment</span>
+            </div>
+          </div>
+          <div class="text-white">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+              <span class="fw-semibold">Free project consultation</span>
+            </div>
+          </div>
+          <div class="text-white">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+              <span class="fw-semibold">Money-back guarantee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left" data-aos-delay="200">
+        <!-- Hero Visual with Stats Overlay -->
+        <div class="position-relative">
+          <div class="hero-graphic rounded-4 shadow-lg overflow-hidden">
+            <img src="{% static 'images/hero-image.jpg' %}" alt="Custom Software Development" class="img-fluid w-100">
+          </div>
+          
+          <!-- Floating Stats Cards -->
+          <div class="d-none d-lg-block position-absolute top-0 start-0 translate-middle-y ms-3" style="margin-top: 20%;">
+            <div class="card border-0 shadow-lg" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+              
+            </div>
+          </div>
+          
+          <div class="d-none d-md-block position-absolute bottom-0 end-0 translate-middle-y me-3" style="margin-bottom: 20%;">
+            <div class="card border-0 shadow-lg" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-secondary rounded-circle p-3">
+                    <i class="bi bi-star-fill text-white fs-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="mb-0 fw-bold text-secondary">98%</h3>
+                    <p class="mb-0 small text-dark">Client Satisfaction</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="hero-bg-gradient"></div>
+  
+  <!-- Decorative Elements -->
+  <div class="position-absolute bottom-0 start-0 w-100" style="height: 100px; background: linear-gradient(to top, rgba(255,255,255,0.1), transparent);"></div>
 </section>
-<!-- About Us -->
-<section id="about" class="py-5 bg-dark">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-          <div class="position-relative">
-            <div class="about-image rounded-4 overflow-hidden">
-              <img src="{% static 'images/about-us.jpg' %}" 
-                   alt="Our Team" class="img-fluid w-100">
+<!-- Why Choose Us Section -->
+<section id="why-choose-us" class="py-4 py-md-5 bg-white">
+    <div class="container py-3 py-md-5 px-3 px-md-4">
+      <!-- Section Header -->
+      <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+        <div class="badge bg-primary text-white mb-3 px-3 py-2">
+          <i class="bi bi-shield-check me-2"></i>Why Choose OnPoint
+        </div>
+        <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">Your Success Is Our Priority</h2>
+        <p class="lead text-dark mx-auto" style="max-width: 700px;">
+          We don't just build software—we build partnerships. Here's why businesses trust us with their most critical projects.
+        </p>
+      </div>
+
+      <!-- Benefits Grid -->
+      <div class="row g-3 g-md-4 mb-4 mb-md-5">
+        <!-- Benefit 1 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="bg-primary bg-opacity-10 rounded-circle p-3 p-md-4 d-inline-flex mb-3">
+                <i class="bi bi-lightning-charge-fill text-primary fs-2 fs-md-1"></i>
+              </div>
+              <h5 class="fw-bold text-muted mb-3">Fast Delivery</h5>
+              <p class="text-light mb-0">We deliver projects 30% faster than industry average without compromising quality.</p>
             </div>
           </div>
         </div>
-        <div class="col-lg-6 ps-lg-5" data-aos="fade-left">
-          <h6 class="text-uppercase text-primary mb-3">About Us</h6>
-          
-          <div class="row g-4 mb-4">
-            <div class="col-sm-6">
-              <div class="d-flex">
-                <div class="me-3">
-                  <div class="icon-wrap">
-                    <i class="bi bi-lightbulb"></i>
-                  </div>
-                </div>
-                <div>
-                  <h5 class="h6 mb-2">Our Mission</h5>
-                  <p class="small text-light mb-0">To empower businesses through innovative and reliable technology solutions.</p>
-                </div>
+
+        <!-- Benefit 2 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="bg-secondary bg-opacity-10 rounded-circle p-3 p-md-4 d-inline-flex mb-3">
+                <i class="bi bi-cash-stack text-secondary fs-2 fs-md-1"></i>
               </div>
+              <h5 class="fw-bold text-muted mb-3">Cost-Effective</h5>
+              <p class="text-light mb-0">Get enterprise-grade solutions at competitive prices with transparent pricing.</p>
             </div>
-            <div class="col-sm-6">
-              <div class="d-flex">
-                <div class="me-3">
-                  <div class="icon-wrap">
-                    <i class="bi bi-eye"></i>
+          </div>
+        </div>
+
+        <!-- Benefit 3 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="bg-success bg-opacity-10 rounded-circle p-3 p-md-4 d-inline-flex mb-3">
+                <i class="bi bi-headset text-success fs-2 fs-md-1"></i>
+              </div>
+              <h5 class="fw-bold text-muted mb-3">24/7 Support</h5>
+              <p class="text-light mb-0">Round-the-clock technical support to keep your business running smoothly.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benefit 4 -->
+        <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+          <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-body p-3 p-md-4 text-center">
+              <div class="bg-info bg-opacity-10 rounded-circle p-3 p-md-4 d-inline-flex mb-3">
+                <i class="bi bi-graph-up-arrow text-info fs-2 fs-md-1"></i>
+              </div>
+              <h5 class="fw-bold text-muted mb-3">Scalable Solutions</h5>
+              <p class="text-light mb-0">Build once, scale forever. Our solutions grow with your business needs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Competitive Advantages -->
+      <div class="row align-items-center mt-4 mt-md-5">
+        <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+          <div class="position-relative">
+            <img src="{% static 'images/about-us.jpg' %}" alt="Our Expert Team" class="img-fluid rounded-4 shadow-lg">
+            <!-- Stats Overlay -->
+            <div class="d-none d-md-block position-absolute bottom-0 start-0 m-4">
+              <div class="card border-0 shadow-lg" style="backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
+                <div class="card-body p-3">
+                  <div class="row g-3 text-center">
+                    <div class="col-4">
+                      <h4 class="fw-bold text-primary mb-0">5+</h4>
+                      <small class="text-dark">Years</small>
+                    </div>
+                    <div class="col-4">
+                      <h4 class="fw-bold text-secondary mb-0">200+</h4>
+                      <small class="text-dark">Clients</small>
+                    </div>
+                    <div class="col-4">
+                      <h4 class="fw-bold text-success mb-0">500+</h4>
+                      <small class="text-dark">Projects</small>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h5 class="h6 mb-2">Our Vision</h5>
-                  <p class="small text-light mb-0">To be the most trusted technology partner for businesses worldwide.</p>
                 </div>
               </div>
             </div>
           </div>
-  
+        </div>
+
+        <div class="col-lg-6 ps-lg-4 ps-xl-5" data-aos="fade-left">
+          <h3 class="fw-bold text-dark mb-3 mb-md-4">What Sets Us Apart</h3>
+          
+          <!-- Advantage 1 -->
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0">
+              <div class="bg-primary text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-lg fw-bold"></i>
+              </div>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold text-dark mb-2">Proven Track Record</h6>
+              <p class="text-dark mb-0">Successfully delivered 500+ projects across 15+ industries with 98% client satisfaction rate.</p>
+            </div>
+          </div>
+
+          <!-- Advantage 2 -->
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0">
+              <div class="bg-secondary text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-lg fw-bold"></i>
+              </div>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold text-dark mb-2">Expert Team</h6>
+              <p class="text-dark mb-0">Our developers average 7+ years of experience in cutting-edge technologies and best practices.</p>
+            </div>
+          </div>
+
+          <!-- Advantage 3 -->
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0">
+              <div class="bg-success text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-lg fw-bold"></i>
+              </div>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold text-dark mb-2">Agile Methodology</h6>
+              <p class="text-dark mb-0">Flexible, iterative development process that adapts to your changing business requirements.</p>
+            </div>
+          </div>
+
+          <!-- Advantage 4 -->
+          <div class="d-flex mb-4">
+            <div class="flex-shrink-0">
+              <div class="bg-info text-white rounded-circle p-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-check-lg fw-bold"></i>
+              </div>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold text-dark mb-2">Quality Assurance</h6>
+              <p class="text-dark mb-0">Rigorous testing and QA processes ensure bug-free, secure, and high-performance software.</p>
+            </div>
+          </div>
+
           <div class="mt-4">
-            <a href="/contact-us/" class="btn btn-gradient me-3">Get in Touch</a>
-            <a href="{% url 'about' %}" class="btn btn-outline-light">Learn More</a>
+            <a href="/contact-us/" class="btn btn-primary btn-lg px-5 py-3">
+              <i class="bi bi-chat-dots me-2"></i>Talk to Us
+            </a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-<!-- Featured Product -->
-<section id="featured-product" class="py-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6" data-aos="fade-right">
-        <h6 class="text-uppercase text-primary mb-3">Featured Product</h6>
-        <h2 class="display-5 fw-bold text-white mb-4">BizFlow POS</h2>
-        <p class="text-secondary mb-4">A powerful, intuitive Point of Sale system designed to streamline your business operations. Manage sales, inventory, and customers with ease.</p>
-        <ul class="list-unstyled text-light mb-4">
-          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Real-time Sales Tracking</li>
-          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Inventory Management</li>
-          <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Customer Relationship Management</li>
-        </ul>
-        <a href="{% url 'bizflow_pos_docs' %}" class="btn btn-gradient btn-lg">Learn More</a>
+<!-- How We Work Section -->
+<section id="process" class="py-4 py-md-5 bg-gray-50">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <!-- Section Header -->
+    <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+      <div class="badge bg-secondary text-white mb-3 px-3 py-2">
+        <i class="bi bi-gear-fill me-2"></i>Our Process
       </div>
-      <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
-        <img src="{% static 'images/bizflow-mockup.png' %}" alt="BizFlow POS Mockup" class="img-fluid rounded-4 shadow-lg">
+      <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">How We Work</h2>
+      <p class="lead text-dark mx-auto" style="max-width: 700px;">
+        A proven, transparent process that ensures your project is delivered on time, within budget, and exceeds expectations.
+      </p>
+    </div>
+
+    <!-- Process Steps -->
+    <div class="row g-3 g-md-4">
+      <!-- Step 1 -->
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card h-100 border-0 shadow-sm position-relative">
+          <div class="position-absolute top-0 start-50 translate-middle">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <span class="fw-bold fs-5">1</span>
+            </div>
+          </div>
+          <div class="card-body p-3 p-md-4 pt-5 mt-2 mt-md-3 text-center">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+              <i class="bi bi-chat-dots-fill text-primary fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-muted mb-3">Discovery Call</h5>
+            <p class="text-light small mb-0">We discuss your goals, challenges, and vision in a free 30-minute consultation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card h-100 border-0 shadow-sm position-relative">
+          <div class="position-absolute top-0 start-50 translate-middle">
+            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <span class="fw-bold fs-5">2</span>
+            </div>
+          </div>
+          <div class="card-body p-3 p-md-4 pt-5 mt-2 mt-md-3 text-center">
+            <div class="bg-secondary bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+              <i class="bi bi-file-earmark-text-fill text-secondary fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-muted mb-3">Proposal & Planning</h5>
+            <p class="text-light small mb-0">Receive a detailed proposal with timeline, milestones, and transparent pricing.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card h-100 border-0 shadow-sm position-relative">
+          <div class="position-absolute top-0 start-50 translate-middle">
+            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <span class="fw-bold fs-5">3</span>
+            </div>
+          </div>
+          <div class="card-body p-3 p-md-4 pt-5 mt-2 mt-md-3 text-center">
+            <div class="bg-success bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+              <i class="bi bi-code-slash text-success fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-muted mb-3">Development</h5>
+            <p class="text-light small mb-0">Agile sprints with regular updates and demos to keep you in the loop.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="card h-100 border-0 shadow-sm position-relative">
+          <div class="position-absolute top-0 start-50 translate-middle">
+            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              <span class="fw-bold fs-5">4</span>
+            </div>
+          </div>
+          <div class="card-body p-3 p-md-4 pt-5 mt-2 mt-md-3 text-center">
+            <div class="bg-info bg-opacity-10 rounded-circle p-3 d-inline-flex mb-3">
+              <i class="bi bi-rocket-takeoff-fill text-info fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-muted mb-3">Launch & Support</h5>
+            <p class="text-light small mb-0">Smooth deployment with ongoing maintenance and dedicated support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-4 mt-md-5" data-aos="fade-up">
+      <p class="text-muted mb-3">Ready to get started?</p>
+      <a href="/contact-us/" class="btn btn-primary btn-lg px-4 px-md-5 py-2 py-md-3">
+        <i class="bi bi-calendar-check me-2"></i>Schedule Your Free Consultation
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Product -->
+<section id="featured-product" class="py-4 py-md-5 bg-gray-50">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+      <div class="badge bg-secondary text-white mb-3 px-3 py-2">
+        <i class="bi bi-star-fill me-2"></i>Featured Product
+      </div>
+      <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">BizFlow POS</h2>
+      <p class="lead text-dark">A powerful, intuitive Point of Sale system designed to streamline your business operations</p>
+    </div>
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="BizFlow POS Mockup" class="img-fluid">
+        </div>
+      </div>
+      <div class="col-lg-6 ps-lg-4 ps-xl-5" data-aos="fade-left">
+        <h3 class="fw-bold mb-3 mb-md-4 text-dark">Everything You Need to Run Your Business</h3>
+        <p class="text-dark mb-3 mb-md-4">Manage sales, inventory, and customers with ease. BizFlow POS is designed for modern businesses that need reliability and speed.</p>
+        <ul class="list-unstyled mb-4">
+          <li class="mb-3 d-flex align-items-start">
+            <div class="bg-success text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-dark mb-1">Real-time Sales Tracking</h6>
+              <p class="text-dark small mb-0">Monitor your sales performance in real-time with detailed analytics</p>
+            </div>
+          </li>
+          <li class="mb-3 d-flex align-items-start">
+            <div class="bg-success text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-dark mb-1">Inventory Management</h6>
+              <p class="text-dark small mb-0">Keep track of stock levels and automate reordering</p>
+            </div>
+          </li>
+          <li class="mb-3 d-flex align-items-start">
+            <div class="bg-success text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-dark mb-1">Customer Relationship Management</h6>
+              <p class="text-dark small mb-0">Build lasting relationships with your customers</p>
+            </div>
+          </li>
+        </ul>
+        <a href="{% url 'bizflow_pos_docs' %}" class="btn btn-secondary btn-lg px-4 px-md-5 py-2 py-md-3">
+          <i class="bi bi-arrow-right-circle me-2"></i>Learn More
+        </a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Services -->
-<section id="services" class="py-5 bg-dark">
-  <div class="container">
-    <h2 class="section-title" data-aos="fade-up">Our Services</h2>
-    <div class="row g-4 mt-1">
-      <div class="col-md-6 col-lg-3" data-aos="fade-up">
+<section id="services" class="py-4 py-md-5 bg-white">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+      <div class="badge bg-primary text-white mb-3 px-3 py-2">
+        <i class="bi bi-grid-3x3-gap me-2"></i>What We Offer
+      </div>
+      <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">Our Services</h2>
+      <p class="lead text-dark">Comprehensive technology solutions tailored to your business needs</p>
+    </div>
+    <div class="row g-3 g-md-4 mt-1">
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up">
         <div class="card service-card h-100">
           <div class="banner">
             <img src="{% static 'images/customsoftware.png' %}" class="img-fluid" height="100" alt="Custom Software Development" class="img-fluid">
           </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-cpu"></i></div>
-            <h5 class="card-title text-white">Custom Software Development</h5>
-            <p class="card-text text-secondary">Robust, scalable systems tailored to your business.</p>
+            <h5 class="card-title text-dark fw-bold">Custom Software Development</h5>
+            <p class="card-text text-dark">Robust, scalable systems tailored to your business.</p>
           </div>
           <div class="footer">
-            <a href="custom-software-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+            <a href="custom-software-development/" class="btn btn-primary justify-content-center">Learn More</a>
           </div>
         </div>
       </div>
@@ -129,26 +440,26 @@
           </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-window"></i></div>
-            <h5 class="card-title text-white">Website Design & Development</h5>
-            <p class="card-text text-secondary">Beautiful, fast, and SEO-ready websites.</p>
+            <h5 class="card-title text-dark fw-bold">Website Design & Development</h5>
+            <p class="card-text text-dark">Beautiful, fast, and SEO-ready websites.</p>
           </div>
           <div class="footer">
-            <a href="web-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+            <a href="web-development/" class="btn btn-primary justify-content-center">Learn More</a>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-sm-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
         <div class="card service-card h-100">
           <div class="banner">
             <img src="{% static 'images/mobileappdev.png' %}" class="img-fluid" alt="Mobile App Development" height="100" class="img-fluid">
           </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-phone"></i></div>
-            <h5 class="card-title text-white">Mobile App Development</h5>
-            <p class="card-text text-secondary">iOS and Android apps using modern stacks.</p>
+            <h5 class="card-title text-dark fw-bold">Mobile App Development</h5>
+            <p class="card-text text-dark">iOS and Android apps using modern stacks.</p>
           </div>
           <div class="footer">
-            <a href="mobile-development/" class="btn btn-outline-light justify-content-center">Learn More</a>
+            <a href="mobile-development/" class="btn btn-primary justify-content-center">Learn More</a>
           </div>
         </div>
       </div>
@@ -159,11 +470,11 @@
           </div>
           <div class="card-body">
             <div class="icon-wrap mb-3"><i class="bi bi-journal-code"></i></div>
-            <h5 class="card-title text-white">GitHub README Writing & Editing</h5>
-            <p class="card-text text-secondary">Clear, polished documentation that stands out.</p>
+            <h5 class="card-title text-dark fw-bold">GitHub README Writing & Editing</h5>
+            <p class="card-text text-dark">Clear, polished documentation that stands out.</p>
           </div>
           <div class="footer">
-            <a href="github-readme/" class="btn btn-outline-light justify-content-center">Learn More</a>
+            <a href="github-readme/" class="btn btn-primary justify-content-center">Learn More</a>
           </div>
         </div>
       </div>
@@ -243,12 +554,18 @@
   </div>
 </section>
 -->
-<section id="portfolio" class="py-5 bg-black-50">
-  <div class="container">
-    <h2 class="section-title" data-aos="fade-up">Portfolio</h2>
-    <div class="row g-4 mt-1">
+<section id="portfolio" class="py-4 py-md-5 bg-gray-50">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+      <div class="badge bg-primary text-white mb-3 px-3 py-2">
+        <i class="bi bi-briefcase me-2"></i>Our Work
+      </div>
+      <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">Portfolio</h2>
+      <p class="lead text-dark">Explore our recent projects and success stories</p>
+    </div>
+    <div class="row g-3 g-md-4 mt-1">
       {% for project in projects %}
-      <div class="col-6 col-md-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}0">
+      <div class="col-sm-6 col-lg-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1 }}0">
         <div class="portfolio-card">
           <div class="banner">
             {% if project.image %}
@@ -286,18 +603,18 @@
       {% empty %}
       <!-- Fallback content when no projects are available -->
       <div class="col-12 text-center py-5">
-        <div class="text-muted">
-          <i class="bi bi-folder2-open fs-1 mb-3 d-block"></i>
-          <h5>No Featured Projects Yet</h5>
-          <p>We're working on some amazing projects. Check back soon!</p>
+        <div>
+          <i class="bi bi-folder2-open fs-1 mb-3 d-block text-dark"></i>
+          <h5 class="text-dark">No Featured Projects Yet</h5>
+          <p class="text-dark">We're working on some amazing projects. Check back soon!</p>
         </div>
       </div>
       {% endfor %}
     </div>
     
     {% if projects.count > 6 %}
-    <div class="text-center mt-4">
-      <a href="#" class="btn btn-outline-light">View All Projects</a>
+    <div class="text-center mt-4 mt-md-5">
+      <a href="#" class="btn btn-primary btn-lg px-4 px-md-5 py-2 py-md-3">View All Projects</a>
     </div>
     {% endif %}
   </div>

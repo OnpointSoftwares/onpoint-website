@@ -1,0 +1,30 @@
+/* 
+ * OnPoint Softwares - Color Reference Guide
+ * This file documents the color system for easy reference
+ * 
+ * PRIMARY COLORS (Blue):
+ * --primary: #1e3a8a (Deep Blue) - Use for: buttons, nav links, headings on white
+ * --primary-hover: #1e40af (Darker Blue) - Use for: hover states
+ * --primary-light: #3b82f6 (Light Blue) - Use for: gradients, accents
+ * 
+ * SECONDARY/ACCENT COLORS (Orange):
+ * --secondary: #FF6B35 (Deep Orange) - Use for: CTAs, highlights, icons
+ * --secondary-hover: #ff5722 (Darker Orange) - Use for: hover states
+ * 
+ * TEXT COLORS:
+ * --text: #111827 (Almost Black) - Use for: main body text on white/light backgrounds
+ * --text-muted: #4b5563 (Gray) - Use for: secondary text, descriptions
+ * --text-light: #374151 (Dark Gray) - Use for: less important text
+ * 
+ * BACKGROUND COLORS:
+ * --light: #ffffff (White) - Use for: main content areas, cards
+ * --gray-50: #f9fafb (Very Light Gray) - Use for: alternating sections
+ * --dark: #1f2937 (Dark Gray) - Use for: text on light backgrounds
+ * 
+ * USAGE RULES:
+ * 1. On WHITE backgrounds: Use text-dark, text-primary, text-secondary, text-muted
+ * 2. On BLUE gradients: Use text-white, text-light
+ * 3. On GRAY backgrounds: Use text-dark, text-primary
+ * 4. Buttons on white: btn-primary (blue), btn-secondary (orange)
+ * 5. Buttons on blue: btn-light (white), btn-outline-light (white outline)
+ */

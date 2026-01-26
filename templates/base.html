@@ -53,11 +53,82 @@
 </head>
 <body class="bg-light text-dark has-fixed-header">
   <!-- Header -->
-  <header class="navbar navbar-expand-lg navbar-dark position-fixed top-0 w-100 py-3 shadow-0" id="siteHeader">
-    <div class="container">
-        <a class="navbar-brand p-0 me-0 me-lg-3 d-flex align-items-center" href="#" style="text-decoration: none;">
+  <header class="navbar navbar-expand-lg navbar-light bg-white position-fixed top-0 w-100 py-3 shadow-sm border-bottom" id="siteHeader" style="z-index: 1050;">
+    <style>
+      .navbar-toggler {
+        border-color: var(--primary-color) !important;
+        border-width: 2px !important;
+      }
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%231e3a8a' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+      }
+      .navbar-toggler:hover {
+        border-color: var(--secondary-color) !important;
+      }
+      .navbar-toggler:hover .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23FF6B35' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+      }
+      
+      /* Mobile Navigation Styles */
+      @media (max-width: 991.98px) {
+        .navbar-collapse {
+          background-color: white;
+          border: 1px solid var(--gray-300);
+          border-radius: 8px;
+          padding: 1rem;
+          margin-top: 0.5rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-nav {
+          gap: 0.5rem;
+        }
+        
+        .nav-link {
+          padding: 0.75rem 1rem !important;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+          background-color: var(--primary-color);
+          color: white !important;
+        }
+        
+        .dropdown-menu {
+          background-color: var(--gray-50);
+          border: 1px solid var(--gray-300);
+          border-radius: 6px;
+          margin-top: 0.5rem;
+        }
+        
+        .dropdown-item {
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          margin: 0.25rem 0;
+        }
+        
+        .dropdown-item:hover {
+          background-color: var(--primary-color);
+          color: white;
+        }
+      }
+      
+      /* Mobile Logo Adjustments */
+      @media (max-width: 575.98px) {
+        .navbar-brand img {
+          height: 40px !important;
+        }
+        
+        .navbar {
+          padding: 1rem 0 !important;
+        }
+      }
+    </style>
+    <div class="container px-3 px-lg-4">
+        <a class="navbar-brand p-0 me-0 me-lg-3 d-flex align-items-center" href="/" style="text-decoration: none;">
             <div class="d-flex align-items-center">
-                <img src="{% static 'images/logo.png' %}" alt="OnPoint Logo" height="100" align="center" class="d-block me-2">
+                <img src="{% static 'images/logo.png' %}" alt="OnPoint Logo" height="50" class="d-block me-2" style="max-height: 50px; width: auto;">
                 <!-- <span class="d-none d-md-inline-block fs-5 fw-bold text-white brand-text">OnPoint Software Solutions</span> -->
             </div>
         </a>
@@ -66,8 +137,8 @@
       </button>
       <nav class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="/about/"><i class="bi bi-info-circle me-1"></i>About</a></li>
+          <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="/about/"><i class="bi bi-info-circle me-1"></i>About</a></li>
           <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-box-seam me-1"></i>Products</a>
             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="productsDropdown">
@@ -76,15 +147,15 @@
             </ul>
           </li>-->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear me-1"></i>Services</a>
-            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="servicesDropdown">
+            <a class="nav-link dropdown-toggle text-dark fw-semibold" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear me-1"></i>Services</a>
+            <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
               <li><a class="dropdown-item" href="{% url 'custom_software_development' %}"><i class="bi bi-cpu me-2"></i>Custom Software</a></li>
               <li><a class="dropdown-item" href="{% url 'web_development' %}"><i class="bi bi-window me-2"></i>Web Development</a></li>
               <li><a class="dropdown-item" href="{% url 'mobile_development' %}"><i class="bi bi-phone me-2"></i>Mobile Apps</a></li>
               <li><a class="dropdown-item" href="{% url 'github_readme' %}"><i class="bi bi-journal-code me-2"></i>GitHub READMEs</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a class="nav-link" href="/#portfolio"><i class="bi bi-briefcase me-1"></i>Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="/#portfolio"><i class="bi bi-briefcase me-1"></i>Portfolio</a></li>
          <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="learningDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-mortarboard me-1"></i>Learning
@@ -98,8 +169,8 @@
               </a></li>
             </ul>-->
           </li>
-          <li class="nav-item"><a class="nav-link" href="/blog/">Blog</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contact-us/">Contact</a></li>
+          <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="/blog/"><i class="bi bi-newspaper me-1"></i>Blog</a></li>
+          <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="/contact-us/"><i class="bi bi-envelope me-1"></i>Contact</a></li>
           {% if user.is_authenticated %}
           <li class="nav-item dropdown ms-lg-3">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -139,7 +210,7 @@
           </li>
           {% else %}
           <li class="nav-item ms-lg-3">
-            <a class="btn btn-primary btn-sm px-3" href="{% url 'login' %}">
+            <a class="btn btn-primary btn-sm px-4 py-2 rounded-pill" href="{% url 'login' %}">
               <i class="bi bi-box-arrow-in-right me-1"></i> Login
             </a>
           </li>
@@ -167,48 +238,100 @@
   </main>
 
   <!-- Footer -->
-  <footer class="mt-5 py-5 border-top border-secondary-subtle bg-dark">
+  <footer class="mt-5 py-5 bg-dark text-white border-top border-secondary">
     <div class="container">
-      <div class="row g-4">
-        <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
-          <h5 class="fw-bold">OnPointsoft Solutions</h5>
-          <p class="text-secondary small">Innovating Your Digital Future.</p>
+      <div class="row g-4 g-lg-5">
+        <!-- Company Info -->
+        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+          <div class="d-flex align-items-center mb-3">
+            <img src="{% static 'images/logo.png' %}" alt="OnPoint Logo" height="40" class="me-3">
+            <div>
+              <h5 class="fw-bold mb-0">OnPointsoft solutions</h5>
+              <p class="text-muted small mb-0">Innovating the Future of Technology</p>
+            </div>
+          </div>
+          <p class="text-muted mb-4">We deliver cutting-edge software solutions that transform businesses and drive digital innovation. Partner with us for excellence in technology.</p>
           <div class="d-flex gap-3">
-            <a href="#" class="text-secondary fs-5 hover-bright"><i class="bi bi-github"></i></a>
-            <a href="#" class="text-secondary fs-5 hover-bright"><i class="bi bi-linkedin"></i></a>
-            <a href="#" class="text-secondary fs-5 hover-bright"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="text-white bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='rgba(29, 78, 216, 0.1)'; this.style.transform='translateY(0)'">
+              <i class="bi bi-github"></i>
+            </a>
+            <a href="#" class="text-white bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='rgba(29, 78, 216, 0.1)'; this.style.transform='translateY(0)'">
+              <i class="bi bi-linkedin"></i>
+            </a>
+            <a href="#" class="text-white bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='rgba(29, 78, 216, 0.1)'; this.style.transform='translateY(0)'">
+              <i class="bi bi-twitter-x"></i>
+            </a>
+            <a href="#" class="text-white bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; transition: all 0.3s;" onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.backgroundColor='rgba(29, 78, 216, 0.1)'; this.style.transform='translateY(0)'">
+              <i class="bi bi-envelope"></i>
+            </a>
           </div>
         </div>
-        <div class="col-lg-2 col-6">
-          <h6 class="text-uppercase small text-secondary">Services</h6>
+        
+        <!-- Services -->
+        <div class="col-lg-2 col-md-6">
+          <h6 class="text-uppercase small fw-bold mb-3">Services</h6>
           <ul class="list-unstyled small">
-            <li><a class="text-decoration-none text-light-50" href="{% url 'custom_software_development' %}">Custom Software</a></li>
-            <li><a class="text-decoration-none text-light-50" href="{% url 'web_development' %}">Web Development</a></li>
-            <li><a class="text-decoration-none text-light-50" href="{% url 'mobile_development' %}">Mobile Apps</a></li>
-            <li><a class="text-decoration-none text-light-50" href="{% url 'github_readme' %}">GitHub READMEs</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="{% url 'custom_software_development' %}" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Custom Software</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="{% url 'web_development' %}" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Web Development</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="{% url 'mobile_development' %}" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Mobile Apps</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="{% url 'github_readme' %}" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">GitHub READMEs</a></li>
           </ul>
         </div>
-        <div class="col-lg-2 col-6">
-          <h6 class="text-uppercase small text-secondary">Company</h6>
+        
+        <!-- Company -->
+        <div class="col-lg-2 col-md-6">
+          <h6 class="text-uppercase small fw-bold mb-3">Company</h6>
           <ul class="list-unstyled small">
-            <li><a class="text-decoration-none text-light-50" href="{% url 'about' %}">About Us</a></li>
-            <li><a class="text-decoration-none text-light-50" href="/blog/">Blog</a></li>
-            <li><a class="text-decoration-none text-light-50" href="/contact-us/">Contact</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="{% url 'about' %}" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">About Us</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="/blog/" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Blog</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="/contact-us/" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Contact</a></li>
+            <li class="mb-2"><a class="text-decoration-none text-muted" href="/portfolio/" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Portfolio</a></li>
           </ul>
         </div>
-        <div class="col-lg-4 col-md-12">
-          <h6 class="text-uppercase small text-secondary">Subscribe to our newsletter</h6>
-          <p class="text-secondary small">Get the latest news, articles, and resources, sent to your inbox weekly.</p>
-          <form>
+        
+        <!-- Newsletter & Contact -->
+        <div class="col-lg-4 col-md-6">
+          <h6 class="text-uppercase small fw-bold mb-3">Stay Connected</h6>
+          <p class="text-muted mb-4">Get the latest updates, tech insights, and exclusive offers delivered to your inbox.</p>
+          <form class="mb-4">
             <div class="input-group">
-              <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Enter your email">
-              <button class="btn btn-primary" type="button">Subscribe</button>
+              <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Enter your email" style="border-color: var(--gray-600);">
+              <button class="btn btn-primary px-3 px-lg-4" type="button">Subscribe</button>
             </div>
           </form>
+          
+          <!-- Contact Info -->
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-envelope-fill text-primary me-3 flex-shrink-0"></i>
+              <a href="mailto:info@onpointsoftwares.com" class="text-muted text-decoration-none small">info@onpointsoftwares.com</a>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-telephone-fill text-primary me-3 flex-shrink-0"></i>
+              <a href="tel:+254712345678" class="text-muted text-decoration-none small">+254 702502952</a>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-geo-alt-fill text-primary me-3 flex-shrink-0"></i>
+              <span class="text-muted small">Nakuru, Kenya</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="text-center text-secondary small mt-5 pt-4 border-top border-secondary-subtle">
-        &copy; <span id="year"></span> OnPointsoft Solutions. All Rights Reserved.
+      
+      <!-- Bottom Bar -->
+      <div class="mt-5 pt-4 border-top border-secondary">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <p class="text-muted small mb-3 mb-md-0">&copy; <span id="year"></span> OnPoint Softwares. All Rights Reserved.</p>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex flex-column flex-md-row gap-2 gap-md-3 justify-content-md-end">
+              <a href="#" class="text-muted small text-decoration-none" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a>
+              <a href="#" class="text-muted small text-decoration-none" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Terms of Service</a>
+              <a href="#" class="text-muted small text-decoration-none" style="transition: color 0.3s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#9ca3af'">Cookie Policy</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </footer>

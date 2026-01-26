@@ -4,30 +4,64 @@
 
 {% block content %}
 <!-- About Us Hero -->
-<section class="hero-section position-relative overflow-hidden text-center py-5">
-  <div class="container py-5">
-    <h1 class="display-4 fw-extrabold mb-3" data-aos="fade-up">About OnPointsoft</h1>
-    <p class="lead text-secondary mb-4 mx-auto" style="max-width: 800px;" data-aos="fade-up" data-aos-delay="100">We are a passionate team of developers, designers, and strategists dedicated to innovating the future of technology.</p>
+<section class="hero-section position-relative overflow-hidden text-center py-4 py-md-5 bg-gradient-primary">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <div class="badge bg-white text-primary mb-3 px-3 py-2" data-aos="fade-up">
+      <i class="bi bi-info-circle me-2"></i>About Us
+    </div>
+    <h1 class="display-4 display-md-3 fw-extrabold mb-3 mb-md-4 text-white" data-aos="fade-up">About OnPointsoft solutions</h1>
+    <p class="lead text-white opacity-90 mb-3 mb-md-4 mx-auto" style="max-width: 800px;" data-aos="fade-up" data-aos-delay="100">From helping students achieve their dreams to empowering businesses with cutting-edge technology—our journey is your success story.</p>
   </div>
-  <div class="hero-bg-gradient"></div>
 </section>
 
 <!-- Our Story & Values -->
-<section class="py-5">
-  <div class="container">
+<section class="py-4 py-md-5 bg-white">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
     <div class="row align-items-center">
       <div class="col-lg-6" data-aos="fade-right">
-        <h2 class="section-title mb-4">Our Story</h2>
-        <p class="text-secondary">Founded by Vincent Bett, OnPointsoft Solutions started with a simple mission: to empower businesses with technology that is both powerful and easy to use. From a small team of passionate developers, we have grown into a full-service digital agency serving clients worldwide. Our journey is one of continuous learning, innovation, and a relentless commitment to our clients' success.</p>
-        <h3 class="h4 text-white mt-5 mb-4">Our Core Values</h3>
-        <div class="d-flex flex-column gap-3">
-          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-lightbulb"></i></div><div><h6 class="text-white mb-1">Innovation</h6><p class="text-secondary small mb-0">We constantly explore new technologies and ideas to deliver cutting-edge solutions.</p></div></div>
-          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-people"></i></div><div><h6 class="text-white mb-1">Customer-Centric</h6><p class="text-secondary small mb-0">Our clients are at the heart of everything we do. We build partnerships based on trust and transparency.</p></div></div>
-          <div class="d-flex align-items-start"><div class="icon-wrap me-3 flex-shrink-0"><i class="bi bi-gem"></i></div><div><h6 class="text-white mb-1">Quality</h6><p class="text-secondary small mb-0">We are committed to the highest standards of quality in our code, design, and service.</p></div></div>
+        <div class="badge bg-primary text-white mb-3 px-3 py-2">
+          <i class="bi bi-book me-2"></i>Our Story
+        </div>
+        <h2 class="display-5 display-md-4 fw-bold mb-3 mb-md-4 text-dark">Building the Future Together</h2>
+        <p class="text-dark mb-3 mb-md-4 lead">Founded by Vincent Bett in 2020, OnPointsoftware solutions started with a heartfelt mission: helping students complete their final year projects and turn their academic dreams into reality.</p>
+        <p class="text-dark mb-3 mb-md-4">What began as a passion for empowering students evolved into something bigger. By 2022, we partnered with Stairway to expand our vision—building professional websites for businesses and helping them establish their digital presence. Today, we're a proud, officially registered company (2026) serving clients worldwide with cutting-edge software solutions.</p>
+        
+        <h3 class="h4 text-dark mt-4 mt-md-5 mb-3 mb-md-4 fw-bold">Our Core Values</h3>
+        <div class="d-flex flex-column gap-3 gap-md-4">
+          <div class="d-flex align-items-start">
+            <div class="bg-primary text-white rounded-circle p-3 me-3 flex-shrink-0" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-lightbulb fs-5"></i>
+            </div>
+            <div>
+              <h6 class="text-dark mb-2 fw-bold">Innovation</h6>
+              <p class="text-dark small mb-0">We constantly explore new technologies and ideas to deliver cutting-edge solutions.</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-start">
+            <div class="bg-secondary text-white rounded-circle p-3 me-3 flex-shrink-0" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-people fs-5"></i>
+            </div>
+            <div>
+              <h6 class="text-dark mb-2 fw-bold">Customer-Centric</h6>
+              <p class="text-dark small mb-0">Our clients are at the heart of everything we do. We build partnerships based on trust and transparency.</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-start">
+            <div class="bg-success text-white rounded-circle p-3 me-3 flex-shrink-0" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-gem fs-5"></i>
+            </div>
+            <div>
+              <h6 class="text-dark mb-2 fw-bold">Quality</h6>
+              <p class="text-dark small mb-0">We are committed to the highest standards of quality in our code, design, and service.</p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-lg-6 mt-4 mt-lg-0" data-aos="fade-left">
-        <img src="{% static 'images/about-us.jpg' %}" alt="Our Team in a meeting" class="img-fluid rounded-4 shadow-lg">
+        <div class="position-relative">
+          <img src="{% static 'images/about-us.jpg' %}" alt="Our Team in a meeting" class="img-fluid rounded-4 shadow-lg">
+          <div class="position-absolute top-0 start-0 w-100 h-100 rounded-4" style="border: 3px solid var(--secondary); transform: translate(15px, 15px); z-index: -1;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -35,32 +69,70 @@
 
 
 <!-- Company Timeline -->
-<section class="py-5">
-  <div class="container">
-    <h2 class="section-title text-center mb-5" data-aos="fade-up">Our Journey</h2>
+<section class="py-4 py-md-5 bg-gray-50">
+  <div class="container py-3 py-md-5 px-3 px-md-4">
+    <div class="text-center mb-4 mb-md-5" data-aos="fade-up">
+      <div class="badge bg-secondary text-white mb-3 px-3 py-2">
+        <i class="bi bi-clock-history me-2"></i>Our Journey
+      </div>
+      <h2 class="display-5 display-md-4 fw-bold text-dark mb-3">Our Journey</h2>
+      <p class="lead text-dark">From students to businesses—a timeline of growth and innovation</p>
+    </div>
     <div class="timeline">
       <div class="timeline-item" data-aos="fade-up">
-        <div class="timeline-content">
-          <h5 class="text-white">2018 - The Beginning</h5>
-          <p class="text-secondary small">OnPointsoft Solutions is founded with the goal of making high-quality software accessible to businesses of all sizes.</p>
+        <div class="timeline-content bg-white shadow-lg rounded-4 border-0 p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-primary text-white rounded-circle p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-mortarboard-fill fs-4"></i>
+            </div>
+            <div>
+              <div class="badge bg-primary text-white mb-1">2020</div>
+              <h5 class="text-dark fw-bold mb-0">The Beginning</h5>
+            </div>
+          </div>
+          <p class="text-dark mb-0">OnPointsoft solutions was founded with a heartfelt mission: helping students complete their final year projects. We empowered countless students to turn their academic dreams into reality, providing technical expertise and guidance.</p>
         </div>
       </div>
-      <div class="timeline-item" data-aos="fade-up">
-        <div class="timeline-content">
-          <h5 class="text-white">2020 - First Major Product</h5>
-          <p class="text-secondary small">We launch BizFlow POS, our flagship Point of Sale system, helping retail businesses streamline their operations.</p>
+      <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+        <div class="timeline-content bg-white shadow-lg rounded-4 border-0 p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-secondary text-white rounded-circle p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-building fs-4"></i>
+            </div>
+            <div>
+              <div class="badge bg-secondary text-white mb-1">2022</div>
+              <h5 class="text-dark fw-bold mb-0">Partnership with Stairway</h5>
+            </div>
+          </div>
+          <p class="text-dark mb-0">A pivotal moment in our journey—we partnered with Stairway to expand our services. Together, we began building professional websites for businesses, helping them establish a strong digital presence and reach their customers online.</p>
         </div>
       </div>
-      <div class="timeline-item" data-aos="fade-up">
-        <div class="timeline-content">
-          <h5 class="text-white">2022 - Expanding Services</h5>
-          <p class="text-secondary small">Our services grow to include mobile app development and professional GitHub README writing.</p>
+      <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+        <div class="timeline-content bg-white shadow-lg rounded-4 border-0 p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-award-fill fs-4"></i>
+            </div>
+            <div>
+              <div class="badge bg-success text-white mb-1">2026</div>
+              <h5 class="text-dark fw-bold mb-0">Official Registration</h5>
+            </div>
+          </div>
+          <p class="text-dark mb-0">A major milestone—Onpointsoft Solutionsbecame officially registered by the government. This marked our transition from a passionate startup to a legitimate, recognized business committed to delivering world-class software solutions.</p>
         </div>
       </div>
-      <div class="timeline-item" data-aos="fade-up">
-        <div class="timeline-content">
-          <h5 class="text-white">Today - Innovating the Future</h5>
-          <p class="text-secondary small">We continue to push the boundaries of technology, helping our clients navigate the digital landscape with confidence.</p>
+      <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+        <div class="timeline-content bg-gradient-primary text-white shadow-lg rounded-4 border-0 p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-white text-primary rounded-circle p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-rocket-takeoff-fill fs-4"></i>
+            </div>
+            <div>
+              <div class="badge bg-white text-primary mb-1">Today & Beyond</div>
+              <h5 class="text-white fw-bold mb-0">Innovating the Future</h5>
+            </div>
+          </div>
+          <p class="text-white opacity-90 mb-0">We continue to push the boundaries of technology, serving clients worldwide with custom software, mobile apps, web development, and innovative solutions. Our mission remains the same: empowering success through technology.</p>
         </div>
       </div>
     </div>
