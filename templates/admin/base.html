@@ -343,7 +343,7 @@
 
             <!-- Main Content -->
             <div class="container-fluid py-4">
-                {% block content %}{% endblock %}
+                {% block admin_content %}{% endblock %}
             </div>
         </div>
     </div>
@@ -356,5 +356,6 @@
     <script src="{% static 'js/admin.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
+{% endblock %}
 </body>
 </html>

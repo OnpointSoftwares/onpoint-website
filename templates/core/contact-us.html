@@ -4,295 +4,896 @@
 {% block title %}Contact Us - OnPointsoft Solutions{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-5 bg-light" >
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="text-center text-white mb-5">
-                    <h1 class="display-4 fw-bold mb-3">Get In Touch</h1>
-                    <p class="lead">Ready to transform your business with cutting-edge software solutions? Let's discuss your project!</p>
-                </div>
-                
-                <!-- Success/Error Messages -->
-                {% if messages %}
-                    <div class="row justify-content-center mb-4">
-                        <div class="col-lg-8">
-                            {% for message in messages %}
-                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
-                
-                <div class="row g-4">
-                    <!-- Contact Form -->
-                    <div class="col-lg-8">
-                        <div class="card border-0 shadow-lg h-100">
-                            <div class="card-body p-5">
-                                <h3 class="card-title mb-4">
-                                    <i class="bi bi-envelope text-primary me-2"></i>Send us a Message
-                                </h3>
-                                <form method="post" id="contactForm" novalidate>
-                                    {% csrf_token %}
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="name" class="form-label">
-                                                <i class="bi bi-person me-1"></i>Full Name *
-                                            </label>
-                                            <input type="text" class="form-control" id="name" name="name" required 
-                                                   placeholder="Enter your full name" value="{{ request.POST.name|default:'' }}">
-                                            <div class="invalid-feedback">
-                                                Please provide your full name.
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="email" class="form-label">
-                                                <i class="bi bi-envelope me-1"></i>Email Address *
-                                            </label>
-                                            <input type="email" class="form-control" id="email" name="email" required 
-                                                   placeholder="your.email@example.com" value="{{ request.POST.email|default:'' }}">
-                                            <div class="invalid-feedback">
-                                                Please provide a valid email address.
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="phone" class="form-label">
-                                                <i class="bi bi-telephone me-1"></i>Phone Number
-                                            </label>
-                                            <input type="tel" class="form-control" id="phone" name="phone" 
-                                                   placeholder="+254 700 000 000" value="{{ request.POST.phone|default:'' }}">
-                                            <div class="form-text">Optional - We'll call you if needed</div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="message" class="form-label">
-                                                <i class="bi bi-chat-text me-1"></i>Message *
-                                            </label>
-                                            <textarea class="form-control" id="message" name="message" rows="5" required 
-                                                      placeholder="Tell us about your project requirements, timeline, and budget...">{{ request.POST.message|default:'' }}</textarea>
-                                            <div class="invalid-feedback">
-                                                Please provide details about your project.
-                                            </div>
-                                            <div class="form-text">
-                                                <span id="charCount">0</span>/1000 characters
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
-                                                <span class="btn-text">
-                                                    <i class="bi bi-send me-2"></i>Send Message
-                                                </span>
-                                                <span class="btn-loading d-none">
-                                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                    Sending...
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Contact Information -->
-                    <div class="col-lg-4">
-                        <div class="card border-0 shadow-lg h-100">
-                            <div class="card-body p-4">
-                                <h4 class="card-title mb-4">
-                                    <i class="bi bi-info-circle text-primary me-2"></i>Contact Information
-                                </h4>
-                                
-                                <div class="contact-info">
-                                    <div class="contact-item mb-4">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="contact-icon">
-                                                <i class="bi bi-envelope-fill text-primary"></i>
-                                            </div>
-                                            <div class="ms-3">
-                                                <h6 class="mb-1">Email</h6>
-                                                <a href="mailto:onpointinfo635@gmail.com" class="text-decoration-none">
-                                                    onpointinfo635@gmail.com
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="contact-item mb-4">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="contact-icon">
-                                                <i class="bi bi-telephone-fill text-primary"></i>
-                                            </div>
-                                            <div class="ms-3">
-                                                <h6 class="mb-1">Phone</h6>
-                                                <a href="tel:+254702502952" class="text-decoration-none">
-                                                    +254 702 502 952
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="contact-item mb-4">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="contact-icon">
-                                                <i class="bi bi-clock-fill text-primary"></i>
-                                            </div>
-                                            <div class="ms-3">
-                                                <h6 class="mb-1">Response Time</h6>
-                                                <p class="mb-0 text-muted">Within 24 hours</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="contact-item">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="contact-icon">
-                                                <i class="bi bi-geo-alt-fill text-primary"></i>
-                                            </div>
-                                            <div class="ms-3">
-                                                <h6 class="mb-1">Location</h6>
-                                                <p class="mb-0 text-muted">Kenya</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <hr class="my-4">
-                                
-                                <div class="text-center">
-                                    <h6 class="mb-3">Follow Us</h6>
-                                    <div class="social-links">
-                                        <a href="#" class="btn btn-outline-primary btn-sm me-2">
-                                            <i class="bi bi-linkedin"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-outline-primary btn-sm me-2">
-                                            <i class="bi bi-twitter"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-github"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Contact Us Hero -->
+<section class="position-relative overflow-hidden bg-gradient-subtle">
+  <div class="container py-5">
+    <div class="row align-items-center min-vh-90">
+      <div class="col-lg-6 mb-5 mb-lg-0">
+        <div class="pe-lg-5">
+          <div class="badge-modern mb-4" data-aos="fade-up">
+            <i class="bi bi-chat-dots me-2"></i>Let's Connect
+          </div>
+          <h1 class="display-3 fw-bold text-dark mb-4 letter-spacing-tight" data-aos="fade-up" data-aos-delay="100">
+            Let's Build Something
+            <span class="text-gradient">Amazing Together</span>
+          </h1>
+          <p class="lead text-secondary mb-5 fs-5" data-aos="fade-up" data-aos-delay="200">
+            Whether you have a project in mind or just want to chat about possibilities, we're here to help turn your vision into reality.
+          </p>
+          <div class="d-flex flex-wrap gap-4 mb-5" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-pill">
+              <div class="feature-icon bg-success">
+                <i class="bi bi-clock-fill"></i>
+              </div>
+              <span>Quick Response</span>
             </div>
+            <div class="feature-pill">
+              <div class="feature-icon bg-primary">
+                <i class="bi bi-people-fill"></i>
+              </div>
+              <span>Expert Team</span>
+            </div>
+            <div class="feature-pill">
+              <div class="feature-icon bg-warning">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <span>Trusted Partner</span>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="position-relative" data-aos="fade-left" data-aos-delay="200">
+          <div class="floating-card">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                 alt="Contact" class="img-fluid rounded-4 shadow-2xl">
+            <div class="floating-badge">
+              <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+              <span>Available Now</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- Contact Form Section -->
+<section class="py-6 bg-light-subtle">
+  <div class="container">
+    <!-- Success/Error Messages -->
+    {% if messages %}
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8">
+        {% for message in messages %}
+        <div class="alert-modern alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">
+          <div class="alert-icon">
+            <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+          </div>
+          <div class="alert-content">
+            <p class="mb-0">{{ message }}</p>
+          </div>
+          <button type="button" class="alert-close" data-bs-dismiss="alert">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="row g-5">
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        <div class="card-modern" data-aos="fade-right">
+          <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-dark mb-3">Send Us a Message</h2>
+            <p class="text-secondary">We typically respond within 24 hours</p>
+          </div>
+          
+          <form method="post" id="contactForm" novalidate>
+            {% csrf_token %}
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="form-group-modern">
+                  <input type="text" class="form-control-modern" id="name" name="name" required 
+                         placeholder=" " value="{{ request.POST.name|default:'' }}">
+                  <label for="name" class="form-label-modern">
+                    <span>Full Name</span>
+                    <span class="text-danger ms-1">*</span>
+                  </label>
+                  <div class="invalid-feedback-modern">
+                    <i class="bi bi-exclamation-circle me-1"></i>Please enter your name
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-group-modern">
+                  <input type="email" class="form-control-modern" id="email" name="email" required 
+                         placeholder=" " value="{{ request.POST.email|default:'' }}">
+                  <label for="email" class="form-label-modern">
+                    <span>Email Address</span>
+                    <span class="text-danger ms-1">*</span>
+                  </label>
+                  <div class="invalid-feedback-modern">
+                    <i class="bi bi-exclamation-circle me-1"></i>Please enter a valid email
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-group-modern">
+                  <input type="tel" class="form-control-modern" id="phone" name="phone" 
+                         placeholder=" " value="{{ request.POST.phone|default:'' }}">
+                  <label for="phone" class="form-label-modern">
+                    <span>Phone Number</span>
+                    <span class="text-muted ms-1">(Optional)</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-group-modern">
+                  <textarea class="form-control-modern textarea-modern" id="message" name="message" 
+                            required placeholder=" " rows="5">{{ request.POST.message|default:'' }}</textarea>
+                  <label for="message" class="form-label-modern">
+                    <span>Your Message</span>
+                    <span class="text-danger ms-1">*</span>
+                  </label>
+                  <div class="invalid-feedback-modern">
+                    <i class="bi bi-exclamation-circle me-1"></i>Please enter your message
+                  </div>
+                  <div class="char-counter">
+                    <span id="charCount">0</span> / 1000
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <button type="submit" class="btn-modern btn-modern-primary w-100" id="submitBtn">
+                  <span class="btn-content">
+                    <i class="bi bi-send me-2"></i>
+                    <span>Send Message</span>
+                  </span>
+                  <span class="btn-loading">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span>Sending...</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="col-lg-4">
+        <div class="sticky-lg-top" style="top: 2rem;">
+          <!-- Contact Cards -->
+          <div class="contact-info-card mb-4" data-aos="fade-left">
+            <h3 class="h5 fw-bold text-dark mb-4">Contact Information</h3>
+            
+            <a href="mailto:onpointsoftsolutions@gmail.com" class="info-item">
+              <div class="info-icon bg-gradient-primary">
+                <i class="bi bi-envelope-fill"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Email</span>
+                <span class="info-value">onpointsoftsolutions@gmail.com</span>
+              </div>
+              <i class="bi bi-arrow-right info-arrow"></i>
+            </a>
+            
+            <a href="tel:+254702502952" class="info-item">
+              <div class="info-icon bg-gradient-success">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Phone</span>
+                <span class="info-value">+254 702 502 952</span>
+              </div>
+              <i class="bi bi-arrow-right info-arrow"></i>
+            </a>
+            
+            <div class="info-item">
+              <div class="info-icon bg-gradient-warning">
+                <i class="bi bi-geo-alt-fill"></i>
+              </div>
+              <div class="info-content">
+                <span class="info-label">Location</span>
+                <span class="info-value">Nakuru, Kenya</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Business Hours -->
+          <div class="contact-info-card" data-aos="fade-left" data-aos-delay="100">
+            <h3 class="h5 fw-bold text-dark mb-4">Business Hours</h3>
+            
+            <div class="hours-list">
+              <div class="hours-item">
+                <span class="day">Monday - Friday</span>
+                <span class="time">9:00 AM - 6:00 PM</span>
+              </div>
+              <div class="hours-item">
+                <span class="day">Saturday</span>
+                <span class="time">10:00 AM - 4:00 PM</span>
+              </div>
+              <div class="hours-item">
+                <span class="day">Sunday</span>
+                <span class="time text-muted">Closed</span>
+              </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+              <h6 class="text-dark fw-semibold mb-3">Follow Us</h6>
+              <div class="social-links">
+                <a href="#" class="social-link">
+                  <i class="bi bi-linkedin"></i>
+                </a>
+                <a href="#" class="social-link">
+                  <i class="bi bi-twitter-x"></i>
+                </a>
+                <a href="#" class="social-link">
+                  <i class="bi bi-github"></i>
+                </a>
+                <a href="#" class="social-link">
+                  <i class="bi bi-instagram"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-6 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-6 fw-bold text-dark mb-3">Visit Our Office</h2>
+      <p class="text-secondary">We'd love to meet you in person</p>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="map-card" data-aos="zoom-in">
+          <div class="map-placeholder">
+            <div class="map-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <h4 class="text-dark mb-2">OnPointsoft Solutions</h4>
+            <p class="text-secondary mb-4">Nakuru, Kenya</p>
+            <a href="https://maps.google.com" target="_blank" class="btn-modern btn-modern-outline">
+              <i class="bi bi-map me-2"></i>Get Directions
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <style>
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --dark: #1f2937;
+  --secondary: #6b7280;
+  --light: #f9fafb;
+  --border: #e5e7eb;
+}
 
-.alert {
-    animation: slideInDown 0.5s ease-out;
+/* Background Gradients */
+.bg-gradient-subtle {
+  background: linear-gradient(135deg, #f9fafb 0%, #fff 100%);
+}
+
+.bg-light-subtle {
+  background: linear-gradient(180deg, #f9fafb 0%, #fff 100%);
+}
+
+/* Typography */
+.letter-spacing-tight {
+  letter-spacing: -0.02em;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Badge Modern */
+.badge-modern {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 58, 138, 0.1) 100%);
+  color: var(--primary);
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Feature Pills */
+.feature-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border-radius: 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.feature-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.feature-icon.bg-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.feature-icon.bg-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+}
+
+.feature-icon.bg-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.feature-pill span {
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 0.9rem;
+}
+
+/* Floating Card */
+.floating-card {
+  position: relative;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.floating-badge {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  color: var(--dark);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Modern Card */
+.card-modern {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+/* Alert Modern */
+.alert-modern {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  animation: slideInDown 0.4s ease-out;
 }
 
 @keyframes slideInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-modern.alert-success {
+  border-left: 4px solid var(--success);
+}
+
+.alert-modern.alert-danger {
+  border-left: 4px solid var(--danger);
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+}
+
+.alert-success .alert-icon {
+  color: var(--success);
+}
+
+.alert-danger .alert-icon {
+  color: var(--danger);
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.2s;
+}
+
+.alert-close:hover {
+  color: var(--dark);
+}
+
+/* Form Modern */
+.form-group-modern {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-control-modern {
+  width: 100%;
+  padding: 1rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+  color: var(--dark);
+}
+
+.form-control-modern:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.form-control-modern.is-invalid {
+  border-color: var(--danger);
+}
+
+.form-control-modern.is-valid {
+  border-color: var(--success);
+}
+
+.form-label-modern {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  color: var(--secondary);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: white;
+  padding: 0 0.25rem;
+}
+
+.form-control-modern:focus ~ .form-label-modern,
+.form-control-modern:not(:placeholder-shown) ~ .form-label-modern {
+  top: -0.625rem;
+  font-size: 0.875rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.textarea-modern {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.invalid-feedback-modern {
+  display: none;
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.form-control-modern.is-invalid ~ .invalid-feedback-modern {
+  display: block;
+}
+
+.char-counter {
+  position: absolute;
+  bottom: -1.75rem;
+  right: 0;
+  font-size: 0.875rem;
+  color: var(--secondary);
+}
+
+/* Button Modern */
+.btn-modern {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.btn-modern-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-modern-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+}
+
+.btn-modern-primary:active {
+  transform: translateY(0);
+}
+
+.btn-modern-outline {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-modern-outline:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-loading {
+  display: none;
+}
+
+#submitBtn.loading .btn-content {
+  display: none;
+}
+
+#submitBtn.loading .btn-loading {
+  display: flex;
+}
+
+/* Contact Info Card */
+.contact-info-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  background: var(--light);
+}
+
+.info-item:hover {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+}
+
+.info-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.info-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.info-value {
+  color: var(--dark);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.info-arrow {
+  color: var(--secondary);
+  font-size: 1.25rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+a.info-item:hover .info-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* Hours List */
+.hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hours-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.hours-item .day {
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.hours-item .time {
+  color: var(--dark);
+  font-weight: 600;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.social-link {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--light);
+  color: var(--dark);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1.25rem;
+}
+
+.social-link:hover {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+/* Map Card */
+.map-card {
+  background: white;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+.map-placeholder {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #f9fafb 0%, #fff 100%);
+}
+
+.map-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+}
+
+/* Utilities */
+.py-6 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.min-vh-90 {
+  min-height: 90vh;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .card-modern {
+    padding: 2rem;
+  }
+  
+  .py-6 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  .feature-pill {
+    font-size: 0.875rem;
+  }
+  
+  .floating-card {
+    animation: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .display-3 {
+    font-size: 2.5rem;
+  }
+  
+  .card-modern {
+    padding: 1.5rem;
+  }
+  
+  .badge-modern {
+    font-size: 0.75rem;
+    padding: 0.375rem 1rem;
+  }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('contactForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const messageTextarea = document.getElementById('message');
-    const charCount = document.getElementById('charCount');
+  const form = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const messageTextarea = document.getElementById('message');
+  const charCount = document.getElementById('charCount');
+  
+  // Character count
+  function updateCharCount() {
+    const count = messageTextarea.value.length;
+    charCount.textContent = count;
     
-    // Character count for message
-    function updateCharCount() {
-        const count = messageTextarea.value.length;
-        charCount.textContent = count;
-        
-        if (count > 1000) {
-            charCount.style.color = '#dc3545';
-            messageTextarea.classList.add('is-invalid');
-        } else {
-            charCount.style.color = '#6c757d';
-            messageTextarea.classList.remove('is-invalid');
-        }
+    if (count > 1000) {
+      messageTextarea.classList.add('is-invalid');
+    } else {
+      messageTextarea.classList.remove('is-invalid');
+    }
+  }
+  
+  messageTextarea.addEventListener('input', updateCharCount);
+  updateCharCount();
+  
+  // Form validation
+  form.addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+    
+    let isValid = true;
+    
+    // Clear previous states
+    form.querySelectorAll('.form-control-modern').forEach(input => {
+      input.classList.remove('is-invalid', 'is-valid');
+    });
+    
+    // Validate name
+    if (!name) {
+      document.getElementById('name').classList.add('is-invalid');
+      isValid = false;
+    } else {
+      document.getElementById('name').classList.add('is-valid');
     }
     
-    messageTextarea.addEventListener('input', updateCharCount);
-    updateCharCount(); // Initial count
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      document.getElementById('email').classList.add('is-invalid');
+      isValid = false;
+    } else {
+      document.getElementById('email').classList.add('is-valid');
+    }
     
-    // Form validation
-    form.addEventListener('submit', function(e) {
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const message = document.getElementById('message').value.trim();
-        
-        let isValid = true;
-        
-        // Clear previous validation states
-        form.querySelectorAll('.form-control').forEach(input => {
-            input.classList.remove('is-invalid', 'is-valid');
-        });
-        
-        // Validate name
-        if (!name) {
-            document.getElementById('name').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('name').classList.add('is-valid');
-        }
-        
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-            document.getElementById('email').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('email').classList.add('is-valid');
-        }
-        
-        // Validate message
-        if (!message) {
-            document.getElementById('message').classList.add('is-invalid');
-            isValid = false;
-        } else if (message.length > 1000) {
-            document.getElementById('message').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('message').classList.add('is-valid');
-        }
-        
-        if (!isValid) {
-            e.preventDefault();
-            // Focus on first invalid field
-            const firstInvalid = form.querySelector('.is-invalid');
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-            return;
-        }
-        
-        // Show loading state
-        const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoading = submitBtn.querySelector('.btn-loading');
-        
-        btnText.classList.add('d-none');
-        btnLoading.classList.remove('d-none');
-        submitBtn.disabled = true;
-    });
+    // Validate message
+    if (!message || message.length > 1000) {
+      document.getElementById('message').classList.add('is-invalid');
+      isValid = false;
+    } else {
+      document.getElementById('message').classList.add('is-valid');
+    }
     
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
-    });
+    if (!isValid) {
+      e.preventDefault();
+      const firstInvalid = form.querySelector('.is-invalid');
+      if (firstInvalid) firstInvalid.focus();
+      return;
+    }
+    
+    // Show loading state
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+  });
+  
+  // Auto-dismiss alerts
+  const alerts = document.querySelectorAll('.alert-modern');
+  alerts.forEach(alert => {
+    setTimeout(() => {
+      alert.style.animation = 'slideOutUp 0.4s ease-out';
+      setTimeout(() => alert.remove(), 400);
+    }, 5000);
+  });
 });
 </script>
 {% endblock %}
